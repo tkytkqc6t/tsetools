@@ -1,4 +1,4 @@
 # Required Python packages for tsetools
 Flask
-werkzeug.utils
+Werkzeug
 setuptools
