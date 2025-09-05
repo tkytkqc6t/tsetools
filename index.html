@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="static/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSE Tools Suite v1.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-gray-50 font-figtree" style="font-family: 'Figtree', 'Inter', system-ui, sans-serif;">
+    <!-- Header -->
+    <header class="shadow-lg border-b border-blue-500/20 sticky top-0 z-30"
+        style="background-color: #25c9d0; color: #111; font-family: figtree;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="color: #111;">
+            <div class="flex justify-between items-center h-20">
+
+                <!-- Logo + Title -->
+                <div class="flex items-center cursor-pointer" onclick="showSection('welcome')">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                        <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-2xl font-bold">TSE Tools Suite (v1.0)</h1>
+                        <p class="text-sm font-medium">Daily Used Tools</p>
+                    </div>
+                </div>
+
+                <!-- Navigation with dropdowns -->
+                <nav class="hidden md:flex items-center space-x-8 ml-10">
+                    <!-- Home -->
+                    <a href="#" onclick="showSection('welcome')"
+                        class="text-2xl font-bold text-black hover:bg-transparent flex items-center uppercase sidebar-menu-link" style="font-size: 1.2em; color:#111"
+                        style="background-color: #25c9d0; color: #111">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            style="color: #111">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
+                        </svg>
+                        Home
+                    </a>
+
+                    <!-- Beautifier Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('beautifierMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                            </svg>
+                            Beautifier
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="beautifierMenu" class="absolute left-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg hidden">
+                            <a href="#" onclick="showSection('xml'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">XML</a>
+                            <a href="#" onclick="showSection('json'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON</a>
+                            <a href="#" onclick="showSection('html'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">HTML</a>
+                        </div>
+                    </div>
+
+                    <!-- Converter Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('converterMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            Converter
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="converterMenu"
+                            class="absolute left-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg hidden">
+                            <a href="#" onclick="showSection('timezone'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">Timezone</a>
+                            <a href="#" onclick="showSection('json-csv'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON → CSV</a>
+                            <a href="#" onclick="showSection('xml-csv'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">XML → CSV</a>
+                        </div>
+                    </div>
+
+                    <!-- Data Filters Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleDropdown('filtersMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                            </svg>
+                            Data Filters
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="filtersMenu"
+                            class="absolute left-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg hidden">
+                            <a href="#" onclick="showSection('json-filter'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Filter from JSON</a>
+                            <a href="#" onclick="showSection('xml-filter'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Filter from XML</a>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto">
+                            <div style="position: relative; width: 220px;">
+                                <svg class="w-5 h-5 text-black mr-2 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                <input type="text" placeholder="Search tools..." 
+                                             class="bg-transparent text-black placeholder-grey text-sm focus:outline-none w-full pl-12 py-2 rounded-lg"
+                                             id="searchInput" autocomplete="off" onkeyup="searchTools()" oninput="searchTools()">
+                                <div id="searchDropdown" class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"></div>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="flex h-screen pt-2 ml-8 mr-8">
+        <!-- Main Content -->
+        <main class="flex-1 p-8">
+            <!-- Welcome Section (Default) -->
+            <div id="welcome" class="section">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to TSE Tools Suite</h2>
+                    <p class="text-lg text-gray-600 mb-6">Your comprehensive toolkit for data processing, formatting,
+                        and conversion. Get started by selecting a tool from the menu or searching for it.
+                        <ul class="text-lg text-gray-600 mb-6 space-y-4">
+                            <li>• All-in-One Convenience – multiple tools, all on a single page</li>
+                            <li>• Privacy First – no data leaks, fully secure</li>
+                            <li>• Fast & Effortless – smooth, seamless experience</li>
+                        </ul></p>
+                </div>
+
+                <!-- Feature Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div
+                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                        <div class="flex items-center mb-4">
+                            <div class="p-2 bg-blue-100 rounded-lg">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Code Beautifiers</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">Format and beautify your XML, JSON, and HTML code with
+                            proper indentation and validation.</p>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>• XML Formatter with validation</li>
+                            <li>• JSON Beautifier with error detection</li>
+                            <li>• HTML Formatter with syntax checking</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                        <div class="flex items-center mb-4">
+                            <div class="p-2 bg-green-100 rounded-lg">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Data Converters</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">Convert between different data formats and handle timezone
+                            conversions with ease.</p>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>• Multi-timezone converter (up to 5 zones)</li>
+                            <li>• JSON to CSV conversion</li>
+                            <li>• XML to CSV with attribute support</li>
+                        </ul>
+                    </div>
+
+                    <div
+                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                        <div class="flex items-center mb-4">
+                            <div class="p-2 bg-purple-100 rounded-lg">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Advanced Filters</h3>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">Filter and query your JSON and XML data with powerful
+                            condition-based filtering.</p>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>• JSON data filtering with multiple conditions</li>
+                            <li>• XML element and attribute filtering</li>
+                            <li>• AND/OR logic operators</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quick Start Guide -->
+                <div class="rounded-lg p-6 border" style="border-color: #25c9d0; background-color: #ccf4f3;">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">🚀 Quick Start Guide</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-2">Getting Started</h4>
+                            <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                                <li>Choose a tool from the sidebar menu</li>
+                                <li>Paste your data or upload a file</li>
+                                <li>Configure any options if needed</li>
+                                <li>Click the action button to process</li>
+                                <li>Download or copy your results</li>
+                            </ol>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-2">Pro Tips</h4>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>• Use drag & drop for file uploads</li>
+                                <li>• All tools support large files (up to 1GB)</li>
+                                <li>• Results are processed locally for privacy</li>
+                                <li>• Use the search bar to quickly find tools</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- XML Beautifier Section -->
+            <div id="xml" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Beautifier</h2>
+                    <p class="text-gray-600">Format and beautify your XML code.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                            <textarea id="xmlInput"
+                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your XML here..."><root><item id="1"><name>Example</name><value>123</value></item><item id="2"><name>Another</name><value>456</value></item></root></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted XML</label>
+                            <textarea id="xmlOutput"
+                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="Formatted XML will appear here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="beautifyXML()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Beautify XML
+                        </button>
+                        <button onclick="clearXML()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON Beautifier Section -->
+            <div id="json" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Beautifier</h2>
+                    <p class="text-gray-600">Format and validate your JSON data.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+                            <textarea id="jsonInput"
+                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your JSON here...">{"name":"John","age":30,"city":"New York","hobbies":["reading","swimming","coding"]}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted JSON</label>
+                            <textarea id="jsonOutput"
+                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="Formatted JSON will appear here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="beautifyJSON()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Beautify JSON
+                        </button>
+                        <button onclick="clearJSON()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HTML Beautifier Section -->
+            <div id="html" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">HTML Beautifier</h2>
+                    <p class="text-gray-600">Format and beautify your HTML code.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input HTML</label>
+                            <textarea id="htmlInput"
+                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your HTML here..."><div><h1>Title</h1><p>This is a paragraph with <a href="#">a link</a> inside.</p><ul><li>Item 1</li><li>Item 2</li></ul></div></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted HTML</label>
+                            <textarea id="htmlOutput"
+                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="Formatted HTML will appear here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="beautifyHTML()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Beautify HTML
+                        </button>
+                        <button onclick="clearHTML()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Timezone Converter Section -->
+            <div id="timezone" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Timezone Converter</h2>
+                    <p class="text-gray-600">Convert time between different timezones (up to 5 at once).</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <!-- Source Time Input -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Source Timezone</label>
+                            <select id="sourceTimezone"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Timezone options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date & Time</label>
+                            <input type="datetime-local" id="inputDateTime"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Target Timezones -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="block text-sm font-medium text-gray-700">Convert To (Select up to 5
+                                timezones)</label>
+                            <button onclick="addTimezoneConverter()" id="addTimezoneBtn"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                + Add Timezone
+                            </button>
+                        </div>
+                        <div id="timezoneConverters" class="space-y-3">
+                            <!-- Timezone converters will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button onclick="convertAllTimezones()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Convert All
+                        </button>
+                        <button onclick="setCurrentTime()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Use Current Time
+                        </button>
+                        <button onclick="clearAllTimezones()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear All
+                        </button>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="conversionResults" class="space-y-3">
+                        <!-- Conversion results will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON to CSV Converter Section -->
+            <div id="json-csv" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON to CSV Converter</h2>
+                    <p class="text-gray-600">Convert JSON data to CSV format. Upload a file or paste JSON directly.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+
+                            <!-- File Upload Area -->
+                            <div class="mb-4">
+                                <form id="jsonUploadForm" enctype="multipart/form-data">
+                                    <div class="flex items-center gap-3">
+                                        <input type="file" id="jsonFileInput" name="file" accept=".json,.txt" class="hidden" multiple>
+                                        <button type="button" onclick="document.getElementById('jsonFileInput').click()"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                            📁 Upload JSON Files
+                                        </button>
+                                        <span class="text-sm text-gray-500">or paste JSON below</span>
+                                    </div>
+                                    <div id="uploadProgress" class="w-full bg-gray-200 rounded h-2 mt-2 hidden">
+                                        <div id="uploadProgressBar" class="bg-blue-600 h-2 rounded" style="width:0%"></div>
+                                    </div>
+                                    <div id="uploadStatus" class="mt-2 text-sm hidden"></div>
+                                </form>
+                            </div>
+
+                            <!-- Drag and Drop Area -->
+                            <div id="dropZone"
+                                class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
+                                onclick="document.getElementById('jsonFileInput').click()">
+                                <div class="text-gray-500">
+                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                    <p class="text-sm">Drag and drop JSON file here</p>
+                                    <p class="text-xs text-gray-400">Supports .JSON file up to 1GB</p>
+                                </div>
+                            </div>
+
+                            <textarea id="jsonCsvInput"
+                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your JSON array here...">[
+  {"name": "John", "age": 30, "city": "New York"},
+  {"name": "Jane", "age": 25, "city": "Los Angeles"},
+  {"name": "Bob", "age": 35, "city": "Chicago"}
+]</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
+                            <textarea id="csvOutput"
+                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="CSV data will appear here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button onclick="convertJsonToCsv()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Convert to CSV
+                        </button>
+                        <button onclick="downloadCsv()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                            Download CSV
+                        </button>
+                        <button onclick="clearJsonCsv()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XML to CSV Converter Section -->
+            <div id="xml-csv" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML to CSV Converter</h2>
+                    <p class="text-gray-600">Convert XML data to CSV format. Upload a file or paste XML directly.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+
+                            <!-- File Upload Area -->
+                            <div class="mb-4">
+                                <div class="flex items-center gap-3">
+                                    <input type="file" id="xmlFileInput" accept=".xml,.txt" class="hidden"
+                                        onchange="handleXmlFileUpload(event)">
+                                    <button onclick="document.getElementById('xmlFileInput').click()"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                        📁 Upload XML File
+                                    </button>
+                                    <span class="text-sm text-gray-500">or paste XML below</span>
+                                </div>
+                                <div id="xmlUploadStatus" class="mt-2 text-sm hidden"></div>
+                            </div>
+
+                            <!-- Drag and Drop Area -->
+                            <div id="xmlDropZone"
+                                class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer"
+                                onclick="document.getElementById('xmlFileInput').click()">
+                                <div class="text-gray-500">
+                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                    <p class="text-sm">Drag and drop XML file here</p>
+                                    <p class="text-xs text-gray-400">Supports .XML file up to 1GB</p>
+                                </div>
+                            </div>
+
+                            <textarea id="xmlCsvInput"
+                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your XML here..."><users>
+  <user id="1">
+    <name>John</name>
+    <age>30</age>
+    <city>New York</city>
+    <active>true</active>
+  </user>
+  <user id="2">
+    <name>Jane</name>
+    <age>25</age>
+    <city>Los Angeles</city>
+    <active>false</active>
+  </user>
+  <user id="3">
+    <name>Bob</name>
+    <age>35</age>
+    <city>Chicago</city>
+    <active>true</active>
+  </user>
+</users></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
+                            <textarea id="xmlCsvOutput"
+                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="CSV data will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Configuration Options -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Conversion Options</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Root Element (optional)</label>
+                                <input type="text" id="xmlRootElement"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                    placeholder="e.g., user, item, record" value="user">
+                                <p class="text-xs text-gray-500 mt-1">Specify which elements to convert to rows</p>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="includeAttributes" class="mr-2" checked>
+                                <label class="text-sm text-gray-600">Include XML attributes as columns</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="convertXmlToCsv()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Convert to CSV
+                        </button>
+                        <button onclick="downloadXmlCsv()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                            Download CSV
+                        </button>
+                        <button onclick="clearXmlCsv()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON Filter Section -->
+            <div id="json-filter" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Data Filter</h2>
+                    <p class="text-gray-600">Filter JSON data by field values with advanced conditions.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+                            <!-- File Upload & Drag-and-Drop Area -->
+                            <div class="mb-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <input type="file" id="jsonFilterFileInput" accept=".json,.txt" class="hidden"
+                                        onchange="handleJsonFilterFileUpload(event)">
+                                    <button onclick="document.getElementById('jsonFilterFileInput').click()"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                        📁 Upload JSON File
+                                    </button>
+                                    <span class="text-sm text-gray-500">or paste/drag JSON below</span>
+                                </div>
+                                <div id="jsonFilterDropZone"
+                                    class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer text-gray-500">
+                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                    <p class="text-sm text-gray-500">Drag and drop XML file here</p>
+                                    <p class="text-xs text-gray-400">Supports .XML file up to 1GB</p>
+                                </div>
+                                <div id="jsonFilterUploadStatus" class="mt-2 text-sm hidden"></div>
+                            </div>
+                            <textarea id="jsonFilterInput"
+                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your JSON data here...">{
+  "users": [
+    {"name": "John", "age": 30, "city": "New York", "active": true, "salary": 75000, "department": "Engineering"},
+    {"name": "Jane", "age": 25, "city": "Los Angeles", "active": false, "salary": 65000, "department": "Marketing"},
+    {"name": "Bob", "age": 35, "city": "Chicago", "active": true, "salary": 85000, "department": "Engineering"},
+    {"name": "Alice", "age": 28, "city": "New York", "active": true, "salary": 70000, "department": "Sales"},
+    {"name": "Charlie", "age": 32, "city": "Boston", "active": true, "salary": 90000, "department": "Engineering"},
+    {"name": "Diana", "age": 29, "city": "Seattle", "active": false, "salary": 68000, "department": "Marketing"}
+  ]
+}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
+                            <textarea id="jsonFilterOutput"
+                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="Filtered data will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Filter Configuration -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
+                            <button onclick="addJsonFilterField()" id="addJsonFilterBtn"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                + Add Filter
+                            </button>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 mb-2">Data Array Path</label>
+                            <input type="text" id="jsonArrayPath"
+                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                placeholder="e.g., users, data, items" value="users">
+                            <p class="text-xs text-gray-500 mt-1">Path to the array you want to filter</p>
+                        </div>
+
+                        <div id="jsonFilterFields" class="space-y-3">
+                            <!-- Filter fields will be added here -->
+                        </div>
+
+                        <div class="mt-4 flex items-center gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
+                                <select id="jsonLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
+                                    <option value="AND">AND (all conditions must match)</option>
+                                    <option value="OR">OR (any condition can match)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="applyJsonFilter()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Apply Filter
+                        </button>
+                        <button onclick="downloadJsonFilter()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                            Download Result
+                        </button>
+                        <button onclick="clearJsonFilter()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XML Filter Section -->
+            <div id="xml-filter" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Data Filter</h2>
+                    <p class="text-gray-600">Filter XML data by element and attribute values with advanced conditions.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                            <!-- File Upload & Drag-and-Drop Area -->
+                            <div class="mb-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <input type="file" id="xmlFilterFileInput" accept=".xml,.txt" class="hidden"
+                                        onchange="handleXmlFilterFileUpload(event)">
+                                    <button onclick="document.getElementById('xmlFilterFileInput').click()"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                        📁 Upload XML File
+                                    </button>
+                                    <span class="text-sm text-gray-500">or paste/drag XML below (up to 1GB)</span>
+                                </div>
+                                <div id="xmlFilterDropZone"
+                                    class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer">
+                                    <div class="text-gray-500">
+                                        <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                            </path>
+                                        </svg>
+                                        <p class="text-sm">Drag and drop XML file here</p>
+                                        <p class="text-xs text-gray-400">Supports .XML file up to 1GB</p>
+                                    </div>
+                                </div>
+                                <div id="xmlFilterUploadStatus" class="mt-2 text-sm hidden"></div>
+                            </div>
+                            <textarea id="xmlFilterInput"
+                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                placeholder="Paste your XML data here..."><users>
+    <user id="1" active="true">
+        <name>John</name>
+        <age>30</age>
+        <city>New York</city>
+        <salary>75000</salary>
+        <department>Engineering</department>
+    </user>
+    <user id="2" active="false">
+        <name>Jane</name>
+        <age>25</age>
+        <city>Los Angeles</city>
+        <salary>65000</salary>
+        <department>Marketing</department>
+    </user>
+    <user id="3" active="true">
+        <name>Bob</name>
+        <age>35</age>
+        <city>Chicago</city>
+        <salary>85000</salary>
+        <department>Engineering</department>
+    </user>
+    <user id="4" active="true">
+        <name>Alice</name>
+        <age>28</age>
+        <city>New York</city>
+        <salary>70000</salary>
+        <department>Sales</department>
+    </user>
+    <user id="5" active="true">
+        <name>Charlie</name>
+        <age>32</age>
+        <city>Boston</city>
+        <salary>90000</salary>
+        <department>Engineering</department>
+    </user>
+</users></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
+                            <textarea id="xmlFilterOutput"
+                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                readonly placeholder="Filtered data will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Filter Configuration -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
+                            <button onclick="addXmlFilterField()" id="addXmlFilterBtn"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                + Add Filter
+                            </button>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm text-gray-600 mb-2">Element Name</label>
+                            <input type="text" id="xmlElementName"
+                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                placeholder="e.g., user, item, record" value="user">
+                            <p class="text-xs text-gray-500 mt-1">Name of the XML elements to filter</p>
+                        </div>
+
+                        <div id="xmlFilterFields" class="space-y-3">
+                            <!-- Filter fields will be added here -->
+                        </div>
+
+                        <div class="mt-4 flex items-center gap-4">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
+                                <select id="xmlLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
+                                    <option value="AND">AND (all conditions must match)</option>
+                                    <option value="OR">OR (any condition can match)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button onclick="applyXmlFilter()"
+                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                            onmouseout="this.style.backgroundColor='#25c9d0'">
+                            Apply Filter
+                        </button>
+                        <button onclick="downloadXmlFilter()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                            Download Result
+                        </button>
+                        <button onclick="clearXmlFilter()"
+                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Dashboard</h2>
+                    <p class="text-gray-600">Welcome back! Here's what's happening with your projects today.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-blue-100 rounded-lg">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                <p class="text-2xl font-bold text-gray-900">2,847</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-green-100 rounded-lg">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Revenue</p>
+                                <p class="text-2xl font-bold text-gray-900">$45,231</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-yellow-100 rounded-lg">
+                                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Active Projects</p>
+                                <p class="text-2xl font-bold text-gray-900">12</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-purple-100 rounded-lg">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Performance</p>
+                                <p class="text-2xl font-bold text-gray-900">98.5%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <header class="shadow-lg border-b border-blue-500/20 sticky top-0 z-30 bg-[#25c9d0] text-[#111] font-figtree">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-[#111]">
+                            <div class="flex justify-between items-center h-20">
+                                <!-- Logo + Title -->
+                                <div class="flex items-center cursor-pointer" onclick="showSection('welcome')">
+                                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                                        <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h1 class="text-2xl font-bold">TSE Tools Suite</h1>
+                                        <p class="text-sm font-medium">Daily Used Tools</p>
+                                    </div>
+                                </div>
+
+                                <!-- Hamburger for mobile -->
+                                <button id="mobileMenuBtn" class="md:hidden flex items-center px-3 py-2 border rounded text-black border-black ml-auto" onclick="toggleMobileMenu()">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+
+                                <!-- Navigation with dropdowns (desktop) -->
+                                <nav class="hidden md:flex items-center space-x-8 ml-10">
+                                    <!-- ...existing code... -->
+                                </nav>
+
+                                <!-- Search Bar (desktop) -->
+                                <div class="hidden md:flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto">
+                                    <!-- ...existing code... -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Mobile Menu -->
+                        <div id="mobileMenu" class="md:hidden fixed top-20 left-0 w-full bg-white shadow-lg z-40 hidden">
+                            <nav class="flex flex-col space-y-2 p-4">
+                                <a href="#" onclick="showSection('welcome'); toggleMobileMenu()" class="text-lg font-bold text-black py-2 px-4 rounded hover:bg-[#ccf4f3]">Home</a>
+                                <button onclick="toggleMobileDropdown('mobileBeautifierMenu')" class="text-lg font-bold text-black py-2 px-4 rounded flex items-center justify-between hover:bg-[#ccf4f3]">
+                                    Beautifier
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="mobileBeautifierMenu" class="hidden flex flex-col ml-4">
+                                    <a href="#" onclick="showSection('xml'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">XML</a>
+                                    <a href="#" onclick="showSection('json'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">JSON</a>
+                                    <a href="#" onclick="showSection('html'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">HTML</a>
+                                </div>
+                                <button onclick="toggleMobileDropdown('mobileConverterMenu')" class="text-lg font-bold text-black py-2 px-4 rounded flex items-center justify-between hover:bg-[#ccf4f3]">
+                                    Converter
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="mobileConverterMenu" class="hidden flex flex-col ml-4">
+                                    <a href="#" onclick="showSection('timezone'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">Timezone</a>
+                                    <a href="#" onclick="showSection('json-csv'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">JSON → CSV</a>
+                                    <a href="#" onclick="showSection('xml-csv'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">XML → CSV</a>
+                                </div>
+                                <button onclick="toggleMobileDropdown('mobileFiltersMenu')" class="text-lg font-bold text-black py-2 px-4 rounded flex items-center justify-between hover:bg-[#ccf4f3]">
+                                    Data Filters
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="mobileFiltersMenu" class="hidden flex flex-col ml-4">
+                                    <a href="#" onclick="showSection('json-filter'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">Filter from JSON</a>
+                                    <a href="#" onclick="showSection('xml-filter'); toggleMobileMenu()" class="py-2 px-4 text-black hover:bg-gray-100 rounded">Filter from XML</a>
+                                </div>
+                                <!-- Search Bar (mobile) -->
+                                <div class="mt-4">
+                                    <input type="text" placeholder="Search tools..." class="bg-gray-100 text-black placeholder-grey text-sm focus:outline-none w-full pl-4 py-2 rounded-lg mb-2" id="mobileSearchInput" autocomplete="off" onkeyup="searchTools()" oninput="searchTools()">
+                                    <div id="mobileSearchDropdown" class="w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"></div>
+                                </div>
+                            </nav>
+                        </div>
+                    </header>
+                    <p class="text-gray-600">Manage your team members and their roles.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Team Members</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-medium">JD</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-900">John Doe</p>
+                                        <p class="text-sm text-gray-500">Product Manager</p>
+                                    </div>
+                                </div>
+                                <span
+                                    class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Active</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-medium">AS</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-900">Alice Smith</p>
+                                        <p class="text-sm text-gray-500">UI/UX Designer</p>
+                                    </div>
+                                </div>
+                                <span
+                                    class="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">Active</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span class="text-white font-medium">MB</span>
+                                    </div>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-medium text-gray-900">Mike Brown</p>
+                                        <p class="text-sm text-gray-500">Developer</p>
+                                    </div>
+                                </div>
+                                <span
+                                    class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">Away</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section hidden">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Settings</h2>
+                    <p class="text-gray-600">Manage your account and application preferences.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Profile Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input type="text" value="John Doe"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" value="john@example.com"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <button class="text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                                style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                onmouseout="this.style.backgroundColor='#25c9d0'">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Email Notifications</p>
+                                    <p class="text-sm text-gray-500">Receive updates via email</p>
+                                </div>
+                                <button
+                                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                                    style="background-color: #25c9d0;" onclick="toggleSwitch(this)">
+                                    <span
+                                        class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Push Notifications</p>
+                                    <p class="text-sm text-gray-500">Receive push notifications</p>
+                                </div>
+                                <button
+                                    class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors"
+                                    onclick="toggleSwitch(this)">
+                                    <span
+                                        class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="text/javascript" src="static/main.js"></script>
+
+    <footer class="w-full text-center py-4 bg-gray-100 text-gray-600 mt-8 border-t border-gray-200" style="font-size: 1em;">
+        TSE Tools © 2025 · Inspiration from Canva &amp; GitHub Copilot
+    </footer>
+</body>
+
+</html>
