@@ -1,30 +1,71 @@
 # tsetools
 
-Go to your project folder on your local machine
+## Requirements
 
-## Installation
+- Python 3.7+
+- VSCode or any IDE
+- See `requirements.txt` for Python packages
 
+## FIRST STEP
+Open VSCode Terminal (recommended) and cd to your project folder
+
+## Installation: run below commands
+
+### macOS/Linux (bash/zsh)
 1. **Clone the repository:**
-   ```bash
+   
    git clone https://github.com/tkytkqc6t/tsetools.git
+   
    cd tsetools
-   ```
+   
 
 2. **Create a virtual environment (recommended):**
-   ```bash
+   
    python3 -m venv venv
+   
    source venv/bin/activate
-   ```
+   
 
 3. **Install dependencies:**
-   ```bash
+   
    pip install -r requirements.txt
-   ```
+   
 
 4. **Run the server:**
-   ```bash
+   
    python server.py
-   ```
+   
+Then open your browser and go to http://127.0.0.1:5000 as directed in the command lines
+
+### Windows (PowerShell)
+1. **Clone the repository:**
+   powershell
+   
+   git clone https://github.com/tkytkqc6t/tsetools.git
+   
+   cd tsetools
+   
+
+2. **Create a virtual environment (recommended):**
+   powershell
+   
+   python -m venv venv
+   
+   .\venv\Scripts\Activate.ps1
+   
+
+3. **Install dependencies:**
+   powershell
+   
+   pip install -r requirements.txt
+   
+
+4. **Run the server:**
+   powershell
+   
+   python server.py
+   
+Then open your browser and go to http://127.0.0.1:5000 as directed in the command lines
 
 ## Project Structure
 
@@ -33,11 +74,5 @@ Go to your project folder on your local machine
 - `static/`: Static files (JS, CSS)
 - `uploads/`: Uploaded files
 
-## Requirements
 
-- Python 3.7+
-- See `requirements.txt` for Python packages
 
-## License
-
-MIT
