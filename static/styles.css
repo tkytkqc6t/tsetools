@@ -1,0 +1,21 @@
+/* Sidebar menu hover color with high specificity */
+a.sidebar-menu-link:hover,
+a.sidebar-menu-link:focus,
+a.sidebar-menu-link:active {
+    color: #ccf4f3 !important;
+}
+button.sidebar-menu-btn:hover,
+button.sidebar-menu-btn:focus,
+button.sidebar-menu-btn:active {
+    color: #ccf4f3 !important;
+}
+/* Animate dropdown arrow on hover */
+.sidebar-menu-btn:hover .sidebar-menu-arrow,
+.sidebar-menu-btn:focus .sidebar-menu-arrow,
+.sidebar-menu-btn:active .sidebar-menu-arrow {
+    transform: translateY(-4px);
+    transition: transform 0.2s;
+}
+.sidebar-menu-arrow {
+    transition: transform 0.2s;
+}
