@@ -1,12 +1,12 @@
 # tsetools
 
-A simple Python web server project.
+Go to your project folder on your local machine
 
 ## Installation
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/tkytkqc6t/tsetools.git
    cd tsetools
    ```
 
