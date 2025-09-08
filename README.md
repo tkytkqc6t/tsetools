@@ -28,12 +28,12 @@ Open VSCode Terminal (recommended) and cd to your project folder
 
 3. **Install dependencies:**
    
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    
 
 4. **Run the server:**
    
-   python server.py
+   python3 server.py
    
 Then open your browser and go to http://127.0.0.1:5000 as directed in the command lines
 
