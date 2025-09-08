@@ -1,4 +1,6 @@
 ## tsetools: version 1.0
+Desktop-View Only
+
 🔧 All-in-One Tool to Boost Your Work:
 - Formatters: XML, JSON, HTML
 - Timezone Converter
