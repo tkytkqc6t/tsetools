@@ -1,5 +1,15 @@
-# tsetools
+## tsetools: version 1.0
+🔧 All-in-One Tool to Boost Your Work:
+- Formatters: XML, JSON, HTML
+- Timezone Converter
+- JSON/XML ⇆ CSV Converter
+- XML/JSON Data Filter
 
+🖥️ Self-Hosted on Your Local Machine:
+- No need for multiple online tools
+- Zero data-leak risk
+- Quick setup, instant rerun
+    
 ## Requirements
 
 - Python 3.7+
@@ -12,7 +22,7 @@ Open VSCode Terminal (recommended) and cd to your project folder
 ## Installation: run below commands
 
 ### macOS/Linux (bash/zsh)
-1. **Clone the repository:**
+1. **Clone the repository:** (first time only)
    
    git clone https://github.com/tkytkqc6t/tsetools.git
    
@@ -38,7 +48,7 @@ Open VSCode Terminal (recommended) and cd to your project folder
 Then open your browser and go to http://127.0.0.1:5000 as directed in the command lines
 
 ### Windows (PowerShell)
-1. **Clone the repository:**
+1. **Clone the repository:** (first time only)
    powershell
    
    git clone https://github.com/tkytkqc6t/tsetools.git
