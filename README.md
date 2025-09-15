@@ -1,4 +1,10 @@
-## tsetools: version 1.0
+## tsetools: 
+
+## Version History:
+v1.0 (main branch): Original 
+v1.1 (v1-1 branch): backup of Original 
+v1.2 (v1-2 branch): Add SQL Formatter
+
 Desktop-View Only
 
 🔧 All-in-One Tool to Boost Your Work:
