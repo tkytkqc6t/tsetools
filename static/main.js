@@ -1,3 +1,123 @@
+// SQL Beautifier Functions
+function beautifySQL() {
+    const input = document.getElementById('sqlInput').value;
+    const output = document.getElementById('sqlOutput');
+
+    if (!input.trim()) {
+        output.value = 'Error: Please enter SQL to beautify';
+        return;
+    }
+
+    // Basic SQL validation
+    const validationErrors = validateSQL(input);
+    if (validationErrors.length > 0) {
+        output.value = 'SQL Validation Errors:\n' + validationErrors.join('\n');
+        return;
+    }
+
+    try {
+        output.value = formatSQL(input);
+    } catch (error) {
+        output.value = 'Error: ' + error.message;
+    }
+}
+
+function validateSQL(sql) {
+    const errors = [];
+    const sqlTrim = sql.trim();
+    // Check for common SQL statement start
+    if (!/^\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH)\b/i.test(sqlTrim)) {
+        errors.push('SQL must start with SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, or WITH.');
+    }
+    // Check for balanced parentheses
+    let paren = 0;
+    for (let c of sql) {
+        if (c === '(') paren++;
+        if (c === ')') paren--;
+        if (paren < 0) {
+            errors.push('Unmatched closing parenthesis.');
+            break;
+        }
+    }
+    if (paren > 0) errors.push('Unmatched opening parenthesis.');
+    // Check for at least one FROM in SELECT
+    if (/^\s*SELECT/i.test(sqlTrim) && !/\bFROM\b/i.test(sqlTrim)) {
+        errors.push('SELECT statement should contain a FROM clause.');
+    }
+    // Check for ending semicolon
+    if (!/;\s*$/.test(sqlTrim)) {
+        errors.push('SQL should end with a semicolon (;)');
+    }
+    // Check for forbidden keywords (very basic)
+    if (/\b(DELETE|DROP)\b/i.test(sqlTrim) && !/\bWHERE\b/i.test(sqlTrim)) {
+        errors.push('DELETE or DROP statements should have a WHERE clause to avoid affecting all rows.');
+    }
+
+    // Enhanced: Check for misspelled or unknown SQL keywords
+    const knownKeywords = [
+        'SELECT','FROM','WHERE','GROUP','BY','ORDER','HAVING','LIMIT','OFFSET','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','ALTER','DROP','WITH','INNER','JOIN','LEFT','RIGHT','FULL','ON','AND','OR','UNION','ALL','EXCEPT','INTERSECT','IN','EXISTS','NOT','CASE','WHEN','THEN','ELSE','END','AS','DISTINCT','TOP','IS','NULL','LIKE','BETWEEN','OUTER','CROSS','NATURAL','USING','ASC','DESC'
+    ];
+    // Find all words in the SQL that look like keywords (all-caps or mixed-case, not inside quotes)
+    const keywordPattern = /\b([A-Z][A-Z0-9_]*)\b/g;
+    let match;
+    let unknowns = [];
+    // Remove quoted strings to avoid false positives
+    const sqlNoStrings = sql.replace(/(['"]).*?\1/g, '');
+    while ((match = keywordPattern.exec(sqlNoStrings)) !== null) {
+        const word = match[1].toUpperCase();
+        if (!knownKeywords.includes(word) && word.length > 2) {
+            unknowns.push(word);
+        }
+    }
+    // Remove duplicates
+    unknowns = [...new Set(unknowns)];
+    if (unknowns.length > 0) {
+        errors.push('Unknown or misspelled SQL keyword(s): ' + unknowns.join(', '));
+    }
+    return errors;
+}
+
+function formatSQL(sql) {
+    // Basic SQL formatter: splits keywords to new lines and indents
+    // This is a simple implementation, not a full SQL parser
+    const keywords = [
+        'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'OFFSET',
+        'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'JOIN', 'ON', 'AND', 'OR', 'UNION', 'UNION ALL', 'EXCEPT', 'INTERSECT', 'IN', 'EXISTS', 'NOT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END'
+    ];
+    let formatted = sql;
+    // Place keywords on new lines
+    keywords.forEach(kw => {
+        const regex = new RegExp('\\b' + kw.replace(/ /g, '\\s+') + '\\b', 'gi');
+        formatted = formatted.replace(regex, '\n' + kw);
+    });
+    // Remove multiple newlines
+    formatted = formatted.replace(/\n{2,}/g, '\n');
+    // Indent lines after SELECT, WHERE, etc.
+    const indentKeywords = ['SELECT', 'WHERE', 'FROM', 'GROUP BY', 'ORDER BY', 'HAVING', 'SET', 'VALUES'];
+    let lines = formatted.split('\n');
+    let indent = '';
+    let result = '';
+    lines.forEach(line => {
+        let trimmed = line.trim();
+        if (!trimmed) return;
+        let upper = trimmed.toUpperCase();
+        if (indentKeywords.some(kw => upper.startsWith(kw))) {
+            indent = '';
+        }
+        result += indent + trimmed + '\n';
+        if (upper.startsWith('SELECT') || upper.startsWith('WHERE') || upper.startsWith('SET') || upper.startsWith('VALUES')) {
+            indent = '  ';
+        }
+    });
+    return result.trim();
+}
+
+function clearSQL() {
+    document.getElementById('sqlInput').value = '';
+    document.getElementById('sqlOutput').value = '';
+}
+
+
 // AJAX file upload for large files (JSON example)
 document.addEventListener('DOMContentLoaded', function() {
     // JSON multi-file upload
@@ -108,16 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-// Mobile menu toggle
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobileMenu');
-    menu.classList.toggle('hidden');
-}
 
-function toggleMobileDropdown(id) {
-    const dropdown = document.getElementById(id);
-    dropdown.classList.toggle('hidden');
-}
 //All main features
 
         function showSection(sectionId) {
@@ -128,7 +239,10 @@ function toggleMobileDropdown(id) {
             });
 
             // Show selected section
-            document.getElementById(sectionId).classList.remove('hidden');
+            const sectionEl = document.getElementById(sectionId);
+            if (sectionEl) {
+                sectionEl.classList.remove('hidden');
+            }
 
             // Update navigation active state (sidebar only)
             const navLinks = document.querySelectorAll('nav a');
@@ -138,8 +252,8 @@ function toggleMobileDropdown(id) {
                 link.style.backgroundColor = '';
             });
 
-            // Only set active nav item if the event target is inside the sidebar
-            if (event.target.closest('nav')) {
+            // Only set active nav item if the event exists and the target is inside the sidebar
+            if (typeof event !== 'undefined' && event && event.target && event.target.closest && event.target.closest('nav')) {
                 event.target.classList.remove('text-gray-700', 'hover:bg-gray-100');
                 event.target.classList.add('text-white');
                 event.target.style.backgroundColor = '#25c9d0';
