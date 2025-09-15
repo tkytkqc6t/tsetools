@@ -1,7 +1,7 @@
 ## tsetools: 
 
 ## Version History:
-- v1.0 (main branch): Original
+- v1.0 (main branch): merged from latest branch
 - v1.1 (v1-1 branch): backup of Original
 - v1.2 (v1-2 branch): Add SQL Formatter
 
