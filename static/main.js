@@ -120,6 +120,170 @@ function clearSQL() {
 
 // AJAX file upload for large files (JSON example)
 document.addEventListener('DOMContentLoaded', function() {
+    // Data Filter JSON chunked upload with textarea display
+    const jsonFilterFileInput = document.getElementById('jsonFilterFileInput');
+    const jsonFilterUploadStatus = document.getElementById('jsonFilterUploadStatus');
+    if (jsonFilterFileInput && jsonFilterUploadStatus) {
+        jsonFilterFileInput.addEventListener('change', function() {
+            const files = jsonFilterFileInput.files;
+            if (!files.length) return;
+            jsonFilterUploadStatus.classList.remove('hidden');
+            jsonFilterUploadStatus.textContent = 'Uploading...';
+            jsonFilterUploadStatus.style.color = '';
+            let uploaded = 0;
+            let successCount = 0;
+            let errorCount = 0;
+            const CHUNK_SIZE = 5 * 1024 * 1024;
+            function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
+                const chunk = file.slice(start, end);
+                const formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('filename', file.name);
+                formData.append('chunkIndex', chunkIndex);
+                formData.append('totalChunks', totalChunks);
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/uploads', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        onComplete();
+                    } else {
+                        onError();
+                    }
+                };
+                xhr.onerror = function() { onError(); };
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        let percent = ((uploaded + e.loaded) / file.size) * 100;
+                        jsonFilterUploadStatus.textContent = `Uploading: ${percent.toFixed(1)}%`;
+                    }
+                };
+                xhr.send(formData);
+            }
+            function uploadFileInChunks(file, onFileComplete) {
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                let chunkIndex = 0;
+                let uploadedSize = 0;
+                function uploadNextChunk() {
+                    if (chunkIndex < totalChunks) {
+                        const start = chunkIndex * CHUNK_SIZE;
+                        const end = Math.min(start + CHUNK_SIZE, file.size);
+                        uploadChunk(
+                            file,
+                            chunkIndex,
+                            totalChunks,
+                            start,
+                            end,
+                            function(loaded) {
+                                uploadedSize += loaded;
+                            },
+                            function() {
+                                chunkIndex++;
+                                uploadNextChunk();
+                            },
+                            function() {
+                                errorCount++;
+                                jsonFilterUploadStatus.textContent = `Error uploading chunk ${chunkIndex + 1} of ${file.name}`;
+                            }
+                        );
+                    } else {
+                        uploaded += file.size;
+                        successCount++;
+                        jsonFilterUploadStatus.textContent = `Upload complete: ${file.name}`;
+                        // Fetch the uploaded file from the server and display in textarea
+                        fetch(`/uploads/${encodeURIComponent(file.name)}`)
+                            .then(response => response.text())
+                            .then(text => {
+                                document.getElementById('jsonFilterInput').value = text;
+                            });
+                        setTimeout(() => { jsonFilterUploadStatus.classList.add('hidden'); }, 1500);
+                        onFileComplete();
+                    }
+                }
+                uploadNextChunk();
+            }
+            uploadFileInChunks(files[0], function(){});
+        });
+    }
+
+
+    // Data Filter XML chunked upload
+    const xmlFilterFileInput = document.getElementById('xmlFilterFileInput');
+    const xmlFilterUploadStatus = document.getElementById('xmlFilterUploadStatus');
+    if (xmlFilterFileInput && xmlFilterUploadStatus) {
+        xmlFilterFileInput.addEventListener('change', function() {
+            const files = xmlFilterFileInput.files;
+            if (!files.length) return;
+            xmlFilterUploadStatus.classList.remove('hidden');
+            xmlFilterUploadStatus.textContent = 'Uploading...';
+            xmlFilterUploadStatus.style.color = '';
+            let uploaded = 0;
+            let successCount = 0;
+            let errorCount = 0;
+            const CHUNK_SIZE = 5 * 1024 * 1024;
+            function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
+                const chunk = file.slice(start, end);
+                const formData = new FormData();
+                formData.append('file', chunk);
+                formData.append('filename', file.name);
+                formData.append('chunkIndex', chunkIndex);
+                formData.append('totalChunks', totalChunks);
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/uploads', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        onComplete();
+                    } else {
+                        onError();
+                    }
+                };
+                xhr.onerror = function() { onError(); };
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        let percent = ((uploaded + e.loaded) / file.size) * 100;
+                        xmlFilterUploadStatus.textContent = `Uploading: ${percent.toFixed(1)}%`;
+                    }
+                };
+                xhr.send(formData);
+            }
+            function uploadFileInChunks(file, onFileComplete) {
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                let chunkIndex = 0;
+                let uploadedSize = 0;
+                function uploadNextChunk() {
+                    if (chunkIndex < totalChunks) {
+                        const start = chunkIndex * CHUNK_SIZE;
+                        const end = Math.min(start + CHUNK_SIZE, file.size);
+                        uploadChunk(
+                            file,
+                            chunkIndex,
+                            totalChunks,
+                            start,
+                            end,
+                            function(loaded) {
+                                uploadedSize += loaded;
+                            },
+                            function() {
+                                chunkIndex++;
+                                uploadNextChunk();
+                            },
+                            function() {
+                                errorCount++;
+                                xmlFilterUploadStatus.textContent = `Error uploading chunk ${chunkIndex + 1} of ${file.name}`;
+                            }
+                        );
+                    } else {
+                        uploaded += file.size;
+                        successCount++;
+                        xmlFilterUploadStatus.textContent = `Upload complete: ${file.name}`;
+                        setTimeout(() => { xmlFilterUploadStatus.classList.add('hidden'); }, 1500);
+                        onFileComplete();
+                    }
+                }
+                uploadNextChunk();
+            }
+            uploadFileInChunks(files[0], function(){});
+        });
+    }
     // JSON multi-file upload
     const jsonFileInput = document.getElementById('jsonFileInput');
     const jsonUploadForm = document.getElementById('jsonUploadForm');
@@ -138,93 +302,162 @@ document.addEventListener('DOMContentLoaded', function() {
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            const CHUNK_SIZE = 5 * 1024 * 1024;
+            function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
+                const chunk = file.slice(start, end);
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file', chunk);
+                formData.append('filename', file.name);
+                formData.append('chunkIndex', chunkIndex);
+                formData.append('totalChunks', totalChunks);
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/upload', true);
+                xhr.open('POST', '/uploads', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        onComplete();
+                    } else {
+                        onError();
+                    }
+                };
+                xhr.onerror = function() { onError(); };
                 xhr.upload.onprogress = function(e) {
                     if (e.lengthComputable) {
-                        let percent = ((uploaded + e.loaded) / (files.length * file.size)) * 100;
+                        let percent = ((uploaded + e.loaded) / file.size) * 100;
                         uploadProgressBar.style.width = percent + '%';
+                        uploadStatus.textContent = `Uploading: ${percent.toFixed(1)}%`;
                     }
-                };
-                xhr.onload = function() {
-                    uploaded += file.size;
-                    if (xhr.status === 200) {
-                        successCount++;
-                    } else {
-                        errorCount++;
-                    }
-                    uploadProgressBar.style.width = ((uploaded / Array.from(files).reduce((a, f) => a + f.size, 0)) * 100) + '%';
-                    if (successCount + errorCount === files.length) {
-                        uploadStatus.textContent = `${successCount} file(s) uploaded, ${errorCount} error(s)`;
-                        uploadStatus.style.color = errorCount ? 'orange' : 'green';
-                        setTimeout(() => {
-                            uploadProgress.classList.add('hidden');
-                        }, 1500);
-                    }
-                };
-                xhr.onerror = function() {
-                    errorCount++;
                 };
                 xhr.send(formData);
             }
+            function uploadFileInChunks(file, onFileComplete) {
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                let chunkIndex = 0;
+                let uploadedSize = 0;
+                function uploadNextChunk() {
+                    if (chunkIndex < totalChunks) {
+                        const start = chunkIndex * CHUNK_SIZE;
+                        const end = Math.min(start + CHUNK_SIZE, file.size);
+                        uploadChunk(
+                            file,
+                            chunkIndex,
+                            totalChunks,
+                            start,
+                            end,
+                            function(loaded) {
+                                uploadedSize += loaded;
+                            },
+                            function() {
+                                chunkIndex++;
+                                uploadNextChunk();
+                            },
+                            function() {
+                                errorCount++;
+                                uploadStatus.textContent = `Error uploading chunk ${chunkIndex + 1} of ${file.name}`;
+                            }
+                        );
+                    } else {
+                        uploaded += file.size;
+                        successCount++;
+                        uploadProgressBar.style.width = '100%';
+                        uploadStatus.textContent = `Upload complete: ${file.name}`;
+                        // Fetch the uploaded file from the server and display in textarea
+                        fetch(`/uploads/${encodeURIComponent(file.name)}`)
+                            .then(response => response.text())
+                            .then(text => {
+                                document.getElementById('jsonCsvInput').value = text;
+                            });
+                        setTimeout(() => { uploadProgress.classList.add('hidden'); uploadStatus.classList.add('hidden'); }, 1500);
+                        onFileComplete();
+                    }
+                }
+                uploadNextChunk();
+            }
+            uploadFileInChunks(files[0], function(){});
         });
     }
 
-    // XML multi-file upload
+    // XML chunked upload with progress and textarea display
     const xmlFileInput = document.getElementById('xmlFileInput');
-    const xmlUploadForm = document.getElementById('xmlUploadForm');
     const xmlUploadStatus = document.getElementById('xmlUploadStatus');
-    const xmlUploadProgress = document.getElementById('xmlUploadProgress');
-    const xmlUploadProgressBar = document.getElementById('xmlUploadProgressBar');
-    if (xmlFileInput && xmlUploadForm) {
+    if (xmlFileInput && xmlUploadStatus) {
         xmlFileInput.addEventListener('change', function() {
             const files = xmlFileInput.files;
             if (!files.length) return;
             xmlUploadStatus.classList.remove('hidden');
             xmlUploadStatus.textContent = 'Uploading...';
             xmlUploadStatus.style.color = '';
-            xmlUploadProgress.classList.remove('hidden');
-            xmlUploadProgressBar.style.width = '0%';
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            const CHUNK_SIZE = 5 * 1024 * 1024;
+            function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
+                const chunk = file.slice(start, end);
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file', chunk);
+                formData.append('filename', file.name);
+                formData.append('chunkIndex', chunkIndex);
+                formData.append('totalChunks', totalChunks);
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/upload', true);
+                xhr.open('POST', '/uploads', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        onComplete();
+                    } else {
+                        onError();
+                    }
+                };
+                xhr.onerror = function() { onError(); };
                 xhr.upload.onprogress = function(e) {
                     if (e.lengthComputable) {
-                        let percent = ((uploaded + e.loaded) / (files.length * file.size)) * 100;
-                        xmlUploadProgressBar.style.width = percent + '%';
+                        let percent = ((uploaded + e.loaded) / file.size) * 100;
+                        xmlUploadStatus.textContent = `Uploading: ${percent.toFixed(1)}%`;
                     }
-                };
-                xhr.onload = function() {
-                    uploaded += file.size;
-                    if (xhr.status === 200) {
-                        successCount++;
-                    } else {
-                        errorCount++;
-                    }
-                    xmlUploadProgressBar.style.width = ((uploaded / Array.from(files).reduce((a, f) => a + f.size, 0)) * 100) + '%';
-                    if (successCount + errorCount === files.length) {
-                        xmlUploadStatus.textContent = `${successCount} file(s) uploaded, ${errorCount} error(s)`;
-                        xmlUploadStatus.style.color = errorCount ? 'orange' : 'green';
-                        setTimeout(() => {
-                            xmlUploadProgress.classList.add('hidden');
-                        }, 1500);
-                    }
-                };
-                xhr.onerror = function() {
-                    errorCount++;
                 };
                 xhr.send(formData);
             }
+            function uploadFileInChunks(file, onFileComplete) {
+                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                let chunkIndex = 0;
+                let uploadedSize = 0;
+                function uploadNextChunk() {
+                    if (chunkIndex < totalChunks) {
+                        const start = chunkIndex * CHUNK_SIZE;
+                        const end = Math.min(start + CHUNK_SIZE, file.size);
+                        uploadChunk(
+                            file,
+                            chunkIndex,
+                            totalChunks,
+                            start,
+                            end,
+                            function(loaded) {
+                                uploadedSize += loaded;
+                            },
+                            function() {
+                                chunkIndex++;
+                                uploadNextChunk();
+                            },
+                            function() {
+                                errorCount++;
+                                xmlUploadStatus.textContent = `Error uploading chunk ${chunkIndex + 1} of ${file.name}`;
+                            }
+                        );
+                    } else {
+                        uploaded += file.size;
+                        successCount++;
+                        xmlUploadStatus.textContent = `Upload complete: ${file.name}`;
+                        // Fetch the uploaded file from the server and display in textarea
+                        fetch(`/uploads/${encodeURIComponent(file.name)}`)
+                            .then(response => response.text())
+                            .then(text => {
+                                document.getElementById('xmlCsvInput').value = text;
+                            });
+                        setTimeout(() => { xmlUploadStatus.classList.add('hidden'); }, 1500);
+                        onFileComplete();
+                    }
+                }
+                uploadNextChunk();
+            }
+            uploadFileInChunks(files[0], function(){});
         });
     }
 });
@@ -237,6 +470,29 @@ document.addEventListener('DOMContentLoaded', function() {
             sections.forEach(section => {
                 section.classList.add('hidden');
             });
+
+            // Clear all file upload textareas and progress bars to free memory and prevent lag
+            // List of textarea IDs for file upload sections
+            const uploadTextareas = [
+                'jsonInput', 'xmlInput', 'jsonCsvInput', 'xmlCsvInput',
+                'jsonFilterInput', 'xmlFilterInput'
+            ];
+            uploadTextareas.forEach(id => {
+                const ta = document.getElementById(id);
+                if (ta) ta.value = '';
+            });
+            // Clear all file inputs
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => { input.value = ''; });
+            // Hide all progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                bar.style.width = '0%';
+                bar.textContent = '';
+            });
+            // Clear all upload status messages
+            const statusEls = document.querySelectorAll('.upload-status');
+            statusEls.forEach(el => { el.textContent = ''; });
 
             // Show selected section
             const sectionEl = document.getElementById(sectionId);
@@ -1855,14 +2111,17 @@ document.addEventListener('DOMContentLoaded', function() {
         })
 
         // Toggle dropdowns by ID
+
         function toggleDropdown(id) {
-            const menu = document.getElementById(id);
-            // close other open dropdowns
-            document.querySelectorAll('nav div[id$="Menu"]').forEach(el => {
+            // Close all dropdowns first
+            document.querySelectorAll('div[id$="Menu"]').forEach(el => {
                 if (el.id !== id) el.classList.add('hidden');
             });
-            // toggle the clicked one
-            menu.classList.toggle('hidden');
+            // Open the requested dropdown
+            const menu = document.getElementById(id);
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
         }
 
         // Close dropdown if clicking outside
@@ -1870,7 +2129,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const isDropdownButton = event.target.closest('button[onclick^="toggleDropdown"]');
             const isDropdownMenu = event.target.closest('div[id$="Menu"]');
             if (!isDropdownButton && !isDropdownMenu) {
-                document.querySelectorAll('nav div[id$="Menu"]').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('div[id$="Menu"]').forEach(el => el.classList.add('hidden'));
             }
         });
 
