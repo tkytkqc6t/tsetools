@@ -10,7 +10,11 @@ Go to your project folder
 ### macOS
 - Download 2 files:
   + install_macos.sh     --> run it to install first time, it will clone the repo, auto install and run.
+    chmod +x install_macos.sh
+    ./install_macos.sh
   + run_macos.sh         --> run next time, it will pull the latest code, and auto run
+    chmod +x run_macos.sh
+    ./run_macos.sh
 
 ### Windows
 - Download 2 files:
