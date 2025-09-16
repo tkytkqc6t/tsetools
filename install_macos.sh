@@ -24,7 +24,7 @@ source venv/bin/activate
 
 # 3. Install dependencies
 echo "Installing dependencies..."
-pip3 install -r requirements.txt
+pip3 install --no-cache-dir -r requirements.txt
 
 # 4. Run server in background
 echo "Starting server..."
