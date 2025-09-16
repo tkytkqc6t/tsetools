@@ -127,6 +127,15 @@ document.addEventListener('DOMContentLoaded', function() {
         jsonFilterFileInput.addEventListener('change', function() {
             const files = jsonFilterFileInput.files;
             if (!files.length) return;
+            // Only allow .json
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                jsonFilterUploadStatus.classList.remove('hidden');
+                jsonFilterUploadStatus.textContent = 'Only .json files are allowed.';
+                jsonFilterUploadStatus.style.color = 'red';
+                jsonFilterFileInput.value = '';
+                return;
+            }
             jsonFilterUploadStatus.classList.remove('hidden');
             jsonFilterUploadStatus.textContent = 'Uploading...';
             jsonFilterUploadStatus.style.color = '';
@@ -213,6 +222,15 @@ document.addEventListener('DOMContentLoaded', function() {
         xmlFilterFileInput.addEventListener('change', function() {
             const files = xmlFilterFileInput.files;
             if (!files.length) return;
+            // Only allow .xml
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.xml')) {
+                xmlFilterUploadStatus.classList.remove('hidden');
+                xmlFilterUploadStatus.textContent = 'Only .xml files are allowed.';
+                xmlFilterUploadStatus.style.color = 'red';
+                xmlFilterFileInput.value = '';
+                return;
+            }
             xmlFilterUploadStatus.classList.remove('hidden');
             xmlFilterUploadStatus.textContent = 'Uploading...';
             xmlFilterUploadStatus.style.color = '';
@@ -294,6 +312,15 @@ document.addEventListener('DOMContentLoaded', function() {
         jsonFileInput.addEventListener('change', function() {
             const files = jsonFileInput.files;
             if (!files.length) return;
+            // Only allow .json
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                uploadStatus.classList.remove('hidden');
+                uploadStatus.textContent = 'Only .json files are allowed.';
+                uploadStatus.style.color = 'red';
+                jsonFileInput.value = '';
+                return;
+            }
             uploadStatus.classList.remove('hidden');
             uploadStatus.textContent = 'Uploading...';
             uploadStatus.style.color = '';
@@ -383,6 +410,15 @@ document.addEventListener('DOMContentLoaded', function() {
         xmlFileInput.addEventListener('change', function() {
             const files = xmlFileInput.files;
             if (!files.length) return;
+            // Only allow .xml
+            const file = files[0];
+            if (!file.name.toLowerCase().endsWith('.xml')) {
+                xmlUploadStatus.classList.remove('hidden');
+                xmlUploadStatus.textContent = 'Only .xml files are allowed.';
+                xmlUploadStatus.style.color = 'red';
+                xmlFileInput.value = '';
+                return;
+            }
             xmlUploadStatus.classList.remove('hidden');
             xmlUploadStatus.textContent = 'Uploading...';
             xmlUploadStatus.style.color = '';
