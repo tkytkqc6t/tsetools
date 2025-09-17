@@ -507,13 +507,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 section.classList.add('hidden');
             });
 
-            // Clear all file upload textareas and progress bars to free memory and prevent lag
-            // List of textarea IDs for file upload sections
-            const uploadTextareas = [
+            // Clear all file upload and output textareas and progress bars to free memory and prevent lag
+            // List of textarea IDs for file upload and output sections
+            const clearTextareas = [
+                // Inputs
                 'jsonInput', 'xmlInput', 'jsonCsvInput', 'xmlCsvInput',
-                'jsonFilterInput', 'xmlFilterInput'
+                'jsonFilterInput', 'xmlFilterInput',
+                // Outputs (CONVERTER and DATA FILTERS)
+                'jsonOutput', 'xmlOutput', 'csvOutput', 'xmlCsvOutput',
+                'jsonFilterOutput', 'xmlFilterOutput'
             ];
-            uploadTextareas.forEach(id => {
+            clearTextareas.forEach(id => {
                 const ta = document.getElementById(id);
                 if (ta) ta.value = '';
             });
@@ -1730,13 +1734,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // Apply filters
+
+                // Enhanced: support filtering by nested array/object fields (e.g., batters.batter.id or topping.id)
+                function matchConditionDeep(item, fieldPath, operator, value) {
+                    const parts = fieldPath.split('.');
+                    let current = item;
+                    for (let i = 0; i < parts.length; i++) {
+                        if (Array.isArray(current)) {
+                            // If current is array, check if any element matches the rest of the path
+                            return current.some(el => matchConditionDeep(el, parts.slice(i).join('.'), operator, value));
+                        } else if (current && typeof current === 'object') {
+                            current = current[parts[i]];
+                        } else {
+                            return false;
+                        }
+                    }
+                    // At the leaf, evaluate the condition
+                    if (Array.isArray(current)) {
+                        // If leaf is array, match any element
+                        return current.some(el => evaluateCondition(el, operator, value));
+                    } else {
+                        return evaluateCondition(current, operator, value);
+                    }
+                }
+
                 const filteredData = arrayToFilter.filter(item => {
                     const results = conditions.map(condition => {
-                        const fieldValue = getNestedValue(item, condition.field);
-                        return evaluateCondition(fieldValue, condition.operator, condition.value);
+                        return matchConditionDeep(item, condition.field, condition.operator, condition.value);
                     });
-
                     return logicOperator === 'AND' ? results.every(r => r) : results.some(r => r);
                 });
 
