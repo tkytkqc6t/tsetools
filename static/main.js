@@ -654,7 +654,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const parsed = JSON.parse(input);
+                // If the user enabled auto-replace, convert common single-quoted JSON to double-quoted JSON
+                const autoReplace = document.getElementById('jsonAutoReplaceQuotes');
+                let toParse = input;
+                if (autoReplace && autoReplace.checked) {
+                    toParse = safeSingleToDoubleQuotes(input);
+                }
+
+                const parsed = JSON.parse(toParse);
                 output.value = JSON.stringify(parsed, null, 2);
             } catch (error) {
                 // Parse error message to provide better feedback
@@ -667,6 +674,66 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 output.value = 'JSON Validation Error:\n' + errorMsg;
             }
+        }
+
+
+        // Convert many common single-quoted JSON-like strings into valid double-quoted JSON
+        // This is conservative: it targets single-quoted string literals for keys and values,
+        // and avoids changing apostrophes inside words where possible.
+        function safeSingleToDoubleQuotes(str) {
+            // Strategy:
+            // 1) Replace single-quoted keys or values: '(...?)' -> "..." when the quotes appear
+            //    as string boundaries (preceded/followed by whitespace, {, [, :, , or line boundaries).
+            // 2) Avoid touching phrases like don't or O'Neil by requiring a boundary before and after.
+
+            // Step 1: replace single-quoted occurrences that look like JSON string tokens
+            // Regex explanation: (?<=[:\[{,\s])'((?:\\'|[^'])*)'(?=[,\]}:\s])
+            // But JS doesn't support variable-width lookbehind in older engines, so we'll use a safe alternative.
+
+            // Use a replacer that scans the string char-by-char to find single-quoted tokens in likely positions.
+            let out = '';
+            let i = 0;
+            const len = str.length;
+            while (i < len) {
+                const ch = str[i];
+                if (ch === "'") {
+                    // check preceding character (or start) and following context to decide if this is a JSON string
+                    const prev = i === 0 ? '\n' : str[i - 1];
+                    // allow preceding chars that commonly appear before JSON strings
+                    if (/[:\[\{,\s\n]/.test(prev)) {
+                        // attempt to read until the next unescaped single quote
+                        let j = i + 1;
+                        let found = false;
+                        let value = '';
+                        while (j < len) {
+                            const c = str[j];
+                            if (c === "'" && str[j - 1] !== '\\') { found = true; break; }
+                            value += c;
+                            j++;
+                        }
+                        if (found) {
+                            // Lookahead char after closing '
+                            const next = j + 1 < len ? str[j + 1] : '\n';
+                            if (/[,\]\}:\s\n]/.test(next)) {
+                                // safe to replace this quoted token
+                                // unescape any escaped single quotes inside and escape double quotes
+                                const replaced = value.replace(/\\'/g, "'")
+                                    .replace(/\\"/g, '"')
+                                    .replace(/"/g, '\\"');
+                                out += '"' + replaced + '"';
+                                i = j + 1;
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                // default: copy character
+                out += ch;
+                i++;
+            }
+
+            return out;
         }
 
         function clearJSON() {
