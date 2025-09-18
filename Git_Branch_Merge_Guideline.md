@@ -37,6 +37,7 @@ git push -u origin v1-2
 - Do all updates and commits here.  
 
 ```bash
+git pull origin main
 git add .
 git commit -m "Your feature or fix"
 git push
