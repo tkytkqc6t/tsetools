@@ -19,3 +19,6 @@ button.sidebar-menu-btn:active {
 .sidebar-menu-arrow {
     transition: transform 0.2s;
 }
+
+/* Custom editor wrapper tweaks (CodeMirror will provide actual token styles) */
+.sql-editor-wrapper .CodeMirror { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace; font-size: 0.9rem; height: 100%; }

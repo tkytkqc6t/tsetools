@@ -1,25 +1,82 @@
 // SQL Beautifier Functions
+// sqlEditor will hold a CodeMirror instance when available
+let sqlEditor = null;
+
 function beautifySQL() {
     const input = document.getElementById('sqlInput').value;
     const output = document.getElementById('sqlOutput');
 
     if (!input.trim()) {
-        output.value = 'Error: Please enter SQL to beautify';
+        if (sqlEditor) sqlEditor.setValue('Error: Please enter SQL to beautify');
+        if (output) output.value = 'Error: Please enter SQL to beautify';
         return;
     }
 
     // Basic SQL validation
     const validationErrors = validateSQL(input);
     if (validationErrors.length > 0) {
-        output.value = 'SQL Validation Errors:\n' + validationErrors.join('\n');
+        const err = 'SQL Validation Errors:\n' + validationErrors.join('\n');
+        if (sqlEditor) sqlEditor.setValue(err);
+        if (output) output.value = err;
         return;
     }
 
     try {
-        output.value = formatSQL(input);
+        const formatted = formatSQL(input);
+        // Update textarea fallback
+        if (output) output.value = formatted;
+        // Update CodeMirror editor if present, otherwise show plain text in textarea
+        if (sqlEditor) {
+            sqlEditor.setValue(formatted);
+        } else {
+            // no editor: ensure the textarea shows the formatted SQL
+            if (output) output.value = formatted;
+        }
     } catch (error) {
-        output.value = 'Error: ' + error.message;
+        const msg = 'Error: ' + error.message;
+        if (sqlEditor) sqlEditor.setValue(msg);
+        if (output) output.value = msg;
     }
+}
+
+// Lightweight SQL syntax highlighter - not a full parser but good for readability
+function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function highlightSQL(sql) {
+    // token patterns
+    const patterns = [
+        {type: 'comment', regex: /(\/\*[\s\S]*?\*\/|--.*?$)/gm},
+        {type: 'string', regex: /'(?:''|[^'])*'/g},
+        {type: 'number', regex: /\b\d+(?:\.\d+)?\b/g},
+        {type: 'keyword', regex: /\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT|OFFSET|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE\s+FROM|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN|ON|AND|OR|UNION|UNION\s+ALL|EXCEPT|INTERSECT|IN|EXISTS|NOT|CASE|WHEN|THEN|ELSE|END|AS|DISTINCT|TOP|IS|NULL|LIKE|BETWEEN|ASC|DESC)\b/gi},
+        {type: 'operator', regex: /[+\-*\/=%<>!]+/g},
+        {type: 'paren', regex: /[()]/g}
+    ];
+
+    // We'll perform a simple pass that escapes HTML then applies replacements from left to right.
+    let html = escapeHtml(sql);
+
+    // Apply comments and strings first to avoid inner replacements
+    html = html.replace(/(\/\*[\s\S]*?\*\/|--.*?$)/gm, function(m) { return `<span class="sql-comment">${escapeHtml(m)}</span>`; });
+    html = html.replace(/'(?:''|[^'])*'/g, function(m) { return `<span class="sql-string">${escapeHtml(m)}</span>`; });
+
+    // Keywords (case-insensitive)
+    html = html.replace(/\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT|OFFSET|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE\s+FROM|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN|ON|AND|OR|UNION|UNION\s+ALL|EXCEPT|INTERSECT|IN|EXISTS|NOT|CASE|WHEN|THEN|ELSE|END|AS|DISTINCT|TOP|IS|NULL|LIKE|BETWEEN|ASC|DESC)\b/gi, function(m) {
+        return `<span class="sql-keyword">${m.toUpperCase()}</span>`;
+    });
+
+    // Numbers
+    html = html.replace(/\b\d+(?:\.\d+)?\b/g, function(m) { return `<span class="sql-number">${m}</span>`; });
+
+    // Operators
+    html = html.replace(/[+\-*\/=%<>!]+/g, function(m) { return `<span class="sql-operator">${m}</span>`; });
+
+    // Parentheses
+    html = html.replace(/[()]/g, function(m) { return `<span class="sql-paren">${m}</span>`; });
+
+    return html;
 }
 
 function validateSQL(sql) {
@@ -114,7 +171,11 @@ function formatSQL(sql) {
 
 function clearSQL() {
     document.getElementById('sqlInput').value = '';
-    document.getElementById('sqlOutput').value = '';
+    const out = document.getElementById('sqlOutput');
+    if (sqlEditor) {
+        sqlEditor.setValue('');
+    }
+    if (out) out.value = '';
 }
 
 
@@ -2177,6 +2238,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add default filter fields for both JSON and XML filters
             addJsonFilterField();
             addXmlFilterField();
+
+            // Initialize CodeMirror for SQL output (if CodeMirror is loaded)
+            try {
+                const ta = document.getElementById('sqlOutput');
+                if (typeof CodeMirror !== 'undefined' && ta) {
+                    sqlEditor = CodeMirror.fromTextArea(ta, {
+                        mode: 'text/x-sql',
+                        theme: 'eclipse',
+                        lineNumbers: false,
+                        readOnly: true,
+                        matchBrackets: true,
+                        viewportMargin: Infinity,
+                        lineWrapping: true
+                    });
+                    sqlEditor.setSize('100%', '100%');
+                }
+            } catch (e) {
+                console.warn('CodeMirror init failed', e);
+            }
         });
         // Drag and Drop for JSON Filter
         function setupJsonFilterDragAndDrop() {

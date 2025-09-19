@@ -8,6 +8,12 @@
     <title>TSE Tools Suite v1.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CodeMirror (v5) for SQL editor-style highlighting (read-only) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
 </head>
 
 <body class="bg-gray-50 font-figtree" style="font-family: 'Figtree', 'Inter', system-ui, sans-serif;">
@@ -376,9 +382,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Formatted SQL</label>
-                            <textarea id="sqlOutput"
-                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Formatted SQL will appear here..."></textarea>
+                            <!-- Textarea that CodeMirror will enhance into a read-only SQL editor -->
+                            <div class="sql-editor-wrapper w-full h-80 border border-gray-300 rounded-lg bg-gray-50">
+                                <textarea id="sqlOutput" class="w-full h-full px-3 py-2 font-mono text-sm" placeholder="Formatted SQL will appear here..."></textarea>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-6">
