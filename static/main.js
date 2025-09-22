@@ -1,43 +1,103 @@
 // SQL Beautifier Functions
 // sqlEditor will hold a CodeMirror instance when available
-let sqlEditor = null;
+let sqlEditor; // global
+
+function initSQLEditor() {
+    try {
+        const ta = document.getElementById('sqlOutput');
+        ta.value = '';
+        if (typeof CodeMirror !== 'undefined' && ta) {
+            if (sqlEditor) {
+                sqlEditor.setValue('');
+                sqlEditor.setOption('placeholder', 'Formatted SQL will appear here 123...');
+            } else {
+                sqlEditor = CodeMirror.fromTextArea(ta, {
+                    mode: 'text/x-sql',
+                    theme: 'eclipse',
+                    lineNumbers: false,
+                    readOnly: true,
+                    matchBrackets: true,
+                    viewportMargin: Infinity,
+                    lineWrapping: true,
+                });
+                sqlEditor.setSize('100%', '20rem');
+
+                // Apply same Tailwind classes as Input SQL textarea
+                sqlEditor.getWrapperElement().classList.add(
+                    "w-full", "h-80", "px-2", "py-1", "bg-gray-50", "border", "border-gray-300", "rounded-lg", "font-mono", "text-sm"
+                     );
+
+                // Hide original textarea
+                ta.classList.add("hidden");
+
+            }
+        }
+    } catch (e) {
+        console.warn('CodeMirror init failed', e);
+    }
+}
 
 function beautifySQL() {
     const input = document.getElementById('sqlInput').value;
-    const output = document.getElementById('sqlOutput');
 
+    // Reset color before new run
+    if (sqlEditor) sqlEditor.getWrapperElement().style.color = "black";
+
+    let msg = '';
     if (!input.trim()) {
-        if (sqlEditor) sqlEditor.setValue('Error: Please enter SQL to beautify');
-        if (output) output.value = 'Error: Please enter SQL to beautify';
+        msg = 'Error: Please enter SQL to beautify';
+        if (sqlEditor) {
+            sqlEditor.setValue(msg);
+            setTimeout(() => highlightSQLErrorLines(), 10);
+        }
         return;
     }
 
     // Basic SQL validation
     const validationErrors = validateSQL(input);
     if (validationErrors.length > 0) {
-        const err = 'SQL Validation Errors:\n' + validationErrors.join('\n');
-        if (sqlEditor) sqlEditor.setValue(err);
-        if (output) output.value = err;
+        msg = 'SQL Validation Errors:\n' + validationErrors.join('\n');
+        if (sqlEditor) {
+            sqlEditor.setValue(msg);
+            setTimeout(() => highlightSQLErrorLines(), 10);
+        }
         return;
     }
 
     try {
         const formatted = formatSQL(input);
-        // Update textarea fallback
-        if (output) output.value = formatted;
-        // Update CodeMirror editor if present, otherwise show plain text in textarea
         if (sqlEditor) {
             sqlEditor.setValue(formatted);
-        } else {
-            // no editor: ensure the textarea shows the formatted SQL
-            if (output) output.value = formatted;
+            setTimeout(() => highlightSQLErrorLines(), 10);
         }
     } catch (error) {
-        const msg = 'Error: ' + error.message;
-        if (sqlEditor) sqlEditor.setValue(msg);
-        if (output) output.value = msg;
+        msg = 'Error: ' + error.message;
+        if (sqlEditor) {
+            sqlEditor.setValue(msg);
+            setTimeout(() => highlightSQLErrorLines(), 10);
+        }
     }
 }
+
+// Highlight lines containing 'Error' in CodeMirror output
+function highlightSQLErrorLines() {
+    if (!sqlEditor) return;
+    const cm = sqlEditor;
+    const doc = cm.getDoc();
+    const lineCount = doc.lineCount();
+    let errorFound = false;
+    for (let i = 0; i < lineCount; i++) {
+        const text = doc.getLine(i);
+        cm.removeLineClass(i, 'text', 'cm-error-line');
+        if (!errorFound && /Error[:]?/i.test(text)) {
+            errorFound = true;
+        }
+        if (errorFound) {
+            cm.addLineClass(i, 'text', 'cm-error-line');
+        }
+    }
+}
+
 
 // Lightweight SQL syntax highlighter - not a full parser but good for readability
 function escapeHtml(str) {
@@ -171,11 +231,7 @@ function formatSQL(sql) {
 
 function clearSQL() {
     document.getElementById('sqlInput').value = '';
-    const out = document.getElementById('sqlOutput');
-    if (sqlEditor) {
-        sqlEditor.setValue('');
-    }
-    if (out) out.value = '';
+    document.getElementById('sqlOutput').value = '';
 }
 
 
@@ -567,21 +623,32 @@ document.addEventListener('DOMContentLoaded', function() {
             sections.forEach(section => {
                 section.classList.add('hidden');
             });
+                
+            // Show selected
+            const active = document.getElementById(sectionId);
+            if (active) active.classList.remove('hidden');
+
+            // Clear only SQL output when switching
+            if (typeof sqlEditor !== 'undefined' && sqlEditor) {
+                sqlEditor.setValue(''); // clear previous content
+                sqlEditor.setOption('placeholder', 'Formatted SQL will appear here...');
+            }
 
             // Clear all file upload and output textareas and progress bars to free memory and prevent lag
             // List of textarea IDs for file upload and output sections
             const clearTextareas = [
                 // Inputs
                 'jsonInput', 'xmlInput', 'jsonCsvInput', 'xmlCsvInput',
-                'jsonFilterInput', 'xmlFilterInput',
+                'jsonFilterInput', 'xmlFilterInput', 'htmlInput', 'sqlInput',
                 // Outputs (CONVERTER and DATA FILTERS)
                 'jsonOutput', 'xmlOutput', 'csvOutput', 'xmlCsvOutput',
-                'jsonFilterOutput', 'xmlFilterOutput'
+                'jsonFilterOutput', 'xmlFilterOutput', 'htmlOutput'
             ];
             clearTextareas.forEach(id => {
                 const ta = document.getElementById(id);
                 if (ta) ta.value = '';
             });
+
             // Clear all file inputs
             const fileInputs = document.querySelectorAll('input[type="file"]');
             fileInputs.forEach(input => { input.value = ''; });
@@ -654,6 +721,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!input.trim()) {
                 output.value = 'Error: Please enter XML to beautify';
+                output.style.color = "red";
                 return;
             }
 
@@ -665,14 +733,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (parseErrors.length > 0) {
                     const errorText = parseErrors[0].textContent;
                     output.value = 'XML Validation Error:\n' + errorText;
+                    output.style.color = "red";
                     return;
                 }
 
                 const serializer = new XMLSerializer();
                 const formatted = formatXML(serializer.serializeToString(xmlDoc));
                 output.value = formatted;
+                output.style.color = "black"; // reset to normal color
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -711,6 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!input.trim()) {
                 output.value = 'Error: Please enter JSON to beautify';
+                output.style.color = "red";
                 return;
             }
 
@@ -724,6 +796,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const parsed = JSON.parse(toParse);
                 output.value = JSON.stringify(parsed, null, 2);
+                output.style.color = "black"; // reset to normal color
             } catch (error) {
                 // Parse error message to provide better feedback
                 let errorMsg = error.message;
@@ -734,6 +807,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     errorMsg += `\nNear line ${lines.length}, column ${lines[lines.length - 1].length + 1}`;
                 }
                 output.value = 'JSON Validation Error:\n' + errorMsg;
+                output.style.color = "red";
             }
         }
 
@@ -810,6 +884,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!input.trim()) {
                 output.value = 'Error: Please enter HTML to beautify';
+                output.style.color = "red";
                 return;
             }
 
@@ -817,14 +892,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const validationErrors = validateHTMLSyntax(input);
             if (validationErrors.length > 0) {
                 output.value = 'HTML Validation Errors:\n' + validationErrors.join('\n');
+                output.style.color = "red";
                 return;
             }
 
             try {
                 const formatted = formatHTML(input);
                 output.value = formatted;
+                output.style.color = "black"; // reset to normal color
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -1368,6 +1446,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -1572,6 +1651,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 output.value = csv;
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -1897,6 +1977,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -2138,6 +2219,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             } catch (error) {
                 output.value = 'Error: ' + error.message;
+                output.style.color = "red";
             }
         }
 
@@ -2239,25 +2321,9 @@ document.addEventListener('DOMContentLoaded', function() {
             addJsonFilterField();
             addXmlFilterField();
 
-            // Initialize CodeMirror for SQL output (if CodeMirror is loaded)
-            try {
-                const ta = document.getElementById('sqlOutput');
-                if (typeof CodeMirror !== 'undefined' && ta) {
-                    sqlEditor = CodeMirror.fromTextArea(ta, {
-                        mode: 'text/x-sql',
-                        theme: 'eclipse',
-                        lineNumbers: false,
-                        readOnly: true,
-                        matchBrackets: true,
-                        viewportMargin: Infinity,
-                        lineWrapping: true
-                    });
-                    sqlEditor.setSize('100%', '100%');
-                }
-            } catch (e) {
-                console.warn('CodeMirror init failed', e);
-            }
-        });
+            initSQLEditor();
+            });
+
         // Drag and Drop for JSON Filter
         function setupJsonFilterDragAndDrop() {
             const dropZone = document.getElementById('jsonFilterDropZone');

@@ -1,3 +1,6 @@
+
+
+/* Utility: highlight lines containing 'Error' in CodeMirror (JS will add this class) */
 /* Sidebar menu hover color with high specificity */
 a.sidebar-menu-link:hover,
 a.sidebar-menu-link:focus,
@@ -21,4 +24,25 @@ button.sidebar-menu-btn:active {
 }
 
 /* Custom editor wrapper tweaks (CodeMirror will provide actual token styles) */
-.sql-editor-wrapper .CodeMirror { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace; font-size: 0.9rem; height: 100%; }
+.sql-editor-wrapper .CodeMirror { 
+    font-family: ui-monospace, Figtree, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace; 
+}
+
+/* Add border to Formatted SQL CodeMirror output using CodeMirror class only */
+.CodeMirror .CodeMirror-scroll {
+    font-size: 0.875rem; 
+    line-height: 1.25rem;
+    color: #979797;
+    opacity: 0.9;
+}
+
+/* Allow resize like textarea */
+.CodeMirror {
+  resize: vertical;   /* vertical only (like textarea) */
+  overflow: auto;
+}
+
+/* Make error messages in CodeMirror red if line starts with 'Error' or contains 'Error:' */
+.CodeMirror .cm-error-line, .CodeMirror .cm-sql-error {
+    color: red !important;
+}

@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+
 </head>
 
 <body class="bg-gray-50 font-figtree" style="font-family: 'Figtree', 'Inter', system-ui, sans-serif;">
@@ -263,7 +265,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
                             <textarea id="xmlInput"
                                 class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML here..."><root><item id="1"><name>Example</name><value>123</value></item><item id="2"><name>Another</name><value>456</value></item></root></textarea>
+                                placeholder="Paste your XML here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Formatted XML</label>
@@ -300,7 +302,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
                             <textarea id="jsonInput"
                                 class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON here...">{"name":"John","age":30,"city":"New York","hobbies":["reading","swimming","coding"]}</textarea>
+                                placeholder="Paste your JSON here..."></textarea>
                             <div class="mt-2 flex items-center space-x-2">
                                 <input type="checkbox" id="jsonAutoReplaceQuotes" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
                                 <label for="jsonAutoReplaceQuotes" class="text-sm text-gray-600">Auto-replace single quotes with double quotes</label>
@@ -341,7 +343,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Input HTML</label>
                             <textarea id="htmlInput"
                                 class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your HTML here..."><div><h1>Title</h1><p>This is a paragraph with <a href="#">a link</a> inside.</p><ul><li>Item 1</li><li>Item 2</li></ul></div></textarea>
+                                placeholder="Paste your HTML here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Formatted HTML</label>
@@ -378,14 +380,12 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Input SQL</label>
                             <textarea id="sqlInput"
                                 class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your SQL here...">SELECT id, name, age FROM users WHERE age > 18 AND (city = 'New York' OR city = 'Los Angeles') ORDER BY age DESC;</textarea>
+                                placeholder="Paste your SQL here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Formatted SQL</label>
-                            <!-- Textarea that CodeMirror will enhance into a read-only SQL editor -->
-                            <div class="sql-editor-wrapper w-full h-80 border border-gray-300 rounded-lg bg-gray-50">
-                                <textarea id="sqlOutput" class="w-full h-full px-3 py-2 font-mono text-sm" placeholder="Formatted SQL will appear here..."></textarea>
-                            </div>
+                            <textarea id="sqlOutput"
+                                readonly placeholder="Formatted SQL will appear here..."></textarea>
                         </div>
                     </div>
                     <div class="mt-6">
@@ -516,11 +516,7 @@
 
                             <textarea id="jsonCsvInput"
                                 class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON array here...">[
-  {"name": "John", "age": 30, "city": "New York"},
-  {"name": "Jane", "age": 25, "city": "Los Angeles"},
-  {"name": "Bob", "age": 35, "city": "Chicago"}
-]</textarea>
+                                placeholder="Paste your JSON array here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
@@ -592,26 +588,7 @@
 
                             <textarea id="xmlCsvInput"
                                 class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML here..."><users>
-  <user id="1">
-    <name>John</name>
-    <age>30</age>
-    <city>New York</city>
-    <active>true</active>
-  </user>
-  <user id="2">
-    <name>Jane</name>
-    <age>25</age>
-    <city>Los Angeles</city>
-    <active>false</active>
-  </user>
-  <user id="3">
-    <name>Bob</name>
-    <age>35</age>
-    <city>Chicago</city>
-    <active>true</active>
-  </user>
-</users></textarea>
+                                placeholder="Paste your XML here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
@@ -695,16 +672,7 @@
                             </div>
                             <textarea id="jsonFilterInput"
                                 class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON data here...">{
-  "users": [
-    {"name": "John", "age": 30, "city": "New York", "active": true, "salary": 75000, "department": "Engineering"},
-    {"name": "Jane", "age": 25, "city": "Los Angeles", "active": false, "salary": 65000, "department": "Marketing"},
-    {"name": "Bob", "age": 35, "city": "Chicago", "active": true, "salary": 85000, "department": "Engineering"},
-    {"name": "Alice", "age": 28, "city": "New York", "active": true, "salary": 70000, "department": "Sales"},
-    {"name": "Charlie", "age": 32, "city": "Boston", "active": true, "salary": 90000, "department": "Engineering"},
-    {"name": "Diana", "age": 29, "city": "Seattle", "active": false, "salary": 68000, "department": "Marketing"}
-  ]
-}</textarea>
+                                placeholder="Paste your JSON data here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
@@ -806,43 +774,7 @@
                             </div>
                             <textarea id="xmlFilterInput"
                                 class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML data here..."><users>
-    <user id="1" active="true">
-        <name>John</name>
-        <age>30</age>
-        <city>New York</city>
-        <salary>75000</salary>
-        <department>Engineering</department>
-    </user>
-    <user id="2" active="false">
-        <name>Jane</name>
-        <age>25</age>
-        <city>Los Angeles</city>
-        <salary>65000</salary>
-        <department>Marketing</department>
-    </user>
-    <user id="3" active="true">
-        <name>Bob</name>
-        <age>35</age>
-        <city>Chicago</city>
-        <salary>85000</salary>
-        <department>Engineering</department>
-    </user>
-    <user id="4" active="true">
-        <name>Alice</name>
-        <age>28</age>
-        <city>New York</city>
-        <salary>70000</salary>
-        <department>Sales</department>
-    </user>
-    <user id="5" active="true">
-        <name>Charlie</name>
-        <age>32</age>
-        <city>Boston</city>
-        <salary>90000</salary>
-        <department>Engineering</department>
-    </user>
-</users></textarea>
+                                placeholder="Paste your XML data here..."></textarea>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
