@@ -787,11 +787,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                // If the user enabled auto-replace, convert common single-quoted JSON to double-quoted JSON
-                const autoReplace = document.getElementById('jsonAutoReplaceQuotes');
+                // Auto-detect Python dict-like input and convert to JSON if needed
                 let toParse = input;
-                if (autoReplace && autoReplace.checked) {
-                    toParse = safeSingleToDoubleQuotes(input);
+                if (isProbablyPythonDict(input)) {
+                    try {
+                        toParse = pythonDictToJson(input);
+                    } catch (convErr) {
+                        // conversion failed; leave toParse as original input
+                        console.warn('pythonDictToJson failed', convErr);
+                        toParse = input;
+                    }
+                } else {
+                    // If the user enabled auto-replace, convert common single-quoted JSON to double-quoted JSON
+                    const autoReplace = document.getElementById('jsonAutoReplaceQuotes');
+                    if (autoReplace && autoReplace.checked) {
+                        toParse = safeSingleToDoubleQuotes(input);
+                    }
                 }
 
                 const parsed = JSON.parse(toParse);
@@ -867,6 +878,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 out += ch;
                 i++;
             }
+
+            return out;
+        }
+
+        // Heuristic: detect if the input looks like a Python dict/list literal
+        function isProbablyPythonDict(s) {
+            if (!s || typeof s !== 'string') return false;
+            const trimmed = s.trim();
+            // quick checks: uses Python None/True/False or single quotes for keys, or starts with { and contains ':'
+            if (/\b(None|True|False)\b/.test(trimmed)) return true;
+            if (/^\s*\{[\s\S]*:\s*['"]/m.test(trimmed)) return true;
+            // also consider single-quoted keys/values
+            if (/\'[^']+\'\s*:/m.test(trimmed)) return true;
+            return false;
+        }
+
+        // Convert a Python dict/list literal-ish string into valid JSON string.
+        // This is conservative: it handles common cases (single quotes, True/False/None, trailing commas).
+        function pythonDictToJson(s) {
+            let out = s.trim();
+            // Replace Python True/False/None with JSON true/false/null but avoid inside strings by first
+            // converting likely string tokens to double-quoted JSON strings.
+            out = safeSingleToDoubleQuotes(out);
+
+            // Remove Python-style trailing commas before } or ]
+            out = out.replace(/,\s*([}\]])/g, '$1');
+
+            // Replace bare True/False/None (outside of quotes) with JSON equivalents
+            // At this point strings should be double quoted, so these replacements are safer.
+            out = out.replace(/\bTrue\b/g, 'true');
+            out = out.replace(/\bFalse\b/g, 'false');
+            out = out.replace(/\bNone\b/g, 'null');
 
             return out;
         }
