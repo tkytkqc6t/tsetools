@@ -1,6 +1,281 @@
 // SQL Beautifier Functions
 // sqlEditor will hold a CodeMirror instance when available
 let sqlEditor; // global
+// File upload and preview for Data Extract JSON
+// Drag & drop for JSON
+const jsonDropZone = document.getElementById('extractJsonDropZone');
+if (jsonDropZone) {
+    jsonDropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        jsonDropZone.classList.add('border-blue-400', 'bg-blue-50');
+    });
+    jsonDropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        jsonDropZone.classList.remove('border-blue-400', 'bg-blue-50');
+    });
+    jsonDropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        jsonDropZone.classList.remove('border-blue-400', 'bg-blue-50');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.json')) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('extractJsonInput').value = ev.target.result;
+                updateExtractJsonPreview();
+            };
+            reader.readAsText(file);
+        }
+    });
+}
+function handleExtractJsonFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('extractJsonInput').value = e.target.result;
+        updateExtractJsonPreview();
+    };
+    reader.readAsText(file);
+}
+
+function updateExtractJsonPreview() {
+    const val = document.getElementById('extractJsonInput').value;
+    let preview = '';
+    try {
+        const obj = JSON.parse(val);
+        preview = JSON.stringify(obj, null, 2);
+    } catch (e) {
+        preview = 'Invalid JSON';
+    }
+    document.getElementById('extractJsonPreview').textContent = preview;
+}
+document.getElementById('extractJsonInput').addEventListener('input', updateExtractJsonPreview);
+
+// File upload and preview for Data Extract XML
+// Drag & drop for XML
+const xmlDropZone = document.getElementById('extractXmlDropZone');
+if (xmlDropZone) {
+    xmlDropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        xmlDropZone.classList.add('border-blue-400', 'bg-blue-50');
+    });
+    xmlDropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        xmlDropZone.classList.remove('border-blue-400', 'bg-blue-50');
+    });
+    xmlDropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        xmlDropZone.classList.remove('border-blue-400', 'bg-blue-50');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.xml')) {
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('extractXmlInput').value = ev.target.result;
+                updateExtractXmlPreview();
+            };
+            reader.readAsText(file);
+        }
+    });
+}
+function handleExtractXmlFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('extractXmlInput').value = e.target.result;
+        updateExtractXmlPreview();
+    };
+    reader.readAsText(file);
+}
+
+function updateExtractXmlPreview() {
+    const val = document.getElementById('extractXmlInput').value;
+    let preview = '';
+    try {
+        // Format XML with indentation
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(val, 'application/xml');
+        const serializer = new XMLSerializer();
+        let xmlStr = serializer.serializeToString(xmlDoc);
+        // Pretty print (basic)
+        preview = xmlStr.replace(/(>)(<)(\/*)/g, '$1\n$2$3');
+    } catch (e) {
+        preview = 'Invalid XML';
+    }
+    document.getElementById('extractXmlPreview').textContent = preview;
+}
+document.getElementById('extractXmlInput').addEventListener('input', updateExtractXmlPreview);
+// Show/hide sections including Data Extract
+function showSection(sectionId) {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(sec => sec.style.display = 'none');
+    const target = document.getElementById(sectionId);
+    if (target) target.style.display = '';
+}
+
+// Data Extract: JSON
+let lastJsonExtractRows = [];
+let lastJsonExtractFields = [];
+function extractJsonPreview() {
+    let jsonText = document.getElementById('extractJsonInput').value;
+    let parentCond = document.getElementById('extractJsonParent').value.trim();
+    let fields = document.getElementById('extractJsonFields').value.split(',').map(f => f.trim()).filter(f => f);
+    let resultDiv = document.getElementById('extractJsonResult');
+    let outputTa = document.getElementById('extractJsonOutput');
+    resultDiv.innerHTML = '';
+    if (outputTa) outputTa.value = '';
+    try {
+        let data = JSON.parse(jsonText);
+        if (!Array.isArray(data)) data = [data];
+        if (parentCond) {
+            let [pField, pValue] = parentCond.split('=');
+            if (pField && pValue) {
+                pField = pField.trim();
+                pValue = pValue.trim();
+                data = data.filter(item => String(item[pField]) === pValue);
+            }
+        }
+        let rows = data.map(item => {
+            let row = {};
+            fields.forEach(f => {
+                if (f.includes('.')) {
+                    let [parent, child] = f.split('.');
+                    if (Array.isArray(item[parent])) {
+                        row[f] = item[parent].map(sub => sub[child]).join('\n');
+                    } else if (item[parent]) {
+                        row[f] = item[parent][child];
+                    } else {
+                        row[f] = '';
+                    }
+                } else {
+                    row[f] = item[f];
+                }
+            });
+            return row;
+        });
+        lastJsonExtractRows = rows;
+        lastJsonExtractFields = fields;
+        // Output to textarea
+        let csv = fields.join(',') + '\n';
+        rows.forEach(row => {
+            csv += fields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
+        });
+        if (outputTa) outputTa.value = csv;
+        resultDiv.innerHTML = '<span class="text-green-600">Preview generated!</span>';
+    } catch (e) {
+        resultDiv.innerHTML = '<span class="text-red-600">Error: ' + e.message + '</span>';
+    }
+}
+
+function downloadJsonCSV() {
+    if (!lastJsonExtractRows.length || !lastJsonExtractFields.length) {
+        document.getElementById('extractJsonResult').innerHTML = '<span class="text-red-600">No data to download. Please extract first.</span>';
+        return;
+    }
+    let csv = lastJsonExtractFields.join(',') + '\n';
+    lastJsonExtractRows.forEach(row => {
+        csv += lastJsonExtractFields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
+    });
+    let blob = new Blob([csv], {type: 'text/csv'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'extract.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('extractJsonResult').innerHTML = '<span class="text-green-600">CSV downloaded!</span>';
+}
+
+// Data Extract: XML (basic, requires XML to JS conversion)
+let lastXmlExtractRows = [];
+let lastXmlExtractFields = [];
+function extractXmlPreview() {
+    let xmlText = document.getElementById('extractXmlInput').value;
+    let parentCond = document.getElementById('extractXmlParent').value.trim();
+    let fields = document.getElementById('extractXmlFields').value.split(',').map(f => f.trim()).filter(f => f);
+    let resultDiv = document.getElementById('extractXmlResult');
+    let outputTa = document.getElementById('extractXmlOutput');
+    resultDiv.innerHTML = '';
+    if (outputTa) outputTa.value = '';
+    try {
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+        let items = Array.from(xmlDoc.documentElement.children);
+        let data = items.map(item => {
+            let obj = {};
+            Array.from(item.children).forEach(child => {
+                if (child.children.length > 0) {
+                    obj[child.tagName] = Array.from(child.children).map(sub => {
+                        let subObj = {};
+                        Array.from(sub.children).forEach(subChild => {
+                            subObj[subChild.tagName] = subChild.textContent;
+                        });
+                        return subObj;
+                    });
+                } else {
+                    obj[child.tagName] = child.textContent;
+                }
+            });
+            return obj;
+        });
+        if (parentCond) {
+            let [pField, pValue] = parentCond.split('=');
+            if (pField && pValue) {
+                pField = pField.trim();
+                pValue = pValue.trim();
+                data = data.filter(item => String(item[pField]) === pValue);
+            }
+        }
+        let rows = data.map(item => {
+            let row = {};
+            fields.forEach(f => {
+                if (f.includes('.')) {
+                    let [parent, child] = f.split('.');
+                    if (Array.isArray(item[parent])) {
+                        row[f] = item[parent].map(sub => sub[child]).join('\n');
+                    } else if (item[parent]) {
+                        row[f] = item[parent][child];
+                    } else {
+                        row[f] = '';
+                    }
+                } else {
+                    row[f] = item[f];
+                }
+            });
+            return row;
+        });
+        lastXmlExtractRows = rows;
+        lastXmlExtractFields = fields;
+        // Output to textarea
+        let csv = fields.join(',') + '\n';
+        rows.forEach(row => {
+            csv += fields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
+        });
+        if (outputTa) outputTa.value = csv;
+        resultDiv.innerHTML = '<span class="text-green-600">Preview generated!</span>';
+    } catch (e) {
+        resultDiv.innerHTML = '<span class="text-red-600">Error: ' + e.message + '</span>';
+    }
+}
+
+function downloadXmlCSV() {
+    if (!lastXmlExtractRows.length || !lastXmlExtractFields.length) {
+        document.getElementById('extractXmlResult').innerHTML = '<span class="text-red-600">No data to download. Please extract first.</span>';
+        return;
+    }
+    let csv = lastXmlExtractFields.join(',') + '\n';
+    lastXmlExtractRows.forEach(row => {
+        csv += lastXmlExtractFields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
+    });
+    let blob = new Blob([csv], {type: 'text/csv'});
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = 'extract.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('extractXmlResult').innerHTML = '<span class="text-green-600">CSV downloaded!</span>';
+}
 
 function initSQLEditor() {
     try {
@@ -642,12 +917,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 'jsonFilterInput', 'xmlFilterInput', 'htmlInput', 'sqlInput',
                 // Outputs (CONVERTER and DATA FILTERS)
                 'jsonOutput', 'xmlOutput', 'csvOutput', 'xmlCsvOutput',
-                'jsonFilterOutput', 'xmlFilterOutput', 'htmlOutput'
+                'jsonFilterOutput', 'xmlFilterOutput', 'htmlOutput',
+                // Data Extract JSON/XML
+                'extractJsonInput','extractXmlInput',
+                'extractJsonFields','extractXmlFields'
             ];
             clearTextareas.forEach(id => {
                 const ta = document.getElementById(id);
                 if (ta) ta.value = '';
             });
+
+            // Clear Data Extract preview and output areas
+            const clearDivs = [
+                'extractJsonPreview','extractJsonResult','extractJsonTablePreview',
+                'extractXmlPreview','extractXmlResult','extractXmlTablePreview'
+            ];
+            clearDivs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+
+            // Reset last extracted data
+            if (typeof lastJsonExtractRows !== 'undefined') lastJsonExtractRows = [];
+            if (typeof lastJsonExtractFields !== 'undefined') lastJsonExtractFields = [];
+            if (typeof lastXmlExtractRows !== 'undefined') lastXmlExtractRows = [];
+            if (typeof lastXmlExtractFields !== 'undefined') lastXmlExtractFields = [];
 
             // Clear all file inputs
             const fileInputs = document.querySelectorAll('input[type="file"]');
