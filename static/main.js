@@ -190,10 +190,22 @@ function downloadJsonCSV() {
     let url = URL.createObjectURL(blob);
     let a = document.createElement('a');
     a.href = url;
-    a.download = 'extract.csv';
+    a.download = getDownloadFilename('csv');
     a.click();
     URL.revokeObjectURL(url);
     document.getElementById('extractJsonResult').innerHTML = '<span class="text-green-600">CSV downloaded!</span>';
+}
+
+// Helper to generate timestamped download filename: result_mmddyy_hhmmss.ext
+function getDownloadFilename(ext) {
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const yy = String(now.getFullYear()).slice(-2);
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    return `result_${mm}${dd}${yy}_${hh}${min}${ss}.${ext}`;
 }
 
 // Data Extract: XML (basic, requires XML to JS conversion)
@@ -298,7 +310,7 @@ function downloadXmlCSV() {
     let url = URL.createObjectURL(blob);
     let a = document.createElement('a');
     a.href = url;
-    a.download = 'extract.csv';
+    a.download = getDownloadFilename('csv');
     a.click();
     URL.revokeObjectURL(url);
     document.getElementById('extractXmlResult').innerHTML = '<span class="text-green-600">CSV downloaded!</span>';
@@ -1830,7 +1842,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'xml_converted_data.csv';
+                a.download = getDownloadFilename('csv');
                 document.body.appendChild(a);
                 a.click();
 
@@ -2035,7 +2047,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'json_converted_data.csv';
+                a.download = getDownloadFilename('csv');
                 document.body.appendChild(a);
                 a.click();
 
@@ -2407,7 +2419,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'filtered_json_data.json';
+                a.download = getDownloadFilename('json');
                 document.body.appendChild(a);
                 a.click();
 
@@ -2606,7 +2618,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'filtered_xml_data.xml';
+                a.download = getDownloadFilename('xml');
                 document.body.appendChild(a);
                 a.click();
 
