@@ -124,9 +124,19 @@ function extractJsonPreview() {
     let outputTa = document.getElementById('extractJsonOutput');
     resultDiv.innerHTML = '';
     if (outputTa) outputTa.value = '';
+    // If input is empty, show an error instead of a successful preview
+    if (!jsonText || !jsonText.trim()) {
+        lastJsonExtractRows = [];
+        lastJsonExtractFields = [];
+        resultDiv.innerHTML = '<span class="text-red-600">Error: Please enter JSON to extract.</span>';
+        return;
+    }
     try {
         let data = JSON.parse(jsonText);
         if (!Array.isArray(data)) data = [data];
+        if (!data.length) {
+            throw new Error('No JSON items found');
+        }
         if (parentCond) {
             let [pField, pValue] = parentCond.split('=');
             if (pField && pValue) {
@@ -197,10 +207,27 @@ function extractXmlPreview() {
     let outputTa = document.getElementById('extractXmlOutput');
     resultDiv.innerHTML = '';
     if (outputTa) outputTa.value = '';
+    // If input is empty, show an error instead of a successful preview
+    if (!xmlText || !xmlText.trim()) {
+        lastXmlExtractRows = [];
+        lastXmlExtractFields = [];
+        resultDiv.innerHTML = '<span class="text-red-600">Error: Please enter XML to extract.</span>';
+        return;
+    }
     try {
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+        // Detect parse errors: some browsers put a <parsererror> element
+        if (xmlDoc.getElementsByTagName('parsererror').length) {
+            throw new Error('Invalid XML format');
+        }
+        if (!xmlDoc.documentElement) {
+            throw new Error('Invalid XML format');
+        }
         let items = Array.from(xmlDoc.documentElement.children);
+        if (!items.length) {
+            throw new Error('No XML items found under the root element');
+        }
         let data = items.map(item => {
             let obj = {};
             Array.from(item.children).forEach(child => {
@@ -917,6 +944,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'jsonFilterInput', 'xmlFilterInput', 'htmlInput', 'sqlInput',
                 // Outputs (CONVERTER and DATA FILTERS)
                 'jsonOutput', 'xmlOutput', 'csvOutput', 'xmlCsvOutput',
+                // Data Extract output areas
+                'extractJsonOutput', 'extractXmlOutput',
                 'jsonFilterOutput', 'xmlFilterOutput', 'htmlOutput',
                 // Data Extract JSON/XML
                 'extractJsonInput','extractXmlInput',
