@@ -424,7 +424,8 @@ function highlightSQL(sql) {
         {type: 'comment', regex: /(\/\*[\s\S]*?\*\/|--.*?$)/gm},
         {type: 'string', regex: /'(?:''|[^'])*'/g},
         {type: 'number', regex: /\b\d+(?:\.\d+)?\b/g},
-        {type: 'keyword', regex: /\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT|OFFSET|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE\s+FROM|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN|ON|AND|OR|UNION|UNION\s+ALL|EXCEPT|INTERSECT|IN|EXISTS|NOT|CASE|WHEN|THEN|ELSE|END|AS|DISTINCT|TOP|IS|NULL|LIKE|BETWEEN|ASC|DESC)\b/gi},
+        {type: 'function', regex: /\b(AVG|COUNT|FIRST|LAST|MAX|MIN|SUM|UCASE|LCASE|MID|LEN|LENGTH|ROUND|NOW|GETDATE|CURDATE|CURRENT_DATE|CURRENT_TIME|CURRENT_TIMESTAMP|DATE|DATEADD|DATEDIFF|DATE_SUB|YEAR|MONTH|DAY|HOUR|MINUTE|SECOND|ABS|CEIL|CEILING|FLOOR|POWER|SQRT|MOD|RAND|TRUNCATE|COALESCE|NULLIF|ISNULL|IFNULL|NVL|CAST|CONVERT|FORMAT|CONCAT|CONCAT_WS|SUBSTRING|LEFT|RIGHT|REPLACE|INSTR|LOCATE|POSITION|CHAR_LENGTH|CHARACTER_LENGTH|REVERSE|ASCII|CHAR|LTRIM|RTRIM|TRIM|LOWER|UPPER)\b/gi},
+        {type: 'keyword', regex: /\b(SELECT|FROM|WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|TOP|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|CREATE\s+DATABASE|DROP\s+DATABASE|TRUNCATE|JOIN|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|ON|UNION|UNION\s+ALL|INTERSECT|EXCEPT|MINUS|PRIMARY\s+KEY|FOREIGN\s+KEY|NOT\s+NULL|IS\s+NULL|IS\s+NOT\s+NULL|UNIQUE|CHECK|DEFAULT|CONSTRAINT|INDEX|AUTO_INCREMENT|BEGIN|START\s+TRANSACTION|COMMIT|ROLLBACK|DISTINCT|IN|BETWEEN|LIKE|AS|CASE|WHEN|THEN|ELSE|END|EXISTS|ALL|ANY|SOME|CAST|CONVERT|COALESCE|NULLIF|MAX|MIN|AVG|SUM|COUNT|NOW|CURDATE|GETDATE|SYSDATE|DATE|DATEADD|DATEDIFF|DATE_SUB|INTERVAL|DAY|MONTH|YEAR|TIME|CURRENT_TIMESTAMP|CURRENT_DATE|CURRENT_TIME|DATABASE|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|CURSOR|DECLARE|FETCH|OPEN|CLOSE|LOOP|WHILE|IF|ELSEIF|SIGNAL|RESIGNAL|RETURN)\b/gi},
         {type: 'operator', regex: /[+\-*\/=%<>!]+/g},
         {type: 'paren', regex: /[()]/g}
     ];
@@ -436,8 +437,11 @@ function highlightSQL(sql) {
     html = html.replace(/(\/\*[\s\S]*?\*\/|--.*?$)/gm, function(m) { return `<span class="sql-comment">${escapeHtml(m)}</span>`; });
     html = html.replace(/'(?:''|[^'])*'/g, function(m) { return `<span class="sql-string">${escapeHtml(m)}</span>`; });
 
+    // Functions
+    html = html.replace(/\b(AVG|COUNT|FIRST|LAST|MAX|MIN|SUM|UCASE|LCASE|MID|LEN|LENGTH|ROUND|NOW|GETDATE|CURDATE|CURRENT_DATE|CURRENT_TIME|CURRENT_TIMESTAMP|DATE|DATEADD|DATEDIFF|DATE_SUB|YEAR|MONTH|DAY|HOUR|MINUTE|SECOND|ABS|CEIL|CEILING|FLOOR|POWER|SQRT|MOD|RAND|TRUNCATE|COALESCE|NULLIF|ISNULL|IFNULL|NVL|CAST|CONVERT|FORMAT|CONCAT|CONCAT_WS|SUBSTRING|LEFT|RIGHT|REPLACE|INSTR|LOCATE|POSITION|CHAR_LENGTH|CHARACTER_LENGTH|REVERSE|ASCII|CHAR|LTRIM|RTRIM|TRIM|LOWER|UPPER)\b/gi, function(m) { return `<span class="sql-function">${m.toUpperCase()}</span>`; });
+
     // Keywords (case-insensitive)
-    html = html.replace(/\b(SELECT|FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT|OFFSET|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE\s+FROM|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN|ON|AND|OR|UNION|UNION\s+ALL|EXCEPT|INTERSECT|IN|EXISTS|NOT|CASE|WHEN|THEN|ELSE|END|AS|DISTINCT|TOP|IS|NULL|LIKE|BETWEEN|ASC|DESC)\b/gi, function(m) {
+    html = html.replace(/\b(SELECT|FROM|WHERE|GROUP\s+BY|HAVING|ORDER\s+BY|LIMIT|TOP|INSERT\s+INTO|VALUES|UPDATE|SET|DELETE|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|CREATE\s+DATABASE|DROP\s+DATABASE|TRUNCATE|JOIN|INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|ON|UNION|UNION\s+ALL|INTERSECT|EXCEPT|MINUS|PRIMARY\s+KEY|FOREIGN\s+KEY|NOT\s+NULL|IS\s+NULL|IS\s+NOT\s+NULL|UNIQUE|CHECK|DEFAULT|CONSTRAINT|INDEX|AUTO_INCREMENT|BEGIN|START\s+TRANSACTION|COMMIT|ROLLBACK|DISTINCT|IN|BETWEEN|LIKE|AS|CASE|WHEN|THEN|ELSE|END|EXISTS|ALL|ANY|SOME|CAST|CONVERT|COALESCE|NULLIF|MAX|MIN|AVG|SUM|COUNT|NOW|CURDATE|GETDATE|SYSDATE|DATE|DATEADD|DATEDIFF|DATE_SUB|INTERVAL|DAY|MONTH|YEAR|TIME|CURRENT_TIMESTAMP|CURRENT_DATE|CURRENT_TIME|DATABASE|TABLE|VIEW|PROCEDURE|FUNCTION|TRIGGER|CURSOR|DECLARE|FETCH|OPEN|CLOSE|LOOP|WHILE|IF|ELSEIF|SIGNAL|RESIGNAL|RETURN)\b/gi, function(m) {
         return `<span class="sql-keyword">${m.toUpperCase()}</span>`;
     });
 
@@ -455,14 +459,24 @@ function highlightSQL(sql) {
 
 function validateSQL(sql) {
     const errors = [];
-    const sqlTrim = sql.trim();
+    // Remove comments (block and line) for validation purposes
+    let sqlNoComments = sql.replace(/\/\*[\s\S]*?\*\//g, '');
+    sqlNoComments = sqlNoComments.replace(/--.*?$/gm, '');
+    const sqlTrim = sqlNoComments.trim();
+    // If after removing comments there's nothing, treat as empty input
+    if (!sqlTrim) {
+        errors.push('SQL appears to contain only comments or is empty. Please provide an SQL statement.');
+        return errors;
+    }
     // Check for common SQL statement start
-    if (!/^\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH)\b/i.test(sqlTrim)) {
-        errors.push('SQL must start with SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, or WITH.');
+    if (!/^\s*(SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH|BEGIN|START|TRUNCATE)\b/i.test(sqlTrim)) {
+        errors.push('SQL must start with a valid statement (e.g. SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, WITH, BEGIN).');
     }
     // Check for balanced parentheses
+    // Count parentheses ignoring comments and strings
+    const sqlNoStrings = sqlTrim.replace(/(['"]).*?\1/g, '');
     let paren = 0;
-    for (let c of sql) {
+    for (let c of sqlNoStrings) {
         if (c === '(') paren++;
         if (c === ')') paren--;
         if (paren < 0) {
@@ -480,23 +494,28 @@ function validateSQL(sql) {
         errors.push('SQL should end with a semicolon (;)');
     }
     // Check for forbidden keywords (very basic)
-    if (/\b(DELETE|DROP)\b/i.test(sqlTrim) && !/\bWHERE\b/i.test(sqlTrim)) {
-        errors.push('DELETE or DROP statements should have a WHERE clause to avoid affecting all rows.');
+    if (/\b(DELETE|DROP|TRUNCATE)\b/i.test(sqlTrim) && !/\bWHERE\b/i.test(sqlTrim)) {
+        errors.push('DELETE, DROP or TRUNCATE statements should have a WHERE clause (or be used carefully) to avoid affecting all rows.');
     }
 
     // Enhanced: Check for misspelled or unknown SQL keywords
-    const knownKeywords = [
-        'SELECT','FROM','WHERE','GROUP','BY','ORDER','HAVING','LIMIT','OFFSET','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','ALTER','DROP','WITH','INNER','JOIN','LEFT','RIGHT','FULL','ON','AND','OR','UNION','ALL','EXCEPT','INTERSECT','IN','EXISTS','NOT','CASE','WHEN','THEN','ELSE','END','AS','DISTINCT','TOP','IS','NULL','LIKE','BETWEEN','OUTER','CROSS','NATURAL','USING','ASC','DESC'
-    ];
-    // Find all words in the SQL that look like keywords (all-caps or mixed-case, not inside quotes)
+    // Known keywords list (single-word tokens). Multi-word constructs like "GROUP BY" will be validated
+    // by checking the individual tokens ('GROUP' and 'BY') to avoid grouping tokens across newlines.
+    const knownKeywords = new Set([
+        'SELECT','FROM','WHERE','GROUP','BY','ORDER','HAVING','LIMIT','OFFSET','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','ALTER','DROP','WITH','INNER','JOIN','LEFT','RIGHT','FULL','ON','AND','OR','UNION','EXCEPT','INTERSECT','MINUS','IN','EXISTS','NOT','CASE','WHEN','THEN','ELSE','END','AS','DISTINCT','TOP','IS','NULL','LIKE','BETWEEN','ASC','DESC','PRIMARY','KEY','FOREIGN','CONSTRAINT','UNIQUE','CHECK','DEFAULT','INDEX','AUTO_INCREMENT','BEGIN','START','TRANSACTION','COMMIT','ROLLBACK','TRUNCATE','DATABASE','TABLE','VIEW','PROCEDURE','FUNCTION','TRIGGER','CURSOR','DECLARE','FETCH','OPEN','CLOSE','LOOP','WHILE','IF','ELSEIF','SIGNAL','RESIGNAL','RETURN','CAST','CONVERT','COALESCE','NULLIF','ALL','ANY','SOME','MIN','MAX','AVG','SUM','COUNT','NOW','CURDATE','GETDATE','SYSDATE','DATE','DATEADD','DATEDIFF','DATE_SUB','INTERVAL','DAY','MONTH','YEAR','TIME','CURRENT_TIMESTAMP','CURRENT_DATE','CURRENT_TIME'
+    ]);
+
+    // Match only single-word UPPER-like tokens (prevents matching multi-word sequences like "SELECT MAX")
     const keywordPattern = /\b([A-Z][A-Z0-9_]*)\b/g;
     let match;
     let unknowns = [];
     // Remove quoted strings to avoid false positives
-    const sqlNoStrings = sql.replace(/(['"]).*?\1/g, '');
-    while ((match = keywordPattern.exec(sqlNoStrings)) !== null) {
+    const sqlForKeywords = sqlNoComments.replace(/(['"]).*?\1/g, '');
+    while ((match = keywordPattern.exec(sqlForKeywords)) !== null) {
         const word = match[1].toUpperCase();
-        if (!knownKeywords.includes(word) && word.length > 2) {
+        // Skip short tokens and obvious identifiers (length <= 1)
+        if (word.length <= 1) continue;
+        if (!knownKeywords.has(word) && !/^\d+$/.test(word)) {
             unknowns.push(word);
         }
     }
@@ -512,8 +531,11 @@ function formatSQL(sql) {
     // Basic SQL formatter: splits keywords to new lines and indents
     // This is a simple implementation, not a full SQL parser
     const keywords = [
-        'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'OFFSET',
-        'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'JOIN', 'ON', 'AND', 'OR', 'UNION', 'UNION ALL', 'EXCEPT', 'INTERSECT', 'IN', 'EXISTS', 'NOT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END'
+        'SELECT','FROM','WHERE','GROUP BY','ORDER BY','HAVING','LIMIT','OFFSET','TOP',
+        'INSERT INTO','VALUES','UPDATE','SET','DELETE','DELETE FROM','CREATE TABLE','ALTER TABLE','DROP TABLE','CREATE DATABASE','DROP DATABASE','TRUNCATE',
+        'INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','JOIN','ON','AND','OR','UNION','UNION ALL','INTERSECT','EXCEPT','MINUS',
+        'IN','EXISTS','NOT','CASE','WHEN','THEN','ELSE','END','AS','DISTINCT','PRIMARY KEY','FOREIGN KEY','CONSTRAINT','UNIQUE','CHECK','DEFAULT',
+        'BEGIN','START TRANSACTION','COMMIT','ROLLBACK'
     ];
     let formatted = sql;
     // Place keywords on new lines
