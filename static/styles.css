@@ -46,3 +46,34 @@ button.sidebar-menu-btn:active {
 .CodeMirror .cm-error-line, .CodeMirror .cm-sql-error {
     color: red !important;
 }
+
+/* SQL token styles used by the lightweight highlighter */
+.sql-keyword {
+    color: #1e40af; /* blue-800 */
+    font-weight: 600;
+}
+.sql-function {
+    color: #065f46; /* green-800 */
+}
+.sql-comment {
+    color: #6b7280; /* gray-500 */
+    font-style: italic;
+}
+.sql-string {
+    color: #b45309; /* amber-700 */
+}
+.sql-number {
+    color: #7c3aed; /* violet-700 */
+}
+.sql-operator {
+    color: #dc2626; /* red-600 */
+}
+.sql-paren {
+    color: #374151; /* gray-700 */
+}
+
+/* Visually highlight lines flagged as error in CodeMirror */
+.CodeMirror .cm-error-line {
+    background: rgba(255, 0, 0, 0.04) !important;
+    border-left: 3px solid rgba(255, 0, 0, 0.25);
+}
