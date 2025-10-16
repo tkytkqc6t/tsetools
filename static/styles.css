@@ -71,6 +71,29 @@ button.sidebar-menu-btn:active {
 .sql-paren {
     color: #374151; /* gray-700 */
 }
+.diff-container { display: flex; gap: 12px; }
+.diff-column { flex: 1; min-height: 120px; border: 1px solid #e5e7eb; padding: 8px; background: #fff; overflow:auto; }
+.diff-line { padding: 2px 6px; white-space: pre-wrap; word-break: break-word; }
+.diff-line.same { background: transparent; }
+.diff-line.added { background-color: #d1fae5; } /* green-ish */
+.diff-line.removed { background-color: #fee2e2; } /* red-ish */
+.diff-empty-placeholder { background-color: #fee2e2; color: transparent; }
+.diff-inline-added { background-color: #bbf7d0; }
+.diff-inline-removed { background-color: #fecaca; }
+.diff-inline-span { padding: 0 2px; border-radius: 2px; }
+
+/* Layout for side-by-side diff lines */
+.diff-line { display: flex; gap: 8px; align-items: flex-start; }
+.diff-linenumber { width: 3rem; text-align: right; color: #6b7280; padding-right: 8px; flex: 0 0 auto; }
+.diff-cell-content { flex: 1 1 auto; white-space: pre-wrap; word-break: break-word; }
+.diff-row-unchanged { background: transparent; }
+.diff-row { display: block; padding: 2px 0; }
+.diff-left .diff-line { border-right: 1px solid #f3f4f6; padding-right: 8px; }
+.diff-right .diff-line { padding-left: 8px; }
+
+/* Prevent selection/copying of the line number column */
+.diff-linenumber-wrap { user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
+.diff-linenumber { pointer-events: none; }
 
 /* Visually highlight lines flagged as error in CodeMirror */
 .CodeMirror .cm-error-line {

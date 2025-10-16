@@ -15,6 +15,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+    <!-- jsdiff for smarter diffs and inline highlights -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
 
 </head>
 
@@ -99,6 +101,8 @@
                                 class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON → CSV</a>
                             <a href="#" onclick="showSection('xml-csv'); closeDropdowns()"
                                 class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">XML → CSV</a>
+                            <a href="#" onclick="showSection('base64'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">Base64</a>
                         </div>
                     </div>
 
@@ -121,6 +125,8 @@
                                 class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Filter from JSON</a>
                             <a href="#" onclick="showSection('xml-filter'); closeDropdowns()"
                                 class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Filter from XML</a>
+                            <a href="#" onclick="showSection('diff-checker'); closeDropdowns()"
+                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Diff Checker</a>
                         </div>
                     </div>
                         <!-- Data Extract Dropdown -->
@@ -266,6 +272,62 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+            </div>
+            <!-- Base64 Converter Section -->
+            <div id="base64" class="section hidden pb-32">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Base64 Encoder / Decoder</h2>
+                    <p class="text-gray-600">Encode text to Base64 or decode Base64 to text. Works with UTF-8 strings.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Input</label>
+                            <textarea id="base64Input" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Paste text or base64 here..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Output</label>
+                            <textarea id="base64Output" class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Result will appear here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center gap-3">
+                        <button onclick="encodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Encode</button>
+                        <button onclick="decodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Decode</button>
+                        <button onclick="copyBase64Output()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
+                        <button onclick="clearBase64()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Diff Checker Section -->
+            <div id="diff-checker" class="section hidden pb-32">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Diff Checker</h2>
+                    <p class="text-gray-600">Compare two texts line-by-line. Useful for quick diffs.</p>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Left</label>
+                            <textarea id="diffLeft" class="w-full h-60 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Left text..."></textarea>
+                            <!-- Rendered colored diff view (hidden until Compare) -->
+                            <div id="diffLeftView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Right</label>
+                            <textarea id="diffRight" class="w-full h-60 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Right text..."></textarea>
+                            <!-- Rendered colored diff view (hidden until Compare) -->
+                            <div id="diffRightView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex items-center gap-3">
+                        <button onclick="compareDiff()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3" style="background-color: #25c9d0;">Compare</button>
+                        <button onclick="copyDiffResult()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
+                        <button onclick="clearDiff()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                    </div>
+                        <div class="mt-4 flex items-center justify-between">
                 </div>
             </div>
             <!-- XML Beautifier Section -->
@@ -949,7 +1011,7 @@
 
     <script type="text/javascript" src="static/main.js"></script>
     <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
-            TSE Tools Version 1.3a © 2025 <br>
+            TSE Tools Version 1.4 © 2025 <br>
             Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
     </footer>
 </body>
