@@ -113,6 +113,58 @@ function showSection(sectionId) {
     if (target) target.style.display = '';
 }
 
+// Ensure showSection clears transient inputs when switching sections
+const _originalShowSection = showSection;
+function showSection(sectionId) {
+    // Clear diff checker inputs/results
+    const diffLeft = document.getElementById('diffLeft');
+    const diffRight = document.getElementById('diffRight');
+    if (diffLeft) diffLeft.value = '';
+    if (diffRight) diffRight.value = '';
+
+    // Clear rendered diff views and navigation state
+    const diffLeftView = document.getElementById('diffLeftView');
+    const diffRightView = document.getElementById('diffRightView');
+    if (diffLeftView) {
+        diffLeftView.innerHTML = '';
+        diffLeftView.classList.add('hidden');
+    }
+    if (diffRightView) {
+        diffRightView.innerHTML = '';
+        diffRightView.classList.add('hidden');
+    }
+
+    // Reset diff navigation state used by prev/next buttons
+    try {
+        if (window.__diffNav) {
+            window.__diffNav.rows = [];
+            window.__diffNav.index = -1;
+        }
+    } catch (e) {
+        // ignore
+    }
+
+    // Reset diff summary and disable nav buttons
+    const diffSummary = document.getElementById('diffSummary');
+    if (diffSummary) diffSummary.textContent = '0 changes';
+    const prevBtn = document.getElementById('diffPrevBtn');
+    const nextBtn = document.getElementById('diffNextBtn');
+    if (prevBtn) prevBtn.disabled = true;
+    if (nextBtn) nextBtn.disabled = true;
+
+    // Clear base64 inputs/outputs (existing behavior ensured elsewhere but double safe here)
+    const bIn = document.getElementById('base64Input');
+    const bOut = document.getElementById('base64Output');
+    if (bIn) bIn.value = '';
+    if (bOut) bOut.value = '';
+
+    // Call the original to actually show/hide sections
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(sec => sec.style.display = 'none');
+    const target = document.getElementById(sectionId);
+    if (target) target.style.display = '';
+}
+
 // Data Extract: JSON
 let lastJsonExtractRows = [];
 let lastJsonExtractFields = [];
@@ -574,6 +626,374 @@ function clearSQL() {
     document.getElementById('sqlOutput').value = '';
 }
 
+// Diff Checker functions
+function compareDiff() {
+    const leftTa = document.getElementById('diffLeft');
+    const rightTa = document.getElementById('diffRight');
+    const leftView = document.getElementById('diffLeftView');
+    const rightView = document.getElementById('diffRightView');
+    const leftText = leftTa ? leftTa.value : '';
+    const rightText = rightTa ? rightTa.value : '';
+    // We always use word-level inline diffs for modified lines
+
+    // Helpers to create row elements with line number and content cell
+    function createRowEl(lineNumber, contentText) {
+        const row = document.createElement('div');
+        row.className = 'diff-row';
+
+        const line = document.createElement('div');
+        line.className = 'diff-line py-0.5 px-2 text-xs';
+
+        // put line number in a separate non-selectable container so copying content skips the numbers
+        const numWrap = document.createElement('div');
+        numWrap.className = 'diff-linenumber-wrap';
+        const num = document.createElement('div');
+        num.className = 'diff-linenumber';
+        num.textContent = lineNumber ? String(lineNumber) : '';
+        numWrap.appendChild(num);
+
+        const content = document.createElement('div');
+        content.className = 'diff-cell-content';
+        if (contentText !== undefined && contentText !== null) content.textContent = contentText;
+
+        line.appendChild(numWrap);
+        line.appendChild(content);
+        row.appendChild(line);
+        return { row, line, num, content };
+    }
+
+    // Fallback when jsdiff missing
+    if (!window.Diff || !Diff.diffLines) {
+        console.warn('jsdiff not available, using fallback');
+        const left = leftTa ? leftTa.value.split('\n') : [];
+        const right = rightTa ? rightTa.value.split('\n') : [];
+        const maxLen = Math.max(left.length, right.length);
+        leftView.innerHTML = '';
+        rightView.innerHTML = '';
+        for (let i = 0; i < maxLen; i++) {
+            const l = left[i] !== undefined ? left[i] : '';
+            const r = right[i] !== undefined ? right[i] : '';
+            // use createRowEl helper to build consistent row structure
+            const lParts = createRowEl(i + 1, l);
+            const rParts = createRowEl(i + 1, r);
+            if (l === r) {
+                lParts.line.classList.add('same'); lParts.content.textContent = l;
+                rParts.line.classList.add('same'); rParts.content.textContent = r;
+            } else {
+                if (l) { lParts.line.classList.add('removed'); lParts.content.textContent = l; } else { lParts.line.classList.add('diff-empty-placeholder'); lParts.content.textContent = '\u00A0'; }
+                if (r) { rParts.line.classList.add('added'); rParts.content.textContent = r; } else { rParts.line.classList.add('diff-empty-placeholder'); rParts.content.textContent = '\u00A0'; }
+            }
+            leftView.appendChild(lParts.row);
+            rightView.appendChild(rParts.row);
+        }
+        leftView.classList.remove('hidden');
+        rightView.classList.remove('hidden');
+        return;
+    }
+
+    // Settings: default to word granularity only; ignore-whitespace control removed
+    const ignoreWhitespace = false;
+    const granularity = 'word';
+
+    // We'll perform an LCS-based line alignment so identical lines after shifts are matched.
+    const leftLines = leftText === '' ? [] : leftText.split('\n');
+    const rightLines = rightText === '' ? [] : rightText.split('\n');
+    leftView.innerHTML = '';
+    rightView.innerHTML = '';
+
+    // Normalize function: optionally ignore whitespace (collapse internal whitespace) so indentation/extra spaces don't break matching
+    const normalize = s => {
+        if (s === undefined || s === null) return '';
+        let out = String(s);
+        if (ignoreWhitespace) out = out.replace(/\s+/g, ' ');
+        return out.trim();
+    };
+    const leftKeys = leftLines.map(normalize);
+    const rightKeys = rightLines.map(normalize);
+
+    // Global walker over both lists with lookahead for small shifts/transpositions
+    let i = 0, j = 0;
+    const n = leftLines.length, m = rightLines.length;
+    while (i < n || j < m) {
+        if (i < n && j < m && leftKeys[i] === rightKeys[j]) {
+            renderPair(leftLines[i], rightLines[j], 'same', i + 1, j + 1);
+            i++; j++;
+            continue;
+        }
+        // transposition detection
+        if (i + 1 < n && j + 1 < m && leftKeys[i] === rightKeys[j + 1] && leftKeys[i + 1] === rightKeys[j]) {
+            renderPair(leftLines[i], rightLines[j + 1], 'same', i + 1, j + 2);
+            renderPair(leftLines[i + 1], rightLines[j], 'same', i + 2, j + 1);
+            i += 2; j += 2;
+            continue;
+        }
+        // right has an extra line (insert)
+        if (i < n && j + 1 < m && leftKeys[i] === rightKeys[j + 1]) {
+            renderPair('', rightLines[j], 'added', '', j + 1);
+            j++;
+            continue;
+        }
+        // left has an extra line (delete)
+        if (i + 1 < n && j < m && leftKeys[i + 1] === rightKeys[j]) {
+            renderPair(leftLines[i], '', 'removed', i + 1, '');
+            i++;
+            continue;
+        }
+        // fallback: pair as modified or single-sided
+        if (i < n && j < m) {
+            renderPair(leftLines[i], rightLines[j], 'modified', i + 1, j + 1);
+            i++; j++;
+        } else if (i < n) {
+            renderPair(leftLines[i], '', 'removed', i + 1, '');
+            i++;
+        } else if (j < m) {
+            renderPair('', rightLines[j], 'added', '', j + 1);
+            j++;
+        }
+    }
+
+    const dp = buildLcsTable();
+    const matches = backtrackMatches(dp);
+
+    // Helper to render a single line pair (leftLine nullable, rightLine nullable, type)
+    function renderPair(lLine, rLine, type, lNum, rNum) {
+        const lParts = createRowEl(lNum, lLine);
+        const rParts = createRowEl(rNum, rLine);
+
+        if (type === 'same') {
+            lParts.line.classList.add('same'); rParts.line.classList.add('same');
+            lParts.content.textContent = lLine; rParts.content.textContent = rLine;
+        } else if (type === 'removed') {
+            lParts.line.classList.add('removed'); rParts.line.classList.add('diff-empty-placeholder'); rParts.content.textContent = '\u00A0';
+            // inline diff according to granularity
+            let inline = [];
+            if (window.Diff) {
+                inline = Diff.diffWordsWithSpace(lLine, '');
+            } else {
+                inline = [{ value: lLine, removed: true }];
+            }
+            lParts.content.innerHTML = '';
+            inline.forEach(p => {
+                const span = document.createElement('span'); span.className = 'diff-inline-span'; span.textContent = p.value;
+                if (p.removed) span.classList.add('diff-inline-removed');
+                lParts.content.appendChild(span);
+            });
+        } else if (type === 'added') {
+            lParts.line.classList.add('diff-empty-placeholder'); lParts.content.textContent = '\u00A0'; rParts.line.classList.add('added');
+            let inline = [];
+            if (window.Diff) {
+                inline = Diff.diffWordsWithSpace('', rLine);
+            } else {
+                inline = [{ value: rLine, added: true }];
+            }
+            rParts.content.innerHTML = '';
+            inline.forEach(p => {
+                const span = document.createElement('span'); span.className = 'diff-inline-span'; span.textContent = p.value;
+                if (p.added) span.classList.add('diff-inline-added');
+                rParts.content.appendChild(span);
+            });
+        } else if (type === 'modified') {
+            lParts.line.classList.add('removed'); rParts.line.classList.add('added');
+            let inline = [];
+            if (window.Diff) {
+                inline = Diff.diffWordsWithSpace(lLine, rLine);
+            } else {
+                // fallback: mark whole lines as removed/added
+                inline = [{ value: lLine, removed: true }, { value: rLine, added: true }];
+            }
+            lParts.content.innerHTML = '';
+            rParts.content.innerHTML = '';
+            inline.forEach(p => {
+                const spanL = document.createElement('span'); spanL.className = 'diff-inline-span'; spanL.textContent = p.value;
+                const spanR = document.createElement('span'); spanR.className = 'diff-inline-span'; spanR.textContent = p.value;
+                if (p.added) { spanR.classList.add('diff-inline-added'); }
+                else if (p.removed) { spanL.classList.add('diff-inline-removed'); }
+                lParts.content.appendChild(spanL);
+                rParts.content.appendChild(spanR);
+            });
+        }
+
+        // mark rows for navigation and counts
+        if (type === 'added' || type === 'removed' || type === 'modified') {
+            lParts.row.dataset.diffType = type;
+            rParts.row.dataset.diffType = type;
+            lParts.row.classList.add('has-diff');
+            rParts.row.classList.add('has-diff');
+        }
+
+        leftView.appendChild(lParts.row);
+        rightView.appendChild(rParts.row);
+    }
+
+    // Iterate through matches and handle gaps
+    let prevL = 0, prevR = 0;
+    for (let k = 0; k <= matches.length; k++) {
+        const match = matches[k];
+        const matchL = match ? match.i : leftLines.length;
+        const matchR = match ? match.j : rightLines.length;
+
+        // ranges [prevL, matchL) and [prevR, matchR) are unmatched blocks
+        // We'll walk them with lookahead to detect single-line shifts and insert placeholder rows
+        let i = prevL;
+        let j = prevR;
+        while (i < matchL || j < matchR) {
+            // direct match at current indices
+            if (i < matchL && j < matchR && leftKeys[i] === rightKeys[j]) {
+                renderPair(leftLines[i], rightLines[j], 'same', i + 1, j + 1);
+                i++; j++;
+                continue;
+            }
+            // detect adjacent transposition: left[i]==right[j+1] && left[i+1]==right[j]
+            if ((i + 1) < matchL && (j + 1) < matchR && leftKeys[i] === rightKeys[j + 1] && leftKeys[i + 1] === rightKeys[j]) {
+                // treat as two matching lines (swapped) so both appear as same
+                renderPair(leftLines[i], rightLines[j + 1], 'same', i + 1, j + 2);
+                renderPair(leftLines[i + 1], rightLines[j], 'same', i + 2, j + 1);
+                i += 2; j += 2;
+                continue;
+            }
+            // lookahead: right has an extra line before match (L matches R+1)
+            if (i < matchL && (j + 1) < matchR && leftKeys[i] === rightKeys[j + 1]) {
+                // insert an empty placeholder on left, mark right[j] as added
+                renderPair('', rightLines[j], 'added', '', j + 1);
+                j++;
+                continue;
+            }
+            // lookahead: left has an extra line before match (R matches L+1)
+            if ((i + 1) < matchL && j < matchR && leftKeys[i + 1] === rightKeys[j]) {
+                // insert an empty placeholder on right, mark left[i] as removed
+                renderPair(leftLines[i], '', 'removed', i + 1, '');
+                i++;
+                continue;
+            }
+            // otherwise, pair current lines as modified if both exist
+            if (i < matchL && j < matchR) {
+                renderPair(leftLines[i], rightLines[j], 'modified', i + 1, j + 1);
+                i++; j++;
+            } else if (i < matchL) {
+                renderPair(leftLines[i], '', 'removed', i + 1, '');
+                i++;
+            } else if (j < matchR) {
+                renderPair('', rightLines[j], 'added', '', j + 1);
+                j++;
+            }
+        }
+        // advance prev indices to the end of the unmatched block
+        prevL = i;
+        prevR = j;
+
+        // Now render the matched line (if any)
+        if (match) {
+            const lLine = leftLines[match.i];
+            const rLine = rightLines[match.j];
+            renderPair(lLine, rLine, 'same', match.i + 1, match.j + 1);
+            prevL = match.i + 1;
+            prevR = match.j + 1;
+        } else {
+            // finalization
+            prevL = matchL;
+            prevR = matchR;
+        }
+    }
+
+    leftView.classList.remove('hidden');
+    rightView.classList.remove('hidden');
+
+    leftView.classList.remove('hidden');
+    rightView.classList.remove('hidden');
+    // After rendering, collect diff rows for navigation
+    const diffRows = Array.from(document.querySelectorAll('.has-diff'));
+    window.__diffNav = {
+        rows: diffRows,
+        index: diffRows.length ? 0 : -1
+    };
+    // update summary
+    const summaryEl = document.getElementById('diffSummary');
+    if (summaryEl) summaryEl.textContent = `${diffRows.length} change${diffRows.length === 1 ? '' : 's'}`;
+    // highlight initial diff
+    if (window.__diffNav.index >= 0) highlightDiffAtIndex(window.__diffNav.index);
+}
+
+function highlightDiffAtIndex(idx) {
+    if (!window.__diffNav || !window.__diffNav.rows) return;
+    const rows = window.__diffNav.rows;
+    rows.forEach(r => r.classList.remove('diff-selected'));
+    if (idx < 0 || idx >= rows.length) return;
+    const target = rows[idx];
+    target.classList.add('diff-selected');
+    // scroll into view inside its parent container
+    const container = target.closest('.diff-row') ? target.parentElement.parentElement : null;
+    if (container) {
+        target.scrollIntoView({behavior: 'smooth', block: 'center'});
+    } else {
+        target.scrollIntoView({behavior: 'smooth', block: 'center'});
+    }
+}
+
+function findNextDiff() {
+    if (!window.__diffNav) return;
+    if (window.__diffNav.rows.length === 0) return;
+    window.__diffNav.index = Math.min(window.__diffNav.index + 1, window.__diffNav.rows.length - 1);
+    highlightDiffAtIndex(window.__diffNav.index);
+}
+
+function findPrevDiff() {
+    if (!window.__diffNav) return;
+    if (window.__diffNav.rows.length === 0) return;
+    window.__diffNav.index = Math.max(window.__diffNav.index - 1, 0);
+    highlightDiffAtIndex(window.__diffNav.index);
+}
+
+function copyDiffResult() {
+    // Prefer copying the rendered diff views if available
+    const leftView = document.getElementById('diffLeftView');
+    const rightView = document.getElementById('diffRightView');
+    let text = '';
+    if (leftView && rightView && !leftView.classList.contains('hidden')) {
+        // Build side-by-side textual representation using original textareas for fidelity
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        const leftLines = leftTa ? leftTa.value.split('\n') : [];
+        const rightLines = rightTa ? rightTa.value.split('\n') : [];
+        const maxLen = Math.max(leftLines.length, rightLines.length);
+        for (let i = 0; i < maxLen; i++) {
+            const l = leftLines[i] !== undefined ? leftLines[i] : '';
+            const r = rightLines[i] !== undefined ? rightLines[i] : '';
+            text += `${l}\t|\t${r}\n`;
+        }
+    } else {
+        // Fallback to copying raw textarea contents
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        if (!leftTa && !rightTa) return;
+        const leftText = leftTa ? leftTa.value : '';
+        const rightText = rightTa ? rightTa.value : '';
+        text = `${leftText}\n---\n${rightText}`;
+    }
+
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+        if (leftView) { leftView.style.borderColor = '#10b981'; setTimeout(() => { leftView.style.borderColor = ''; }, 800); }
+    }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    });
+}
+
+function clearDiff() {
+    const leftTa = document.getElementById('diffLeft');
+    const rightTa = document.getElementById('diffRight');
+    const leftView = document.getElementById('diffLeftView');
+    const rightView = document.getElementById('diffRightView');
+    if (leftTa) { leftTa.value = ''; }
+    if (rightTa) { rightTa.value = ''; }
+    if (leftView) { leftView.innerHTML = ''; leftView.classList.add('hidden'); }
+    if (rightView) { rightView.innerHTML = ''; rightView.classList.add('hidden'); }
+}
+
 
 // AJAX file upload for large files (JSON example)
 document.addEventListener('DOMContentLoaded', function() {
@@ -987,6 +1407,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 'jsonFilterOutput', 'xmlFilterOutput', 'htmlOutput',
                 // Data Extract JSON/XML
                 'extractJsonInput','extractXmlInput',
+                // Base64 converter
+                'base64Input','base64Output', 'diffLeft', 'diffRight', 'diffLeftView', 'diffRightView',
+                // SQL Formatter
+                'sqlOutput',
+                // Data Extract fields input areas
                 'extractJsonFields','extractXmlFields'
             ];
             clearTextareas.forEach(id => {
@@ -2029,6 +2454,109 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Base64 Encoder/Decoder Functions (global scope)
+        function _toBase64Utf8(str) {
+            try {
+                // Use TextEncoder to handle UTF-8 properly
+                const enc = new TextEncoder();
+                const bytes = enc.encode(str);
+                // Convert to binary string for btoa
+                let binary = '';
+                const len = bytes.length;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                return btoa(binary);
+            } catch (e) {
+                // Fallback
+                return btoa(unescape(encodeURIComponent(str)));
+            }
+        }
+
+        function _fromBase64Utf8(b64) {
+            try {
+                const binary = atob(b64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                const dec = new TextDecoder();
+                return dec.decode(bytes);
+            } catch (e) {
+                // Fallback
+                try {
+                    return decodeURIComponent(escape(atob(b64)));
+                } catch (e2) {
+                    throw new Error('Invalid Base64 input');
+                }
+            }
+        }
+
+        function encodeBase64() {
+            const input = document.getElementById('base64Input').value || '';
+            const out = document.getElementById('base64Output');
+            if (!input.trim()) {
+                out.value = 'Error: Please enter text to encode';
+                out.style.color = 'red';
+                return;
+            }
+            try {
+                const encoded = _toBase64Utf8(input);
+                out.value = encoded;
+                out.style.color = 'black';
+            } catch (e) {
+                out.value = 'Error: ' + e.message;
+                out.style.color = 'red';
+            }
+        }
+
+        function decodeBase64() {
+            const input = document.getElementById('base64Input').value || '';
+            const out = document.getElementById('base64Output');
+            if (!input.trim()) {
+                out.value = 'Error: Please enter Base64 to decode';
+                out.style.color = 'red';
+                return;
+            }
+            try {
+                const decoded = _fromBase64Utf8(input.trim());
+                out.value = decoded;
+                out.style.color = 'black';
+            } catch (e) {
+                out.value = 'Error: ' + e.message;
+                out.style.color = 'red';
+            }
+        }
+
+        function clearBase64() {
+            const inEl = document.getElementById('base64Input');
+            const out = document.getElementById('base64Output');
+            if (inEl) inEl.value = '';
+            if (out) { out.value = ''; out.style.color = 'black'; }
+        }
+
+        function copyBase64Output() {
+            const out = document.getElementById('base64Output');
+            if (!out || !out.value) {
+                alert('Nothing to copy. Please encode or decode first.');
+                return;
+            }
+            navigator.clipboard.writeText(out.value).then(() => {
+                // show a brief success message near the output (use alert fallback if not desired)
+                const prev = out.style.borderColor;
+                out.style.borderColor = '#16a34a'; // green
+                setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
+            }).catch(err => {
+                // Fallback copy method
+                try {
+                    out.select();
+                    document.execCommand('copy');
+                    out.setSelectionRange(0, 0);
+                    alert('Copied to clipboard');
+                } catch (e) {
+                    alert('Copy failed: ' + (e && e.message ? e.message : err));
+                }
+            });
+        }
+
         // JSON to CSV Converter Functions
         function convertJsonToCsv() {
             const input = document.getElementById('jsonCsvInput').value;
@@ -2040,6 +2568,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!Array.isArray(data) || data.length === 0) {
                     throw new Error('Input must be a non-empty array of objects');
                 }
+
 
                 const headers = Object.keys(data[0]);
                 let csv = headers.join(',') + '\n';
