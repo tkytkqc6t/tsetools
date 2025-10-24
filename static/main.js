@@ -3415,4 +3415,274 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusDiv.textContent = 'No file selected.';
             }
         }
-        ;
+            ;
+
+    /* =====================
+       Search & Replace (textareas only) with regex + highlight
+       ===================== */
+    (function(){
+        let srMatches = [];
+        let srIndex = -1;
+
+        function normalizeTargets() {
+            // Wrap all textareas in a sr-wrapper and add an overlay element for highlighting if not present
+            const tAs = Array.from(document.querySelectorAll('textarea'));
+            tAs.forEach(ta => {
+                if (ta.parentElement && ta.parentElement.classList.contains('sr-wrapper')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'sr-wrapper';
+                const overlay = document.createElement('div');
+                overlay.className = 'sr-overlay';
+                overlay.innerHTML = '';
+                // move textarea into wrapper
+                ta.parentNode.insertBefore(wrapper, ta);
+                wrapper.appendChild(overlay);
+                wrapper.appendChild(ta);
+                // apply textarea class for transparent text and caret visibility
+                ta.classList.add('sr-textarea');
+                // Sync basic paddings from textarea to overlay
+                const style = getComputedStyle(ta);
+                overlay.style.padding = style.paddingTop + ' ' + style.paddingRight + ' ' + style.paddingBottom + ' ' + style.paddingLeft;
+                overlay.style.fontSize = style.fontSize;
+                overlay.style.lineHeight = style.lineHeight;
+                overlay.style.fontFamily = style.fontFamily;
+            });
+        }
+
+        function buildMatcher(term, caseSensitive, useRegex) {
+            if (!term) return null;
+            if (useRegex) {
+                try {
+                    const flags = caseSensitive ? 'g' : 'gi';
+                    return new RegExp(term, flags);
+                } catch (e) {
+                    alert('Invalid regular expression: ' + e.message);
+                    return null;
+                }
+            }
+            const esc = escapeRegExp(term);
+            const flags = caseSensitive ? 'g' : 'gi';
+            return new RegExp(esc, flags);
+        }
+
+        function gatherMatches(){
+            const termEl = document.getElementById('srFindInput');
+            if (!termEl) return;
+            const term = termEl.value;
+            const caseSensitive = document.getElementById('srCase').checked;
+            const useRegex = document.getElementById('srRegex').checked;
+            const highlightAll = document.getElementById('srHighlight').checked;
+            srMatches = [];
+            srIndex = -1;
+            normalizeTargets();
+            if (!term) { updateMatchInfo(); updateOverlays([]); return; }
+
+            const re = buildMatcher(term, caseSensitive, useRegex);
+            if (!re) { updateMatchInfo(); return; }
+
+            const targets = Array.from(document.querySelectorAll('textarea'));
+            targets.forEach(el => {
+                const val = el.value || '';
+                if (val === '') return;
+                let match;
+                while ((match = re.exec(val)) !== null) {
+                    const start = match.index;
+                    const end = re.lastIndex;
+                    srMatches.push({ el: el, start: start, end: end, replaceable: !el.readOnly && !el.disabled, matchText: match[0] });
+                    // prevent infinite loop for zero-length matches
+                    if (match[0].length === 0) re.lastIndex = start + 1;
+                }
+                // reset lastIndex for global reuse
+                re.lastIndex = 0;
+            });
+
+            updateMatchInfo();
+            if (highlightAll) updateOverlays(srMatches); else updateOverlays([]);
+        }
+
+        function updateMatchInfo(){
+            const info = document.getElementById('srMatchInfo');
+            const prevBtn = document.getElementById('srPrevBtn');
+            const nextBtn = document.getElementById('srNextBtn');
+            const repBtn = document.getElementById('srReplaceBtn');
+            const repAllBtn = document.getElementById('srReplaceAllBtn');
+            if (!info) return;
+            const total = srMatches.length;
+            info.textContent = total + ' match' + (total === 1 ? '' : 'es');
+            if (prevBtn) prevBtn.disabled = total === 0;
+            if (nextBtn) nextBtn.disabled = total === 0;
+            if (repBtn) repBtn.disabled = total === 0 || srIndex < 0 || !srMatches[srIndex]?.replaceable;
+            if (repAllBtn) repAllBtn.disabled = total === 0 || srMatches.every(m=> !m.replaceable);
+        }
+
+        function updateOverlays(matches){
+            // group matches by element
+            const map = new Map();
+            matches.forEach(m => {
+                if (!map.has(m.el)) map.set(m.el, []);
+                map.get(m.el).push(m);
+            });
+            // for every textarea overlay, render highlighted HTML
+            const wrappers = Array.from(document.querySelectorAll('.sr-wrapper'));
+            wrappers.forEach(wrapper => {
+                const ta = wrapper.querySelector('textarea');
+                const overlay = wrapper.querySelector('.sr-overlay');
+                if (!ta || !overlay) return;
+                const text = ta.value || '';
+                const groups = map.get(ta) || [];
+                if (groups.length === 0) {
+                    overlay.innerHTML = escapeHtml(text);
+                    wrapper.classList.add('sr-no-overlay');
+                    return;
+                }
+                wrapper.classList.remove('sr-no-overlay');
+                // build highlighted HTML by iterating matches
+                let last = 0;
+                let out = '';
+                groups.sort((a,b)=> a.start - b.start);
+                groups.forEach(g => {
+                    const before = text.slice(last, g.start);
+                    const mid = text.slice(g.start, g.end);
+                    out += escapeHtml(before) + '<span class="sr-highlight">' + escapeHtml(mid) + '</span>';
+                    last = g.end;
+                });
+                out += escapeHtml(text.slice(last));
+                overlay.innerHTML = out;
+            });
+        }
+
+        function highlightMatchAt(idx){
+            if (!srMatches.length) return;
+            if (idx < 0) idx = 0;
+            if (idx >= srMatches.length) idx = srMatches.length - 1;
+            srIndex = idx;
+            const m = srMatches[srIndex];
+            const el = m.el;
+            try { el.focus(); } catch(e){}
+            if (typeof el.setSelectionRange === 'function') {
+                el.setSelectionRange(m.start, m.end);
+            }
+            if (el.scrollIntoView) el.scrollIntoView({behavior: 'smooth', block: 'center'});
+            updateMatchInfo();
+        }
+
+        function nextMatch(){ if (!srMatches.length) return; highlightMatchAt((srIndex + 1) % srMatches.length); }
+        function prevMatch(){ if (!srMatches.length) return; highlightMatchAt((srIndex - 1 + srMatches.length) % srMatches.length); }
+
+        function replaceCurrent(){
+            if (!srMatches.length || srIndex < 0) return;
+            const m = srMatches[srIndex];
+            if (!m.replaceable) { alert('Selected match is read-only and cannot be replaced.'); return; }
+            const el = m.el;
+            const replacement = document.getElementById('srReplaceInput').value || '';
+            const before = el.value.slice(0, m.start);
+            const after = el.value.slice(m.end);
+            el.value = before + replacement + after;
+            // rebuild matches and keep nearest
+            gatherMatches();
+            let newIdx = srMatches.findIndex(mm => mm.el === el && mm.start >= m.start);
+            if (newIdx === -1) newIdx = srMatches.findIndex(mm => mm.el === el);
+            if (newIdx === -1) newIdx = 0;
+            highlightMatchAt(newIdx);
+        }
+
+        function replaceAll(){
+            if (!srMatches.length) return;
+            const term = document.getElementById('srFindInput').value;
+            if (!term) return;
+            const replacement = document.getElementById('srReplaceInput').value || '';
+            const caseSensitive = document.getElementById('srCase').checked;
+            const useRegex = document.getElementById('srRegex').checked;
+            // safety confirm when using regex
+            if (useRegex) {
+                if (!confirm('You are about to perform a regex Replace All across editable textareas. This may be destructive. Continue?')) return;
+            } else {
+                if (!confirm('Replace all occurrences across editable textareas?')) return;
+            }
+
+            // Group edits by element to perform single replace per element
+            const byEl = new Map();
+            srMatches.forEach(m => { if (m.replaceable) { if (!byEl.has(m.el)) byEl.set(m.el, []); byEl.get(m.el).push(m); } });
+            byEl.forEach((list, el) => {
+                // if regex mode, use RegExp; else escape and global
+                let newVal = el.value;
+                if (useRegex) {
+                    try {
+                        const flags = caseSensitive ? 'g' : 'gi';
+                        const re = new RegExp(term, flags);
+                        newVal = newVal.replace(re, replacement);
+                    } catch (e) {
+                        alert('Invalid regex when replacing: ' + e.message);
+                    }
+                } else {
+                    const re = new RegExp(escapeRegExp(term), caseSensitive ? 'g' : 'gi');
+                    newVal = newVal.replace(re, replacement);
+                }
+                el.value = newVal;
+            });
+            gatherMatches();
+            if (srMatches.length) highlightMatchAt(0);
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            const toggle = document.getElementById('srToggleBtn');
+            const panel = document.getElementById('srPanel');
+            const close = document.getElementById('srCloseBtn');
+            const findInp = document.getElementById('srFindInput');
+            const caseCb = document.getElementById('srCase');
+            const regexCb = document.getElementById('srRegex');
+            const highlightCb = document.getElementById('srHighlight');
+            const prev = document.getElementById('srPrevBtn');
+            const next = document.getElementById('srNextBtn');
+            const rep = document.getElementById('srReplaceBtn');
+            const repAll = document.getElementById('srReplaceAllBtn');
+
+            normalizeTargets();
+
+            if (toggle && panel) {
+                toggle.addEventListener('click', function(){
+                    panel.classList.toggle('hidden');
+                    panel.setAttribute('aria-hidden', panel.classList.contains('hidden'));
+                    if (!panel.classList.contains('hidden')) {
+                        setTimeout(()=> { findInp && findInp.focus(); }, 50);
+                    }
+                });
+            }
+            if (close && panel) close.addEventListener('click', function(){ panel.classList.add('hidden'); panel.setAttribute('aria-hidden', 'true'); });
+
+            if (findInp) findInp.addEventListener('input', gatherMatches);
+            if (caseCb) caseCb.addEventListener('change', gatherMatches);
+            if (regexCb) regexCb.addEventListener('change', gatherMatches);
+            if (highlightCb) highlightCb.addEventListener('change', gatherMatches);
+            if (prev) prev.addEventListener('click', prevMatch);
+            if (next) next.addEventListener('click', nextMatch);
+            if (rep) rep.addEventListener('click', replaceCurrent);
+            if (repAll) repAll.addEventListener('click', replaceAll);
+
+            if (findInp) {
+                findInp.addEventListener('keydown', function(e){
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); nextMatch(); }
+                    if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); prevMatch(); }
+                });
+            }
+
+            // rebuild matches when user edits textareas while panel open
+            document.addEventListener('input', function(e){
+                if (!panel || panel.classList.contains('hidden')) return;
+                const t = e.target;
+                if (!t) return;
+                if (t.tagName === 'TEXTAREA') {
+                    if (findInp && findInp.value) gatherMatches();
+                }
+            });
+        });
+
+        function escapeRegExp(string) {
+            return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+    })();
