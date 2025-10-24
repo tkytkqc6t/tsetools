@@ -1668,6 +1668,216 @@ document.addEventListener('DOMContentLoaded', function() {
             return out;
         }
 
+        // Repair JSON-like input:
+        // - Remove /* */ and // comments
+        // - Unwrap JSONP callback(...) to extract inner JSON
+        // - Convert single-quoted strings to double-quoted JSON strings
+        // - Quote unquoted keys (conservative: JS identifiers only)
+        // - Remove trailing commas
+        // - Replace undefined with null (conservative)
+        function repairJSON(input) {
+            if (typeof input !== 'string') return input;
+            let s = input.trim();
+
+            // Heuristic: unwrap simple JSONP like callback(...) or cb123(...)
+            const jsonpMatch = s.match(/^\s*([A-Za-z_$][\w$.\[\]]*)\s*\(([\s\S]*)\)\s*;?\s*$/);
+            if (jsonpMatch) {
+                // use inner content between first ( and last ) to be safer
+                const first = s.indexOf('(');
+                const last = s.lastIndexOf(')');
+                if (first !== -1 && last !== -1 && last > first) {
+                    s = s.slice(first + 1, last).trim();
+                }
+            }
+
+            // Remove block comments and line comments
+            s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+            s = s.replace(/\/\/[^\n\r]*/g, '');
+
+            // Convert likely single-quoted strings to double-quoted JSON strings
+            s = safeSingleToDoubleQuotes(s);
+
+            // Escape unescaped double quotes that appear inside double-quoted strings
+            // when they do not look like a valid string terminator (heuristic).
+            s = escapeUnescapedDoubleQuotesInStrings(s);
+
+            // Replace undefined with null
+            s = s.replace(/\bundefined\b/g, 'null');
+
+            // Quote unquoted keys (simple identifiers) only when followed by a colon
+            // This is conservative and won't attempt to quote keys with spaces or hyphens.
+            s = s.replace(/([\{,\s])([A-Za-z_$][\w$]*)\s*:/g, '$1"$2":');
+
+            // Remove trailing commas before } or ]
+            s = s.replace(/,\s*(?=[}\]])/g, '');
+
+            // Trim semicolons at the end
+            s = s.replace(/;\s*$/, '');
+
+            return s;
+        }
+
+        // Heuristic: scan the string and escape double quotes that appear inside
+        // double-quoted strings but don't appear to be the intended closing quote.
+        function escapeUnescapedDoubleQuotesInStrings(str) {
+            let out = '';
+            const len = str.length;
+            let i = 0;
+            while (i < len) {
+                const ch = str[i];
+                if (ch === '"') {
+                    // start of a double-quoted sequence
+                    out += ch; // add opening quote
+                    i++;
+                    let buf = '';
+                    let escaped = false;
+                    while (i < len) {
+                        const c = str[i];
+                        if (c === '\\' && !escaped) {
+                            // start of escape sequence
+                            buf += c;
+                            escaped = true;
+                            i++;
+                            if (i < len) { buf += str[i]; i++; escaped = false; }
+                            continue;
+                        }
+                        if (c === '"' && !escaped) {
+                            // potential closing quote at position i
+                            // look ahead to next non-space char to guess whether this closes the string
+                            let k = i + 1;
+                            while (k < len && /[\s]/.test(str[k])) k++;
+                            const next = k < len ? str[k] : '';
+                            // valid terminator for a string: comma, closing brace/bracket, colon, or end
+                            if (next === ',' || next === '}' || next === ']' || next === ':' || next === '' ) {
+                                // treat as closing quote
+                                out += buf + '"';
+                                i++; // consume closing quote
+                                break;
+                            } else {
+                                // likely an unescaped internal quote — escape it
+                                buf += '\\"';
+                                i++; // consume the quote
+                                continue;
+                            }
+                        }
+                        // normal character
+                        buf += c;
+                        escaped = false;
+                        i++;
+                    }
+                    // if we exited loop without finding a closing quote, append buffer as-is
+                    if (i >= len) {
+                        out += buf;
+                    }
+                    continue;
+                }
+                out += ch;
+                i++;
+            }
+            return out;
+        }
+
+        // Repair input then beautify (attempt parsing). If repair fails, show candidate and error.
+        function repairAndBeautifyJSON() {
+            const input = document.getElementById('jsonInput').value;
+            const output = document.getElementById('jsonOutput');
+            if (!input || !input.trim()) {
+                output.value = 'Error: Please enter JSON or JS object to repair';
+                output.style.color = 'red';
+                return;
+            }
+
+            try {
+                const repaired = repairJSON(input);
+                // Try parsing repaired candidate
+                let parsed;
+                try {
+                    parsed = JSON.parse(repaired);
+                    output.value = JSON.stringify(parsed, null, 2);
+                    output.style.color = 'black';
+                    return;
+                } catch (firstErr) {
+                    // attempt an automatic small fix when parser reports a position-based error
+                    const attempt = tryAutoFixParse(repaired, firstErr);
+                    if (attempt && attempt.success) {
+                        output.value = JSON.stringify(attempt.parsed, null, 2);
+                        output.style.color = 'black';
+                        return;
+                    }
+                    // otherwise fall through to show helpful error
+                    throw firstErr;
+                }
+            } catch (err) {
+                // If parse fails, show helpful output with repaired candidate
+                const repairedCandidate = repairJSON(input);
+                // attempt to parse error message position
+                let posInfo = '';
+                try {
+                    const m = err.message && err.message.match(/position (\d+)/i);
+                    if (m) {
+                        const pos = parseInt(m[1]);
+                        const ctxStart = Math.max(0, pos - 40);
+                        const ctxEnd = Math.min(repairedCandidate.length, pos + 40);
+                        const ctx = repairedCandidate.slice(ctxStart, ctxEnd);
+                        posInfo = `\n\nContext (around position ${pos}):\n...${ctx}...`;
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
+                output.value = 'Repair attempted but parsing failed:\n' + (err && err.message ? err.message : String(err)) + posInfo + '\n\nRepaired candidate:\n' + repairedCandidate;
+                output.style.color = 'red';
+            }
+        }
+
+        // Try a small, conservative auto-fix when parse fails with a position error.
+        // Currently handles the common "Expected ',' or '}' after property value" by
+        // inserting a comma at the reported position if it appears to be the correct fix.
+        function tryAutoFixParse(candidate, parseError) {
+            if (!parseError || !parseError.message) return null;
+            const m = parseError.message.match(/position (\d+)/i);
+            if (!m) return null;
+            const pos = parseInt(m[1]);
+            if (isNaN(pos) || pos < 0 || pos > candidate.length) return null;
+
+            // Look for a place to insert a comma: move forward to next non-space char
+            let insertAt = pos;
+            while (insertAt < candidate.length && /\s/.test(candidate[insertAt])) insertAt++;
+
+            // If next char is '}' or ']' then no comma needed; if next char is '"' or a letter/number, comma likely missing
+            const nextChar = candidate[insertAt] || '';
+            const prevChar = candidate[Math.max(0, insertAt - 1)] || '';
+            // Avoid inserting inside strings (very naive): count quotes before position
+            const before = candidate.slice(0, insertAt);
+            const quotes = (before.match(/"/g) || []).length;
+            if (quotes % 2 === 1) {
+                // we're inside a double-quoted string — don't attempt
+                return null;
+            }
+
+            if (/^[\"\{\[\],}]$/.test(nextChar)) {
+                // if next is a brace or comma, probably no simple fix
+                return null;
+            }
+
+            // conservative check: previous non-space char should be a quote, digit, true/false/null or ] or }
+            let k = insertAt - 1;
+            while (k >= 0 && /\s/.test(candidate[k])) k--;
+            const prevNonSpace = candidate[k] || '';
+            if (!(/["]|[0-9]|\]|\}|[a-zA-Z]/.test(prevNonSpace))) {
+                return null;
+            }
+
+            // Build a new candidate with a comma inserted at insertAt
+            const fixed = candidate.slice(0, insertAt) + ',' + candidate.slice(insertAt);
+            try {
+                const parsed = JSON.parse(fixed);
+                return { success: true, parsed: parsed, fixed: fixed };
+            } catch (e) {
+                return { success: false };
+            }
+        }
+
         // Heuristic: detect if the input looks like a Python dict/list literal
         function isProbablyPythonDict(s) {
             if (!s || typeof s !== 'string') return false;
