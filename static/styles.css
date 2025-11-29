@@ -139,3 +139,9 @@ button.sidebar-menu-btn:active {
 
 /* when overlay is hidden we restore default appearance */
 .sr-no-overlay .sr-textarea { color: inherit; caret-color: auto; }
+
+/* UUID converter small tweaks */
+#uuid .text-sm { line-height: 1.2; }
+#uuid .font-mono { letter-spacing: 0.02em; }
+#uuid .uuid-actions { display: flex; gap: 8px; align-items: center; }
+#uuid-error { min-height: 1.25rem; }
