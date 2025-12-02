@@ -3627,6 +3627,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
             ;
 
+        /* =====================
+           UUID Converter Helpers
+           ===================== */
+
+        // Convert a 32-hex string (with or without non-hex chars) to standard UUID format
+        function toUUIDFormat(hex) {
+            const clean = String(hex || '').replace(/[^0-9a-fA-F]/g, '').toLowerCase();
+            if (clean.length !== 32) return { error: 'Input must contain exactly 32 hex characters after removing non-hex characters.' };
+            const parts = [
+                clean.slice(0, 8),
+                clean.slice(8, 12),
+                clean.slice(12, 16),
+                clean.slice(16, 20),
+                clean.slice(20)
+            ];
+            return { uuid: parts.join('-') };
+        }
+
+        function convertUUID() {
+            const inp = document.getElementById('uuidInput');
+            const out = document.getElementById('uuidOutput');
+            const err = document.getElementById('uuid-error');
+            if (!inp || !out || !err) return;
+            const res = toUUIDFormat(inp.value);
+            if (res.error) {
+                err.textContent = res.error;
+                err.style.display = 'block';
+                out.value = '';
+            } else {
+                err.style.display = 'none';
+                out.value = res.uuid;
+            }
+        }
+
+        function copyUUID() {
+            const out = document.getElementById('uuidOutput');
+            if (!out) return;
+            const val = out.value;
+            if (!val) return;
+            navigator.clipboard?.writeText(val).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = val;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            });
+        }
+
+        function clearUUID() {
+            const inp = document.getElementById('uuidInput');
+            const out = document.getElementById('uuidOutput');
+            const err = document.getElementById('uuid-error');
+            if (inp) inp.value = '';
+            if (out) out.value = '';
+            if (err) { err.textContent = ''; err.style.display = 'none'; }
+        }
+
     /* =====================
        Search & Replace (textareas only) with regex + highlight
        ===================== */
