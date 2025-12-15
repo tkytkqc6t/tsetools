@@ -1,1085 +1,1116 @@
-<!DOCTYPE html>
-<html lang="en">
+        <!DOCTYPE html>
+        <html lang="en">
 
-<head>
-    <link rel="stylesheet" href="static/styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TSE Tools Suite</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- CodeMirror (v5) for SQL editor-style highlighting (read-only) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
-    <!-- jsdiff for smarter diffs and inline highlights -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+        <head>
+            <link rel="stylesheet" href="static/styles.css">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>TSE Tools Suite</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <!-- CodeMirror (v5) for SQL editor-style highlighting (read-only) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/eclipse.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/display/placeholder.min.js"></script>
+            <!-- jsdiff for smarter diffs and inline highlights -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
 
-</head>
+        </head>
 
-<body class="bg-gray-50 font-figtree" style="font-family: 'Figtree', 'Inter', system-ui, sans-serif;">
-    <!-- Header -->
-    <header class="shadow-lg border-b border-blue-500/20 sticky top-0 z-30"
-        style="background-color: #25c9d0; color: #111; font-family: figtree;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="color: #111;">
-            <div class="flex justify-between items-center h-20">
+        <body class="bg-gray-50 font-figtree" style="font-family: 'Figtree', 'Inter', system-ui, sans-serif;">
+            <!-- Header -->
+            <header class="shadow-lg border-b border-blue-500/20 sticky top-0 z-30"
+                style="background-color: #25c9d0; color: #111; font-family: figtree;">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="color: #111;">
+                    <div class="flex justify-between items-center h-20">
 
-                <!-- Logo + Title -->
-                <div class="flex items-center cursor-pointer" onclick="showSection('welcome')">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
-                        <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                    </div>
-                    <div class="ml-4" >
-                        <h1 class="text-2xl font-bold">TSE Tools Suite</h1>
-                        <p class="text-sm font-medium">Daily Used Tools</p>
-                    </div>
-                </div>
-
-                <!-- Navigation with dropdowns -->
-                <nav class="flex items-center space-x-8 ml-10">
-                    <!-- Home -->
-                    <a href="#" onclick="showSection('welcome')"
-                        class="text-2xl font-bold text-black hover:bg-transparent flex items-center uppercase sidebar-menu-link" style="font-size: 1.2em; color:#111"
-                        style="background-color: #25c9d0; color: #111">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            style="color: #111">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
-                        </svg>
-                        Home
-                    </a>
-
-                    <!-- Beautifier Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('beautifierMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
-                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
-                            </svg>
-                            BEAUTIFY
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div id="beautifierMenu" class="absolute left-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg hidden">
-                            <a href="#" onclick="showSection('xml'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">XML</a>
-                            <a href="#" onclick="showSection('json'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON</a>
-                            <a href="#" onclick="showSection('html'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">HTML</a>
-                            <a href="#" onclick="showSection('sql'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">SQL</a>
-                        </div>
-                    </div>
-
-                    <!-- Converter Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('converterMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
-                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                            </svg>
-                            CONVERT
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div id="converterMenu"
-                            class="absolute left-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg hidden">
-                            <a href="#" onclick="showSection('timezone'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">Timezone</a>
-                            <a href="#" onclick="showSection('json-csv'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON → CSV</a>
-                            <a href="#" onclick="showSection('xml-csv'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">XML → CSV</a>
-                            <a href="#" onclick="showSection('base64'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">Base64</a>
-                            <a href="#" onclick="showSection('uuid'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">UUID</a>
-                        </div>
-                    </div>
-
-                    <!-- Data Filters Dropdown -->
-                    <div class="relative">
-                        <button onclick="toggleDropdown('filtersMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
-                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            FILTER
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div id="filtersMenu"
-                            class="absolute left-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg hidden">
-                            <a href="#" onclick="showSection('json-filter'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Filter from JSON</a>
-                            <a href="#" onclick="showSection('xml-filter'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Filter from XML</a>
-                            <a href="#" onclick="showSection('diff-checker'); closeDropdowns()"
-                                class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Diff Checker</a>
-                        </div>
-                    </div>
-                        <!-- Data Extract Dropdown -->
-                        <div class="relative">
-                            <button onclick="toggleDropdown('extractMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
-                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v16H4z" />
-                                </svg>
-                                EXTRACT
-                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                            <div id="extractMenu" class="absolute left-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg hidden">
-                                <a href="#" onclick="showSection('data-extract-json'); closeDropdowns()" class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Extract from JSON</a>
-                                <a href="#" onclick="showSection('data-extract-xml'); closeDropdowns()" class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Extract from XML</a>
-                            </div>
-                        </div>
-                </nav>
-                    
-                <!-- Find & Replace Toggle Button -->
-                    <div class="ml-3">
-                        <button id="srToggleBtn" class="text-black bg-white/30 px-3 py-1 mr-2 rounded-lg hover:bg-white/60" title="Open Find & Replace">Find & Replace</button>
-                    </div>
-
-                <!-- Search Bar + Search & Replace Toggle -->
-                <div class="flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto">
-                    <div style="position: relative; width: 140px;">
-                        <svg class="w-5 h-5 text-black mr-2 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <input type="text" placeholder="Search tools..." 
-                            class="bg-transparent text-black placeholder-grey text-sm focus:outline-none w-full pl-12 py-2 rounded-lg"
-                            id="searchInput" autocomplete="off" onkeyup="searchTools()" oninput="searchTools()">
-                        <div id="searchDropdown" class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"></div>
-                    </div>
-                </div>
-
-                <!-- Search & Replace Panel (hidden by default) -->
-                <div id="srPanel" class="sr-panel hidden" aria-hidden="true">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                        <strong>Find & Replace</strong>
-                        <button id="srCloseBtn" class="text-sm text-gray-600">Close</button>
-                    </div>
-                    <div style="margin-top:8px;">
-                        <input id="srFindInput" class="sr-field" placeholder="Find (plain text)" />
-                        <input id="srReplaceInput" class="sr-field" placeholder="Replace with" />
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                            <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srCase" /> Case sensitive</label>
-                            <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srRegex" /> Use regex</label>
-                            <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srHighlight" /> Highlight all</label>
-                            <div id="srMatchInfo" class="sr-match-info" style="margin-left:auto;">0 matches</div>
-                        </div>
-                        <div class="sr-controls">
-                            <div style="display:flex; gap:6px;">
-                                <button id="srPrevBtn" class="px-3 py-1 rounded bg-gray-100" disabled>Prev</button>
-                                <button id="srNextBtn" class="px-3 py-1 rounded bg-gray-100" disabled>Next</button>
-                                <button id="srReplaceBtn" class="px-3 py-1 rounded bg-yellow-400" disabled>Replace</button>
-                                <button id="srReplaceAllBtn" class="px-3 py-1 rounded bg-green-500 text-white" disabled>Replace All</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <div class="flex h-screen pt-2 ml-8 mr-8">
-        <!-- Main Content -->
-        <main class="flex-1 p-8">
-            <!-- Welcome Section (Default) -->
-            <div id="welcome" class="section pb-32">
-                <div class="mb-8">
-                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to TSE Tools Suite</h2>
-                    <p class="text-lg text-gray-600 mb-6">Your comprehensive toolkit for data processing, formatting,
-                        and conversion. Get started by selecting a tool from the menu or searching for it.
-                        <ul class="text-lg text-gray-600 mb-6 space-y-4">
-                            <li>• All-in-One Convenience – multiple tools, all on a single page</li>
-                            <li>• Privacy First – no data leaks, fully secure</li>
-                            <li>• Fast & Effortless – smooth, seamless experience</li>
-                        </ul></p>
-                </div>
-
-                <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <div
-                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                        <div class="flex items-center mb-4">
-                            <div class="p-2 bg-blue-100 rounded-lg">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                        <!-- Logo + Title -->
+                        <div class="flex items-center cursor-pointer" onclick="showSection('welcome')">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                                <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z">
-                                    </path>
+                                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Code Beautifiers</h3>
+                            <div class="ml-4" >
+                                <h1 class="text-2xl font-bold">TSE Tools Suite</h1>
+                                <p class="text-sm font-medium">Daily Used Tools</p>
+                            </div>
                         </div>
-                        <p class="text-gray-600 text-sm mb-4">Format and beautify your XML, JSON, and HTML code with
-                            proper indentation and validation.</p>
-                        <ul class="text-sm text-gray-500 space-y-1">
-                            <li>• XML Formatter with validation</li>
-                            <li>• JSON Beautifier with error detection</li>
-                            <li>• HTML Formatter with syntax checking</li>
-                        </ul>
-                    </div>
 
-                    <div
-                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                        <div class="flex items-center mb-4">
-                            <div class="p-2 bg-green-100 rounded-lg">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                        <!-- Navigation with dropdowns -->
+                        <nav class="flex items-center space-x-8 ml-10">
+                            <!-- Home -->
+                            <a href="#" onclick="showSection('welcome')"
+                                class="text-2xl font-bold text-black hover:bg-transparent flex items-center uppercase sidebar-menu-link" style="font-size: 1.2em; color:#111"
+                                style="background-color: #25c9d0; color: #111">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    style="color: #111">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
                                 </svg>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Data Converters</h3>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-4">Convert between different data formats and handle timezone
-                            conversions with ease.</p>
-                        <ul class="text-sm text-gray-500 space-y-1">
-                            <li>• Multi-timezone converter (up to 5 zones)</li>
-                            <li>• JSON to CSV conversion</li>
-                            <li>• XML to CSV with attribute support</li>
-                        </ul>
-                    </div>
+                                Home
+                            </a>
 
-                    <div
-                        class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                        <div class="flex items-center mb-4">
-                            <div class="p-2 bg-purple-100 rounded-lg">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                    </path>
+                            <!-- Beautifier Dropdown -->
+                            <div class="relative">
+                                <button onclick="toggleDropdown('beautifierMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                    </svg>
+                                    BEAUTIFY
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="beautifierMenu" class="absolute left-0 mt-2 w-40 bg-white text-black rounded-lg shadow-lg hidden">
+                                    <a href="#" onclick="showSection('xml'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">XML</a>
+                                    <a href="#" onclick="showSection('json'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON</a>
+                                    <a href="#" onclick="showSection('html'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">HTML</a>
+                                    <a href="#" onclick="showSection('sql'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">SQL</a>
+                                </div>
+                            </div>
+
+                            <!-- Converter Dropdown -->
+                            <div class="relative">
+                                <button onclick="toggleDropdown('converterMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                    CONVERT
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="converterMenu"
+                                    class="absolute left-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg hidden">
+                                    <a href="#" onclick="showSection('timezone'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">Timezone</a>
+                                    <a href="#" onclick="showSection('json-csv'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">JSON → CSV</a>
+                                    <a href="#" onclick="showSection('xml-csv'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">XML → CSV</a>
+                                    <a href="#" onclick="showSection('base64'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">Base64</a>
+                                    <a href="#" onclick="showSection('uuid'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 uppercase" style="font-size: 1em;">UUID</a>
+                                </div>
+                            </div>
+
+                            <!-- Data Filters Dropdown -->
+                            <div class="relative">
+                                <button onclick="toggleDropdown('filtersMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                    </svg>
+                                    FILTER
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="filtersMenu"
+                                    class="absolute left-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg hidden">
+                                    <a href="#" onclick="showSection('json-filter'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Filter from JSON</a>
+                                    <a href="#" onclick="showSection('xml-filter'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Filter from XML</a>
+                                    <a href="#" onclick="showSection('diff-checker'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Diff Checker</a>
+                                </div>
+                            </div>
+                                <!-- Data Extract Dropdown -->
+                                <div class="relative">
+                                    <button onclick="toggleDropdown('extractMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v16H4z" />
+                                        </svg>
+                                        EXTRACT
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    <div id="extractMenu" class="absolute left-0 mt-2 w-44 bg-white text-black rounded-lg shadow-lg hidden">
+                                        <a href="#" onclick="showSection('data-extract-json'); closeDropdowns()" class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg " style="font-size: 1em;">Extract from JSON</a>
+                                        <a href="#" onclick="showSection('data-extract-xml'); closeDropdowns()" class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Extract from XML</a>
+                                    </div>
+                                </div>
+                        </nav>
+                            
+                        <!-- Find & Replace Toggle Button -->
+                            <div class="ml-3">
+                                <button id="srToggleBtn" class="text-black bg-white/30 px-3 py-1 mr-2 rounded-lg hover:bg-white/60" title="Open Find & Replace">Find & Replace</button>
+                            </div>
+
+                        <!-- Search Bar + Search & Replace Toggle -->
+                        <div class="flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto">
+                            <div style="position: relative; width: 140px;">
+                                <svg class="w-5 h-5 text-black mr-2 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
+                                <input type="text" placeholder="Search tools..." 
+                                    class="bg-transparent text-black placeholder-grey text-sm focus:outline-none w-full pl-12 py-2 rounded-lg"
+                                    id="searchInput" autocomplete="off" onkeyup="searchTools()" oninput="searchTools()">
+                                <div id="searchDropdown" class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"></div>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-900 ml-3">Advanced Filters</h3>
                         </div>
-                        <p class="text-gray-600 text-sm mb-4">Filter and query your JSON and XML data with powerful
-                            condition-based filtering.</p>
-                        <ul class="text-sm text-gray-500 space-y-1">
-                            <li>• JSON data filtering with multiple conditions</li>
-                            <li>• XML element and attribute filtering</li>
-                            <li>• AND/OR logic operators</li>
-                        </ul>
-                    </div>
-                </div>
 
-                <!-- Quick Start Guide -->
-                <div class="rounded-lg p-6 border" style="border-color: #25c9d0; background-color: #ccf4f3;">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">🚀 Quick Start Guide</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <h4 class="font-medium text-gray-900 mb-2">Getting Started</h4>
-                            <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-                                <li>Choose a tool from the Navigation Bar</li>
-                                <li>Paste your data or upload a file</li>
-                                <li>Configure any options if needed</li>
-                                <li>Click the action button to process</li>
-                                <li>Download or copy your results</li>
-                            </ol>
-                        </div>
-                        <div>
-                            <h4 class="font-medium text-gray-900 mb-2">Pro Tips</h4>
-                            <ul class="text-sm text-gray-600 space-y-1">
-                                <li>• Use drag & drop for file uploads</li>
-                                <li>• All tools support large files (up to 200MB)</li>
-                                <li>• Results are processed locally for privacy</li>
-                                <li>• Use the search bar to quickly find tools</li>
-                            </ul>
+                        <!-- Search & Replace Panel (hidden by default) -->
+                        <div id="srPanel" class="sr-panel hidden" aria-hidden="true">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                <strong>Find & Replace</strong>
+                                <button id="srCloseBtn" class="text-sm text-gray-600">Close</button>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <input id="srFindInput" class="sr-field" placeholder="Find (plain text)" />
+                                <input id="srReplaceInput" class="sr-field" placeholder="Replace with" />
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                                    <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srCase" /> Case sensitive</label>
+                                    <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srRegex" /> Use regex</label>
+                                    <label style="font-size:12px; color:#374151;"><input type="checkbox" id="srHighlight" /> Highlight all</label>
+                                    <div id="srMatchInfo" class="sr-match-info" style="margin-left:auto;">0 matches</div>
+                                </div>
+                                <div class="sr-controls">
+                                    <div style="display:flex; gap:6px;">
+                                        <button id="srPrevBtn" class="px-3 py-1 rounded bg-gray-100" disabled>Prev</button>
+                                        <button id="srNextBtn" class="px-3 py-1 rounded bg-gray-100" disabled>Next</button>
+                                        <button id="srReplaceBtn" class="px-3 py-1 rounded bg-yellow-400" disabled>Replace</button>
+                                        <button id="srReplaceAllBtn" class="px-3 py-1 rounded bg-green-500 text-white" disabled>Replace All</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Base64 Converter Section -->
-            <div id="base64" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Base64 Encoder / Decoder</h2>
-                    <p class="text-gray-600">Encode text to Base64 or decode Base64 to text. Works with UTF-8 strings.</p>
-                </div>
+            </header>
+            
+            <div class="flex h-screen pt-2 ml-8 mr-8">
+                <!-- Main Content -->
+                <main class="flex-1 p-8">
+                    <!-- Welcome Section (Default) -->
+                    <div id="welcome" class="section pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to TSE Tools Suite</h2>
+                            <p class="text-lg text-gray-600 mb-6">Your comprehensive toolkit for data processing, formatting,
+                                and conversion. Get started by selecting a tool from the menu or searching for it.
+                                <ul class="text-lg text-gray-600 mb-6 space-y-4">
+                                    <li>• All-in-One Convenience – multiple tools, all on a single page</li>
+                                    <li>• Privacy First – no data leaks, fully secure</li>
+                                    <li>• Fast & Effortless – smooth, seamless experience</li>
+                                </ul></p>
+                        </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input</label>
-                            <textarea id="base64Input" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Paste text or base64 here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Output</label>
-                            <textarea id="base64Output" class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Result will appear here..."></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex items-center gap-3">
-                        <button onclick="encodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Encode</button>
-                        <button onclick="decodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Decode</button>
-                        <button onclick="copyBase64Output()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
-                        <button onclick="clearBase64()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
-                    </div>
-                </div>
-            </div>
-            <!-- Diff Checker Section -->
-            <div id="diff-checker" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Diff Checker</h2>
-                    <p class="text-gray-600">Compare two texts line-by-line. Useful for quick diffs.</p>
-                </div>
+                        <!-- Feature Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <div
+                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                                <div class="flex items-center mb-4">
+                                    <div class="p-2 bg-blue-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Code Beautifiers</h3>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">Format and beautify your XML, JSON, and HTML code with
+                                    proper indentation and validation.</p>
+                                <ul class="text-sm text-gray-500 space-y-1">
+                                    <li>• XML Formatter with validation</li>
+                                    <li>• JSON Beautifier with error detection</li>
+                                    <li>• HTML Formatter with syntax checking</li>
+                                </ul>
+                            </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Left</label>
-                            <textarea id="diffLeft" class="w-full h-60 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Left text..."></textarea>
-                            <!-- Rendered colored diff view (hidden until Compare) -->
-                            <div id="diffLeftView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Right</label>
-                            <textarea id="diffRight" class="w-full h-60 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Right text..."></textarea>
-                            <!-- Rendered colored diff view (hidden until Compare) -->
-                            <div id="diffRightView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex items-center gap-3">
-                        <button onclick="compareDiff()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3" style="background-color: #25c9d0;">Compare</button>
-                        <button onclick="copyDiffResult()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
-                        <button onclick="clearDiff()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
-                    </div>
-                </div>
-            </div>
-            <!-- XML Beautifier Section -->
-            <div id="xml" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Beautifier</h2>
-                    <p class="text-gray-600">Format and beautify your XML code.</p>
-                </div>
+                            <div
+                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                                <div class="flex items-center mb-4">
+                                    <div class="p-2 bg-green-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Data Converters</h3>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">Convert between different data formats and handle timezone
+                                    conversions with ease.</p>
+                                <ul class="text-sm text-gray-500 space-y-1">
+                                    <li>• Multi-timezone converter (up to 5 zones)</li>
+                                    <li>• JSON to CSV conversion</li>
+                                    <li>• XML to CSV with attribute support</li>
+                                </ul>
+                            </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
-                            <textarea id="xmlInput"
-                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML here..."></textarea>
+                            <div
+                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
+                                <div class="flex items-center mb-4">
+                                    <div class="p-2 bg-purple-100 rounded-lg">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Advanced Filters</h3>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">Filter and query your JSON and XML data with powerful
+                                    condition-based filtering.</p>
+                                <ul class="text-sm text-gray-500 space-y-1">
+                                    <li>• JSON data filtering with multiple conditions</li>
+                                    <li>• XML element and attribute filtering</li>
+                                    <li>• AND/OR logic operators</li>
+                                </ul>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted XML</label>
-                            <textarea id="xmlOutput"
-                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Formatted XML will appear here..."></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button onclick="beautifyXML()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Beautify XML
-                        </button>
-                        <button onclick="clearXML()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- JSON Beautifier Section -->
-            <div id="json" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Beautifier</h2>
-                    <p class="text-gray-600">Format and beautify your JSON data.</p>
-                </div>
+                        <!-- Quick Start Guide -->
+                        <div class="rounded-lg p-6 border" style="border-color: #25c9d0; background-color: #ccf4f3;">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">🚀 Quick Start Guide</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">Getting Started</h4>
+                                    <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                                        <li>Choose a tool from the Navigation Bar</li>
+                                        <li>Paste your data or upload a file</li>
+                                        <li>Configure any options if needed</li>
+                                        <li>Click the action button to process</li>
+                                        <li>Download or copy your results</li>
+                                    </ol>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">Pro Tips</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Use drag & drop for file uploads</li>
+                                        <li>• All tools support large files (up to 200MB)</li>
+                                        <li>• Results are processed locally for privacy</li>
+                                        <li>• Use the search bar to quickly find tools</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Base64 Converter Section -->
+                    <div id="base64" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Base64 Encoder / Decoder</h2>
+                            <p class="text-gray-600">Encode text to Base64 or decode Base64 to text. Works with UTF-8 strings.</p>
+                        </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
-                            <textarea id="jsonInput"
-                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted JSON</label>
-                            <textarea id="jsonOutput"
-                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Formatted JSON will appear here..."></textarea>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input</label>
+                                    <textarea id="base64Input" class="w-full h-[428px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Paste text or base64 here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Output</label>
+                                    <textarea id="base64Output" class="w-full h-[428px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Result will appear here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex items-center gap-3">
+                                <button onclick="encodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Encode</button>
+                                <button onclick="decodeBase64()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Decode</button>
+                                <button onclick="clearBase64()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                                <button onclick="copyBase64Output()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy Output</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-6">
-                        <button onclick="beautifyJSON()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Beautify JSON
-                        </button>
-                        <button onclick="repairAndBeautifyJSON()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #f59e0b;" title="Attempt to repair malformed JS/JSON and beautify">
-                            Repair & Beautify
-                        </button>
-                        <button onclick="clearJSON()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    <!-- Diff Checker Section -->
+                    <div id="diff-checker" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Diff Checker</h2>
+                            <p class="text-gray-600">Compare two texts line-by-line. Useful for quick diffs.</p>
+                        </div>
 
-            <!-- HTML Beautifier Section -->
-            <div id="html" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">HTML Beautifier</h2>
-                    <p class="text-gray-600">Format and beautify your HTML code.</p>
-                </div>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Left</label>
+                                    <textarea id="diffLeft" class="w-full h-[428px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Left text..."></textarea>
+                                    <!-- Rendered colored diff view (hidden until Compare) -->
+                                    <div id="diffLeftView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Right</label>
+                                    <textarea id="diffRight" class="w-full h-[428px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Right text..."></textarea>
+                                    <!-- Rendered colored diff view (hidden until Compare) -->
+                                    <div id="diffRightView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                                </div>
+                            </div>
+                            <div class="mt-6 flex items-center gap-3">
+                                <button onclick="compareDiff()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3" style="background-color: #25c9d0;">Compare</button>
+                                <button onclick="copyDiffResult()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
+                                <button onclick="clearDiff()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- XML Beautifier Section -->
+                    <div id="xml" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Beautifier</h2>
+                            <p class="text-gray-600">Format and beautify your XML code.</p>
+                        </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input HTML</label>
-                            <textarea id="htmlInput"
-                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your HTML here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted HTML</label>
-                            <textarea id="htmlOutput"
-                                class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Formatted HTML will appear here..."></textarea>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                                    <textarea id="xmlInput"
+                                        class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your XML here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Formatted XML</label>
+                                    <textarea id="xmlOutput"
+                                        class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="Formatted XML will appear here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button onclick="beautifyXML()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Beautify XML
+                                </button>
+                                <button onclick="clearXML()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Clear
+                                </button>
+                                <button onclick="copyXMLOutput()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">Copy Output</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-6">
-                        <button onclick="beautifyHTML()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Beautify HTML
-                        </button>
-                        <button onclick="clearHTML()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
+
+                    <!-- JSON Beautifier Section -->
+                    <div id="json" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Beautifier</h2>
+                            <p class="text-gray-600">Format and beautify your JSON data.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+                                    <textarea id="jsonInput"
+                                        class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your JSON here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Formatted JSON</label>
+                                    <textarea id="jsonOutput"
+                                        class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="Formatted JSON will appear here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button onclick="beautifyJSON()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Beautify JSON
+                                </button>
+                                <button onclick="repairAndBeautifyJSON()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #f59e0b;" title="Attempt to repair malformed JS/JSON and beautify">
+                                    Repair & Beautify
+                                </button>
+                                <button onclick="clearJSON()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Clear
+                                </button>
+                                <button onclick="copyJSONOutput()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">Copy Output</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+
+                    <!-- HTML Beautifier Section -->
+                    <div id="html" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">HTML Beautifier</h2>
+                            <p class="text-gray-600">Format and beautify your HTML code.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input HTML</label>
+                                    <textarea id="htmlInput"
+                                        class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your HTML here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Formatted HTML</label>
+                                    <textarea id="htmlOutput"
+                                        class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="Formatted HTML will appear here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button onclick="beautifyHTML()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Beautify HTML
+                                </button>
+                                <button onclick="clearHTML()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Clear
+                                </button>
+                                <button onclick="copyHTMLOutput()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">Copy Output</button>
+
+                            </div>
+                        </div>
+                    </div>
 
             <!-- SQL Beautifier Section -->
             <div id="sql" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">SQL Beautifier</h2>
-                    <p class="text-gray-600">Format and beautify your SQL queries for readability.</p>
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                SQL Beautifier
+                </h2>
+                <p class="text-gray-600">
+                Format and beautify your SQL queries for readability.
+                </p>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="flex flex-col">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Input SQL -->
+                    <div class="flex flex-col">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Input SQL
+                    </label>
+                    <textarea
+                    id="sqlInput"
+                    class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg
+                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                    font-mono text-sm align-top"
+                    placeholder="Paste your SQL here...">
+                    </textarea>
                 </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input SQL</label>
-                            <textarea id="sqlInput"
-                                class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your SQL here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Formatted SQL</label>
-                            <textarea id="sqlOutput"
-                                readonly placeholder="Formatted SQL will appear here..."></textarea>
-                        </div>
-                    </div>
-                    <div class="mt-6">
-                        <button onclick="beautifySQL()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Beautify SQL
-                        </button>
-                        <button onclick="clearSQL()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
-                    </div>
+                <!-- Formatted SQL -->
+                <div class="flex flex-col">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Formatted SQL
+                    </label>
+                    <textarea
+                    id="sqlOutput"
+                    class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300
+                    rounded-lg font-mono text-sm align-top"
+                    readonly
+                    placeholder="Formatted SQL will appear here...">
+                </textarea>
                 </div>
+            </div>
+            <!-- Actions -->
+            <div class="mt-8">
+                <button
+                onclick="beautifySQL()"
+                class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                style="background-color: #25c9d0;"
+                onmouseover="this.style.backgroundColor='#1fb5bc'"
+                onmouseout="this.style.backgroundColor='#25c9d0'">
+                Beautify SQL
+            </button>
+            <button
+            onclick="clearSQL()"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2
+            rounded-lg font-medium transition-colors mr-3">
+            Clear
+            </button>
+            <button onclick="copySQLOutput()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">Copy Output</button>
+        
+            </div>
+            </div>
+            </div>
             </div>
             <!-- End of SQL Beautifier Section -->
-            <!-- UUID Converter Section -->
-            <div id="uuid" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">UUID Converter</h2>
-                    <p class="text-gray-600">Convert a 32-hex string into standard UUID format (8-4-4-4-12).</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input (32 hex characters)</label>
-                            <input id="uuidInput" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" placeholder="e.g. 9e2a94c275074a92aefb5ca102231198" />
-                            <div id="uuid-error" class="text-sm text-red-600 mt-2" style="display:none;"></div>
+                    <!-- UUID Converter Section -->
+                    <div id="uuid" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">UUID Converter</h2>
+                            <p class="text-gray-600">Convert a 32-hex string into standard UUID format (8-4-4-4-12).</p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Result UUID</label>
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <input id="uuidOutput" type="text" readonly class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" placeholder="Result will appear here" />
-                                <button id="uuid-copy-btn" onclick="copyUUID()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">Copy</button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="mt-6 flex items-center gap-3">
-                        <button id="uuid-convert-btn" onclick="convertUUID()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Convert</button>
-                        <button onclick="clearUUID()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Timezone Converter Section -->
-            <div id="timezone" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Timezone Converter</h2>
-                    <p class="text-gray-600">Convert time between different timezones (up to 5 at once).</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <!-- Source Time Input -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Source Timezone</label>
-                            <select id="sourceTimezone"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <!-- Timezone options will be populated by JavaScript -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Date & Time</label>
-                            <input type="datetime-local" id="inputDateTime"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Target Timezones -->
-                    <div class="mb-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Convert To (Select up to 5
-                                timezones)</label>
-                            <button onclick="addTimezoneConverter()" id="addTimezoneBtn"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
-                                + Add Timezone
-                            </button>
-                        </div>
-                        <div id="timezoneConverters" class="space-y-3">
-                            <!-- Timezone converters will be added here -->
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        <button onclick="convertAllTimezones()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Convert All
-                        </button>
-                        <button onclick="setCurrentTime()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Use Current Time
-                        </button>
-                        <button onclick="clearAllTimezones()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear All
-                        </button>
-                    </div>
-
-                    <!-- Results -->
-                    <div id="conversionResults" class="space-y-3">
-                        <!-- Conversion results will appear here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- JSON to CSV Converter Section -->
-            <div id="json-csv" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON to CSV Converter</h2>
-                    <p class="text-gray-600">Convert JSON data to CSV format. Upload a file or paste JSON directly.</p>
-                </div>
-
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
-
-                            <!-- File Upload Area -->
-                            <div class="mb-4">
-                                <form id="jsonUploadForm" enctype="multipart/form-data">
-                                    <div class="flex items-center gap-3">
-                                        <input type="file" id="jsonFileInput" name="file" accept=".json" class="hidden" multiple>
-                                        <button type="button" onclick="document.getElementById('jsonFileInput').click()"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                            📁 Upload JSON Files
-                                        </button>
-                                        <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input (32 hex characters)</label>
+                                    <input id="uuidInput" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" placeholder="e.g. 9e2a94c275074a92aefb5ca102231198" />
+                                    <div id="uuid-error" class="text-sm text-red-600 mt-2" style="display:none;"></div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Result UUID</label>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input id="uuidOutput" type="text" readonly class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" placeholder="Result will appear here" />
+                                        <button id="uuid-copy-btn" onclick="copyUUID()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm">Copy</button>
                                     </div>
-                                    <div id="uploadProgress" class="w-full bg-gray-200 rounded h-2 mt-2 hidden">
-                                        <div id="uploadProgressBar" class="bg-blue-600 h-2 rounded" style="width:0%"></div>
-                                    </div>
-                                    <div id="uploadStatus" class="mt-2 text-sm hidden"></div>
-                                </form>
-                            </div>
-
-                            <!-- Drag and Drop Area -->
-                            <div id="dropZone"
-                                class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
-                                onclick="document.getElementById('jsonFileInput').click()">
-                                <div class="text-gray-500">
-                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                        </path>
-                                    </svg>
-                                    <p class="text-sm">Drag and drop JSON file here</p>
-                                    <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
                                 </div>
                             </div>
 
-                            <textarea id="jsonCsvInput"
-                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON array here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
-                            <textarea id="csvOutput"
-                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="CSV data will appear here..."></textarea>
+                            <div class="mt-6 flex items-center gap-3">
+                                <button id="uuid-convert-btn" onclick="convertUUID()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Convert</button>
+                                <button onclick="clearUUID()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-6">
-                        <button onclick="convertJsonToCsv()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Convert to CSV
-                        </button>
-                        <button onclick="downloadCsv()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
-                            Download CSV
-                        </button>
-                        <button onclick="clearJsonCsv()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- XML to CSV Converter Section -->
-            <div id="xml-csv" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML to CSV Converter</h2>
-                    <p class="text-gray-600">Convert XML data to CSV format. Upload a file or paste XML directly.</p>
-                </div>
+                    <!-- Timezone Converter Section -->
+                    <div id="timezone" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Timezone Converter</h2>
+                            <p class="text-gray-600">Convert time between different timezones (up to 5 at once).</p>
+                        </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <!-- Source Time Input -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Source Timezone</label>
+                                    <select id="sourceTimezone"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <!-- Timezone options will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date & Time</label>
+                                    <input type="datetime-local" id="inputDateTime"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </div>
 
-                            <!-- File Upload Area -->
-                            <div class="mb-4">
-                                <div class="flex items-center gap-3">
-                                    <input type="file" id="xmlFileInput" accept=".xml" class="hidden"
-                                        onchange="handleXmlFileUpload(event)">
-                                    <button onclick="document.getElementById('xmlFileInput').click()"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                        📁 Upload XML File
+                            <!-- Target Timezones -->
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <label class="block text-sm font-medium text-gray-700">Convert To (Select up to 5
+                                        timezones)</label>
+                                    <button onclick="addTimezoneConverter()" id="addTimezoneBtn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                        + Add Timezone
                                     </button>
-                                    <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
                                 </div>
-                                <div id="xmlUploadStatus" class="mt-2 text-sm hidden"></div>
-                            </div>
-
-                            <!-- Drag and Drop Area -->
-                            <div id="xmlDropZone"
-                                class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer"
-                                onclick="document.getElementById('xmlFileInput').click()">
-                                <div class="text-gray-500">
-                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                        </path>
-                                    </svg>
-                                    <p class="text-sm">Drag and drop XML file here</p>
-                                    <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
+                                <div id="timezoneConverters">
+                                    <!-- Timezone converters will be added here -->
                                 </div>
                             </div>
 
-                            <textarea id="xmlCsvInput"
-                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
-                            <textarea id="xmlCsvOutput"
-                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="CSV data will appear here..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Configuration Options -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Conversion Options</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Root Element (optional)</label>
-                                <input type="text" id="xmlRootElement"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                                    placeholder="e.g., user, item, record" value="user">
-                                <p class="text-xs text-gray-500 mt-1">Specify which elements to convert to rows</p>
+                            <!-- Action Buttons -->
+                            <div class="flex flex-wrap gap-3 mb-6">
+                                <button onclick="convertAllTimezones()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Convert All
+                                </button>
+                                <button onclick="setCurrentTime()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Use Current Time
+                                </button>
+                                <button onclick="clearAllTimezones()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Clear All
+                                </button>
                             </div>
-                            <div class="flex items-center">
-                                <input type="checkbox" id="includeAttributes" class="mr-2" checked>
-                                <label class="text-sm text-gray-600">Include XML attributes as columns</label>
+
+                            <!-- Results -->
+                            <div id="conversionResults" class="space-y-3">
+                                <!-- Conversion results will appear here -->
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-6">
-                        <button onclick="convertXmlToCsv()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Convert to CSV
-                        </button>
-                        <button onclick="downloadXmlCsv()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
-                            Download CSV
-                        </button>
-                        <button onclick="clearXmlCsv()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear
-                        </button>
+                    <!-- JSON to CSV Converter Section -->
+                    <div id="json-csv" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON to CSV Converter</h2>
+                            <p class="text-gray-600">Convert JSON data to CSV format. Upload a file or paste JSON directly.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+
+                                    <!-- File Upload Area -->
+                                    <div class="mb-4">
+                                        <form id="jsonUploadForm" enctype="multipart/form-data">
+                                            <div class="flex items-center gap-3">
+                                                <input type="file" id="jsonFileInput" name="file" accept=".json" class="hidden" multiple>
+                                                <button type="button" onclick="document.getElementById('jsonFileInput').click()"
+                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                                    📁 Upload JSON Files
+                                                </button>
+                                                <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
+                                            </div>
+                                            <div id="uploadProgress" class="w-full bg-gray-200 rounded h-2 mt-2 hidden">
+                                                <div id="uploadProgressBar" class="bg-blue-600 h-2 rounded" style="width:0%"></div>
+                                            </div>
+                                            <div id="uploadStatus" class="mt-2 text-sm hidden"></div>
+                                        </form>
+                                    </div>
+
+                                    <!-- Drag and Drop Area -->
+                                    <div id="dropZone"
+                                        class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer"
+                                        onclick="document.getElementById('jsonFileInput').click()">
+                                        <div class="text-gray-500">
+                                            <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                </path>
+                                            </svg>
+                                            <p class="text-sm">Drag and drop JSON file here</p>
+                                            <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
+                                        </div>
+                                    </div>
+
+                                    <textarea id="jsonCsvInput"
+                                        class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your JSON array here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
+                                    <textarea id="csvOutput"
+                                        class="w-full h-[430px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="CSV data will appear here..."></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-6">
+                                <button onclick="convertJsonToCsv()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Convert to CSV
+                                </button>
+                                <button onclick="downloadCsv()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Download CSV
+                                </button>
+                                <button onclick="clearJsonCsv()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- JSON Filter Section -->
-            <div id="json-filter" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Data Filter</h2>
-                    <p class="text-gray-600">Filter JSON data by field values with advanced conditions.</p>
-                </div>
+                    <!-- XML to CSV Converter Section -->
+                    <div id="xml-csv" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">XML to CSV Converter</h2>
+                            <p class="text-gray-600">Convert XML data to CSV format. Upload a file or paste XML directly.</p>
+                        </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
-                            <!-- File Upload & Drag-and-Drop Area -->
-                            <div class="mb-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <input type="file" id="jsonFilterFileInput" accept=".json" class="hidden"
-                                        onchange="handleJsonFilterFileUpload(event)">
-                                    <button onclick="document.getElementById('jsonFilterFileInput').click()"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                        📁 Upload JSON File
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+
+                                    <!-- File Upload Area -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <input type="file" id="xmlFileInput" accept=".xml" class="hidden"
+                                                onchange="handleXmlFileUpload(event)">
+                                            <button onclick="document.getElementById('xmlFileInput').click()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                                📁 Upload XML File
+                                            </button>
+                                            <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
+                                        </div>
+                                        <div id="xmlUploadStatus" class="mt-2 text-sm hidden"></div>
+                                    </div>
+
+                                    <!-- Drag and Drop Area -->
+                                    <div id="xmlDropZone"
+                                        class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer"
+                                        onclick="document.getElementById('xmlFileInput').click()">
+                                        <div class="text-gray-500">
+                                            <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                </path>
+                                            </svg>
+                                            <p class="text-sm">Drag and drop XML file here</p>
+                                            <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
+                                        </div>
+                                    </div>
+
+                                    <textarea id="xmlCsvInput"
+                                        class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your XML here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CSV Output</label>
+                                    <textarea id="xmlCsvOutput"
+                                        class="w-full h-[430px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="CSV data will appear here..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Configuration Options -->
+                            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                                <h4 class="text-sm font-medium text-gray-700 mb-3">Conversion Options</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Root Element (optional)</label>
+                                        <input type="text" id="xmlRootElement"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                            placeholder="e.g., user, item, record" value="user">
+                                        <p class="text-xs text-gray-500 mt-1">Specify which elements to convert to rows</p>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="includeAttributes" class="mr-2" checked>
+                                        <label class="text-sm text-gray-600">Include XML attributes as columns</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <button onclick="convertXmlToCsv()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Convert to CSV
+                                </button>
+                                <button onclick="downloadXmlCsv()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Download CSV
+                                </button>
+                                <button onclick="clearXmlCsv()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JSON Filter Section -->
+                    <div id="json-filter" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">JSON Data Filter</h2>
+                            <p class="text-gray-600">Filter JSON data by field values with advanced conditions.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+                                    <!-- File Upload & Drag-and-Drop Area -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <input type="file" id="jsonFilterFileInput" accept=".json" class="hidden"
+                                                onchange="handleJsonFilterFileUpload(event)">
+                                            <button onclick="document.getElementById('jsonFilterFileInput').click()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                                📁 Upload JSON File
+                                            </button>
+                                            <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
+                                        </div>
+                                        <div id="jsonFilterDropZone"
+                                            class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer text-gray-500">
+                                            <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                </path>
+                                            </svg>
+                                            <p class="text-sm text-gray-500">Drag and drop JSON file here</p>
+                                            <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
+                                        </div>
+                                        <div id="jsonFilterUploadStatus" class="mt-2 text-sm hidden"></div>
+                                    </div>
+                                    <textarea id="jsonFilterInput"
+                                        class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your JSON data here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
+                                    <textarea id="jsonFilterOutput"
+                                        class="w-full h-[428px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="Filtered data will appear here..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Filter Configuration -->
+                            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
+                                    <button onclick="addJsonFilterField()" id="addJsonFilterBtn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                        + Add Filter
                                     </button>
-                                    <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
                                 </div>
-                                <div id="jsonFilterDropZone"
-                                    class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer text-gray-500">
-                                    <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                        </path>
-                                    </svg>
-                                    <p class="text-sm text-gray-500">Drag and drop JSON file here</p>
-                                    <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm text-gray-600 mb-2">Data Array Path</label>
+                                    <input type="text" id="jsonArrayPath"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                        placeholder="e.g., users, data, items" value="users">
+                                    <p class="text-xs text-gray-500 mt-1">Path to the array you want to filter</p>
                                 </div>
-                                <div id="jsonFilterUploadStatus" class="mt-2 text-sm hidden"></div>
+
+                                <div id="jsonFilterFields" class="space-y-3">
+                                    <!-- Filter fields will be added here -->
+                                </div>
+
+                                <div class="mt-4 flex items-center gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
+                                        <select id="jsonLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
+                                            <option value="AND">AND (all conditions must match)</option>
+                                            <option value="OR">OR (any condition can match)</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <textarea id="jsonFilterInput"
-                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your JSON data here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
-                            <textarea id="jsonFilterOutput"
-                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Filtered data will appear here..."></textarea>
-                        </div>
-                    </div>
 
-                    <!-- Filter Configuration -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
-                            <button onclick="addJsonFilterField()" id="addJsonFilterBtn"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
-                                + Add Filter
-                            </button>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-600 mb-2">Data Array Path</label>
-                            <input type="text" id="jsonArrayPath"
-                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                                placeholder="e.g., users, data, items" value="users">
-                            <p class="text-xs text-gray-500 mt-1">Path to the array you want to filter</p>
-                        </div>
-
-                        <div id="jsonFilterFields" class="space-y-3">
-                            <!-- Filter fields will be added here -->
-                        </div>
-
-                        <div class="mt-4 flex items-center gap-4">
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
-                                <select id="jsonLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
-                                    <option value="AND">AND (all conditions must match)</option>
-                                    <option value="OR">OR (any condition can match)</option>
-                                </select>
+                            <div class="mt-6">
+                                <button onclick="applyJsonFilter()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Apply Filter
+                                </button>
+                                <button onclick="downloadJsonFilter()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Download Result
+                                </button>
+                                <button onclick="clearJsonFilter()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Clear All
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-6">
-                        <button onclick="applyJsonFilter()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Apply Filter
-                        </button>
-                        <button onclick="downloadJsonFilter()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
-                            Download Result
-                        </button>
-                        <button onclick="clearJsonFilter()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear All
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    <!-- XML Filter Section -->
+                    <div id="xml-filter" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Data Filter</h2>
+                            <p class="text-gray-600">Filter XML data by element and attribute values with advanced conditions.
+                            </p>
+                        </div>
 
-            <!-- XML Filter Section -->
-            <div id="xml-filter" class="section hidden pb-32">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">XML Data Filter</h2>
-                    <p class="text-gray-600">Filter XML data by element and attribute values with advanced conditions.
-                    </p>
-                </div>
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                                    <!-- File Upload & Drag-and-Drop Area -->
+                                    <div class="mb-4">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <input type="file" id="xmlFilterFileInput" accept=".xml" class="hidden"
+                                                onchange="handleXmlFilterFileUpload(event)">
+                                            <button onclick="document.getElementById('xmlFilterFileInput').click()"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                                📁 Upload XML File
+                                            </button>
+                                            <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
+                                        </div>
+                                        <div id="xmlFilterDropZone"
+                                            class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer">
+                                            <div class="text-gray-500">
+                                                <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                    </path>
+                                                </svg>
+                                                <p class="text-sm">Drag and drop XML file here</p>
+                                                <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
+                                            </div>
+                                        </div>
+                                        <div id="xmlFilterUploadStatus" class="mt-2 text-sm hidden"></div>
+                                    </div>
+                                    <textarea id="xmlFilterInput"
+                                        class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                        placeholder="Paste your XML data here..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
+                                    <textarea id="xmlFilterOutput"
+                                        class="w-full h-[428px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
+                                        readonly placeholder="Filtered data will appear here..."></textarea>
+                                </div>
+                            </div>
 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
-                            <!-- File Upload & Drag-and-Drop Area -->
-                            <div class="mb-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <input type="file" id="xmlFilterFileInput" accept=".xml" class="hidden"
-                                        onchange="handleXmlFilterFileUpload(event)">
-                                    <button onclick="document.getElementById('xmlFilterFileInput').click()"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                                        📁 Upload XML File
+                            <!-- Filter Configuration -->
+                            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
+                                    <button onclick="addXmlFilterField()" id="addXmlFilterBtn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
+                                        + Add Filter
                                     </button>
-                                    <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
                                 </div>
-                                <div id="xmlFilterDropZone"
-                                    class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-green-400 hover:bg-green-50 cursor-pointer">
-                                    <div class="text-gray-500">
-                                        <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                            </path>
-                                        </svg>
-                                        <p class="text-sm">Drag and drop XML file here</p>
-                                        <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
+
+                                <div class="mb-4">
+                                    <label class="block text-sm text-gray-600 mb-2">Element Name</label>
+                                    <input type="text" id="xmlElementName"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                                        placeholder="e.g., user, item, record" value="user">
+                                    <p class="text-xs text-gray-500 mt-1">Name of the XML elements to filter</p>
+                                </div>
+
+                                <div id="xmlFilterFields" class="space-y-3">
+                                    <!-- Filter fields will be added here -->
+                                </div>
+
+                                <div class="mt-4 flex items-center gap-4">
+                                    <div>
+                                        <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
+                                        <select id="xmlLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
+                                            <option value="AND">AND (all conditions must match)</option>
+                                            <option value="OR">OR (any condition can match)</option>
+                                        </select>
                                     </div>
                                 </div>
-                                <div id="xmlFilterUploadStatus" class="mt-2 text-sm hidden"></div>
                             </div>
-                            <textarea id="xmlFilterInput"
-                                class="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-                                placeholder="Paste your XML data here..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Filtered Result</label>
-                            <textarea id="xmlFilterOutput"
-                                class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm"
-                                readonly placeholder="Filtered data will appear here..."></textarea>
-                        </div>
-                    </div>
 
-                    <!-- Filter Configuration -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-sm font-medium text-gray-700">Filter Conditions (up to 10 fields)</h4>
-                            <button onclick="addXmlFilterField()" id="addXmlFilterBtn"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors">
-                                + Add Filter
-                            </button>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-600 mb-2">Element Name</label>
-                            <input type="text" id="xmlElementName"
-                                class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                                placeholder="e.g., user, item, record" value="user">
-                            <p class="text-xs text-gray-500 mt-1">Name of the XML elements to filter</p>
-                        </div>
-
-                        <div id="xmlFilterFields" class="space-y-3">
-                            <!-- Filter fields will be added here -->
-                        </div>
-
-                        <div class="mt-4 flex items-center gap-4">
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Logic Operator</label>
-                                <select id="xmlLogicOperator" class="px-3 py-2 border border-gray-300 rounded text-sm">
-                                    <option value="AND">AND (all conditions must match)</option>
-                                    <option value="OR">OR (any condition can match)</option>
-                                </select>
+                            <div class="mt-6">
+                                <button onclick="applyXmlFilter()"
+                                    class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
+                                    style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
+                                    onmouseout="this.style.backgroundColor='#25c9d0'">
+                                    Apply Filter
+                                </button>
+                                <button onclick="downloadXmlFilter()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
+                                    Download Result
+                                </button>
+                                <button onclick="clearXmlFilter()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Clear All
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="mt-6">
-                        <button onclick="applyXmlFilter()"
-                            class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3"
-                            style="background-color: #25c9d0;" onmouseover="this.style.backgroundColor='#1fb5bc'"
-                            onmouseout="this.style.backgroundColor='#25c9d0'">
-                            Apply Filter
-                        </button>
-                        <button onclick="downloadXmlFilter()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3">
-                            Download Result
-                        </button>
-                        <button onclick="clearXmlFilter()"
-                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Clear All
-                        </button>
-                    </div>
-                </div>
+                        <!-- Data Extract Section (JSON) -->
+                        <div id="data-extract-json" class="section pb-32 hidden">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Data Extract from JSON to CSV</h2>
+                            <p class="text-gray-600 mb-8">Extract JSON data by fields</p>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                <div class="flex flex-row gap-6 w-full p-2">
+                                    <!-- Left: Inputs -->
+                                    <div style="width: 100%; max-width: 100%; min-width: 0;">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
+                                        <div class="mb-4">
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <input type="file" id="extractJsonFileInput" accept=".json" class="hidden" onchange="handleExtractJsonFileUpload(event)">
+                                                <button onclick="document.getElementById('extractJsonFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">📁 Upload JSON File</button>
+                                                <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
+                                            </div>
+                                            <div id="extractJsonDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer mb-2" onclick="document.getElementById('extractJsonFileInput').click()">
+                                                <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                    </path>
+                                                </svg>
+                                                <p class="text-sm">Drag and drop JSON file here</p>
+                                                <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
+                                            </div>
+                                            <textarea id="extractJsonInput" class="w-full h-32 p-2 border rounded" placeholder="Paste JSON here..."></textarea>
+                                            <textarea id="extractJsonPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>                                
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block mb-2 font-semibold">Parent Node (optional):</label>
+                                            <input id="extractJsonParent" type="text" class="w-full p-2 border rounded" placeholder="e.g. id = 2">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="block mb-2 font-semibold">Fields to Extract (comma separated):</label>
+                                            <input id="extractJsonFields" type="text" class="w-full p-2 border rounded" placeholder="e.g. id, name, location.id, location.name">
+                                        </div>
+                                    </div>
+                                    <!-- Middle: Buttons -->
+                                    <div class="flex flex-col items-center gap-10 md:sticky md:top-0 z-10 bg-gray pt-11">
+                                        <button onclick="extractJsonPreview()" class="bg-blue-500 text-white px-4 py-2 rounded w-40">Extract & Preview</button>
+                                        <button onclick="downloadJsonCSV()" class="bg-green-600 text-white px-4 py-2 rounded w-40">Download CSV</button>
+                                    </div>
+                                    <!-- Right: Preview -->
+                                    <div style="width: 100%; max-width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start;">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Extracted Result</label>
+                                        <textarea id="extractJsonOutput" class="w-full h-[428px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Extracted data will appear here..."></textarea>
+                                        <div id="extractJsonResult" class="mb-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Data Extract Section (XML) -->
+                        <div id="data-extract-xml" class="section pb-32 hidden">
+                            <h2 class="text-2xl font-bold text-gray-90 mb-2">Data Extract from XML to CSV</h2>
+                            <p class="text-gray-600 mb-8">Extract XML data by fields</p>
+                            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                            <div class="flex flex-row gap-6 w-full p-2">
+                                <!-- Left: Inputs -->
+                                <div style="width: 100%; max-width: 100%; min-width: 0;">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
+                                    <div class="mb-4">
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <input type="file" id="extractXmlFileInput" accept=".xml" class="hidden" onchange="handleExtractXmlFileUpload(event)">
+                                            <button onclick="document.getElementById('extractXmlFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">📁 Upload XML File</button>
+                                            <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
+                                        </div>
+                                        <div id="extractXmlDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer mb-2" onclick="document.getElementById('extractXmlFileInput').click()">
+                                                <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                                    </path>
+                                                </svg>
+                                            <p class="text-sm">Drag and drop XML file here</p>
+                                            <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
+                                        </div>
+                                        <textarea id="extractXmlInput" class="w-full h-32 p-2 border rounded" placeholder="Paste XML here..."></textarea>
+                                        <textarea id="extractXmlPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>
+                                    </div>
+                                        <div class="mb-4">
+                                        <label class="block mb-2 font-semibold">Parent Node (optional):</label>
+                                        <input id="extractXmlParent" type="text" class="w-full p-2 border rounded" placeholder="e.g. id = 2">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="block mb-2 font-semibold">Fields to Extract (comma separated):</label>
+                                        <input id="extractXmlFields" type="text" class="w-full p-2 border rounded" placeholder="e.g. id, name, location.id, location.name">
+                                    </div> 
+                                </div>
+                                <!-- Middle: Buttons -->
+                                <div class="flex flex-col items-center gap-10 md:sticky md:top-0 z-10 bg-gray pt-11">
+                                    <button onclick="extractXmlPreview()" class="bg-blue-500 text-white px-4 py-2 rounded w-40">Extract & Preview</button>
+                                    <button onclick="downloadXmlCSV()" class="bg-green-600 text-white px-4 py-2 rounded w-40">Download CSV</button>
+                                </div>
+                                <!-- Right: Preview -->
+                                <div style="width: 100%; max-width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start;">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Extracted Result</label>
+                                    <textarea id="extractXmlOutput" class="w-full h-[428px] px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Extracted data will appear here..."></textarea>
+                                    <div id="extractXmlResult" class="mb-2"></div>
+                                </div>
+                            </div>
+                        </div>                   
+                </main>
             </div>
-                <!-- Data Extract Section (JSON) -->
-                <div id="data-extract-json" class="section pb-32 hidden">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-2">Data Extract from JSON to CSV</h2>
-                    <p class="text-gray-600 mb-8">Extract JSON data by fields</p>
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <div class="flex flex-row gap-6 w-full p-2">
-                            <!-- Left: Inputs -->
-                            <div style="width: 100%; max-width: 100%; min-width: 0;">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Input JSON</label>
-                                <div class="mb-4">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <input type="file" id="extractJsonFileInput" accept=".json" class="hidden" onchange="handleExtractJsonFileUpload(event)">
-                                        <button onclick="document.getElementById('extractJsonFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">📁 Upload JSON File</button>
-                                        <span class="text-sm text-gray-500">or paste/drag JSON below (No special characters in file name)</span>
-                                    </div>
-                                    <div id="extractJsonDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer mb-2" onclick="document.getElementById('extractJsonFileInput').click()">
-                                        <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                            </path>
-                                        </svg>
-                                        <p class="text-sm">Drag and drop JSON file here</p>
-                                        <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
-                                    </div>
-                                    <textarea id="extractJsonInput" class="w-full h-32 p-2 border rounded" placeholder="Paste JSON here..."></textarea>
-                                    <textarea id="extractJsonPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>                                
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block mb-2 font-semibold">Parent Node (optional):</label>
-                                    <input id="extractJsonParent" type="text" class="w-full p-2 border rounded" placeholder="e.g. id = 2">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="block mb-2 font-semibold">Fields to Extract (comma separated):</label>
-                                    <input id="extractJsonFields" type="text" class="w-full p-2 border rounded" placeholder="e.g. id, name, location.id, location.name">
-                                </div>
-                            </div>
-                            <!-- Middle: Buttons -->
-                            <div class="flex flex-col items-center gap-10 md:sticky md:top-0 z-10 bg-gray pt-11">
-                                <button onclick="extractJsonPreview()" class="bg-blue-500 text-white px-4 py-2 rounded w-40">Extract & Preview</button>
-                                <button onclick="downloadJsonCSV()" class="bg-green-600 text-white px-4 py-2 rounded w-40">Download CSV</button>
-                            </div>
-                            <!-- Right: Preview -->
-                            <div style="width: 100%; max-width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start;">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Extracted Result</label>
-                                <textarea id="extractJsonOutput" class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Extracted data will appear here..."></textarea>
-                                <div id="extractJsonResult" class="mb-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Data Extract Section (XML) -->
-                <div id="data-extract-xml" class="section pb-32 hidden">
-                    <h2 class="text-2xl font-bold text-gray-90 mb-2">Data Extract from XML to CSV</h2>
-                    <p class="text-gray-600 mb-8">Extract XML data by fields</p>
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div class="flex flex-row gap-6 w-full p-2">
-                        <!-- Left: Inputs -->
-                        <div style="width: 100%; max-width: 100%; min-width: 0;">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Input XML</label>
-                            <div class="mb-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <input type="file" id="extractXmlFileInput" accept=".xml" class="hidden" onchange="handleExtractXmlFileUpload(event)">
-                                    <button onclick="document.getElementById('extractXmlFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">📁 Upload XML File</button>
-                                    <span class="text-sm text-gray-500">or paste/drag XML below (No special characters in file name)</span>
-                                </div>
-                                <div id="extractXmlDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer mb-2" onclick="document.getElementById('extractXmlFileInput').click()">
-                                        <svg class="mx-auto h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                            </path>
-                                        </svg>
-                                    <p class="text-sm">Drag and drop XML file here</p>
-                                    <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
-                                </div>
-                                <textarea id="extractXmlInput" class="w-full h-32 p-2 border rounded" placeholder="Paste XML here..."></textarea>
-                                <textarea id="extractXmlPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>
-                            </div>
-                                <div class="mb-4">
-                                <label class="block mb-2 font-semibold">Parent Node (optional):</label>
-                                <input id="extractXmlParent" type="text" class="w-full p-2 border rounded" placeholder="e.g. id = 2">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block mb-2 font-semibold">Fields to Extract (comma separated):</label>
-                                <input id="extractXmlFields" type="text" class="w-full p-2 border rounded" placeholder="e.g. id, name, location.id, location.name">
-                            </div> 
-                        </div>
-                        <!-- Middle: Buttons -->
-                        <div class="flex flex-col items-center gap-10 md:sticky md:top-0 z-10 bg-gray pt-11">
-                            <button onclick="extractXmlPreview()" class="bg-blue-500 text-white px-4 py-2 rounded w-40">Extract & Preview</button>
-                            <button onclick="downloadXmlCSV()" class="bg-green-600 text-white px-4 py-2 rounded w-40">Download CSV</button>
-                        </div>
-                        <!-- Right: Preview -->
-                        <div style="width: 100%; max-width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: flex-start;">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Extracted Result</label>
-                            <textarea id="extractXmlOutput" class="w-full h-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Extracted data will appear here..."></textarea>
-                            <div id="extractXmlResult" class="mb-2"></div>
-                        </div>
-                    </div>
-                </div>                   
-        </main>
-    </div>
 
-    <script type="text/javascript" src="static/main.js"></script>
-    <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
-            TSE Tools Version 1.4 © 2025 <br>
-            Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
-    </footer>
-</body>
+            <script type="text/javascript" src="static/main.js"></script>
+            <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
+                    TSE Tools Version 1.4 © 2025 <br>
+                    Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
+            </footer>
+        </body>
 
-</html>
+        </html>
