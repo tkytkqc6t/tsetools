@@ -2187,14 +2187,17 @@ document.addEventListener('DOMContentLoaded', function() {
             ].join('');
 
             converterDiv.innerHTML = `
-                <div class="flex-1">
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" id="targetTimezone-${timezoneConverterCount}">
-                        ${timezoneOptions}
-                    </select>
-                </div>
-                <div class="flex-2 min-w-0">
-                    <div class="px-3 py-2 bg-white border border-gray-300 rounded-lg font-mono text-sm text-gray-600" id="result-${timezoneConverterCount}">
-                        Click "Convert All" to see result
+                <div class="flex gap-2 w-full">
+                    <div class="w-1/2">
+                        <select id="targetTimezone-${timezoneConverterCount}" class="w-full px-3 py-2 border border-gray-300 rounded-lg rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            ${timezoneOptions}
+                        </select>
+                    </div>
+
+                    <div class="w-1/2 min-w-0">
+                        <div id="result-${timezoneConverterCount}" class="px-3 py-2 bg-white border border-gray-300 rounded-lg font-mono text-sm text-gray-600">
+                            Click "Convert All" to see result
+                        </div>
                     </div>
                 </div>
                 <button onclick="removeTimezoneConverter(${timezoneConverterCount})" class="text-red-600 hover:text-red-800 p-1">
@@ -2764,6 +2767,62 @@ document.addEventListener('DOMContentLoaded', function() {
                 } catch (e) {
                     alert('Copy failed: ' + (e && e.message ? e.message : err));
                 }
+            });
+        }
+    
+        // Copy helpers for Beautify outputs
+        function copyXMLOutput() {
+            const out = document.getElementById('xmlOutput');
+            if (!out || !out.value) { alert('Nothing to copy. Please beautify XML first.'); return; }
+            navigator.clipboard.writeText(out.value).then(() => {
+                const prev = out.style.borderColor;
+                out.style.borderColor = '#16a34a';
+                setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
+            }).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = out.value; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Copied to clipboard');
+            });
+        }
+
+        function copyJSONOutput() {
+            const out = document.getElementById('jsonOutput');
+            if (!out || !out.value) { alert('Nothing to copy. Please beautify JSON first.'); return; }
+            navigator.clipboard.writeText(out.value).then(() => {
+                const prev = out.style.borderColor;
+                out.style.borderColor = '#16a34a';
+                setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
+            }).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = out.value; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Copied to clipboard');
+            });
+        }
+
+        function copyHTMLOutput() {
+            const out = document.getElementById('htmlOutput');
+            if (!out || !out.value) { alert('Nothing to copy. Please beautify HTML first.'); return; }
+            navigator.clipboard.writeText(out.value).then(() => {
+                const prev = out.style.borderColor;
+                out.style.borderColor = '#16a34a';
+                setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
+            }).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = out.value; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Copied to clipboard');
+            });
+        }
+
+        function copySQLOutput() {
+            // If CodeMirror editor exists use it, otherwise fall back to textarea
+            let text = '';
+            if (typeof sqlEditor !== 'undefined' && sqlEditor) {
+                try { text = sqlEditor.getValue(); } catch (e) { text = document.getElementById('sqlOutput') ? document.getElementById('sqlOutput').value : ''; }
+            } else {
+                const out = document.getElementById('sqlOutput');
+                text = out ? out.value : '';
+            }
+            if (!text || !text.trim()) { alert('Nothing to copy. Please beautify SQL first.'); return; }
+            navigator.clipboard.writeText(text).then(() => {
+                // briefly flash the CodeMirror wrapper or textarea
+                const outTa = document.getElementById('sqlOutput');
+                if (outTa) { const prev = outTa.style.borderColor; outTa.style.borderColor = '#16a34a'; setTimeout(() => { outTa.style.borderColor = prev || ''; }, 900); }
+            }).catch(() => {
+                const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('Copied to clipboard');
             });
         }
 
