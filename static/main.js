@@ -200,10 +200,12 @@ function extractJsonPreview() {
         let rows = data.map(item => {
             let row = {};
             fields.forEach(f => {
-                if (f === 'custom_fields[cf_key=cf_postingStatus].value') {
-                    // Special handling for this field
+                // Flexible custom_fields[cf_key=...].value extraction
+                const cfMatch = f.match(/^custom_fields\[cf_key=([^\]]+)\]\.value$/);
+                if (cfMatch) {
+                    const cfKey = cfMatch[1];
                     if (Array.isArray(item.custom_fields)) {
-                        const cf = item.custom_fields.find(sub => sub.cf_key === 'cf_postingStatus');
+                        const cf = item.custom_fields.find(sub => sub.cf_key === cfKey);
                         row[f] = cf && cf.value !== undefined ? cf.value : '';
                     } else {
                         row[f] = '';
