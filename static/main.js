@@ -200,7 +200,17 @@ function extractJsonPreview() {
         let rows = data.map(item => {
             let row = {};
             fields.forEach(f => {
-                if (f.includes('.')) {
+                // Flexible custom_fields[cf_key=...].value extraction
+                const cfMatch = f.match(/^custom_fields\[cf_key=([^\]]+)\]\.value$/);
+                if (cfMatch) {
+                    const cfKey = cfMatch[1];
+                    if (Array.isArray(item.custom_fields)) {
+                        const cf = item.custom_fields.find(sub => sub.cf_key === cfKey);
+                        row[f] = cf && cf.value !== undefined ? cf.value : '';
+                    } else {
+                        row[f] = '';
+                    }
+                } else if (f.includes('.')) {
                     let [parent, child] = f.split('.');
                     if (Array.isArray(item[parent])) {
                         row[f] = item[parent].map(sub => sub[child]).join('\n');
