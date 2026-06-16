@@ -213,71 +213,323 @@
                                 </ul></p>
                         </div>
 
-                        <!-- Feature Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                            <div
-                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                                <div class="flex items-center mb-4">
-                                    <div class="p-2 bg-blue-100 rounded-lg">
-                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Code Beautifiers</h3>
+                        <!-- BEAUTIFIERS Section -->
+                        <div class="mb-12">
+                            <div class="flex items-center mb-6">
+                                <div class="p-3 bg-blue-100 rounded-lg mr-4">
+                                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                    </svg>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Format and beautify your XML, JSON, and HTML code with
-                                    proper indentation and validation.</p>
-                                <ul class="text-sm text-gray-500 space-y-1">
-                                    <li>• XML Formatter with validation</li>
-                                    <li>• JSON Beautifier with error detection</li>
-                                    <li>• HTML Formatter with syntax checking</li>
-                                </ul>
+                                <h2 class="text-3xl font-bold text-gray-900">BEAUTIFIERS</h2>
+                            </div>
+                            
+                            <!-- XML Beautifier -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">XML Beautifier</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Format and validate XML code with proper indentation and error detection.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Indentation:</strong> Automatically indents XML with configurable spacing</li>
+                                        <li>• <strong>Validation:</strong> Detects XML syntax errors and displays them</li>
+                                        <li>• <strong>Error Highlighting:</strong> Highlights problematic lines in red</li>
+                                        <li>• <strong>Download:</strong> Export formatted XML to file</li>
+                                    </ul>
+                                </div>
                             </div>
 
-                            <div
-                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                                <div class="flex items-center mb-4">
-                                    <div class="p-2 bg-green-100 rounded-lg">
-                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Data Converters</h3>
+                            <!-- JSON Beautifier -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">JSON Beautifier</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Format JSON with auto-repair for common issues and comprehensive error detection.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Auto-Repair:</strong> Converts single quotes to double quotes, removes trailing commas, adds missing quotes to keys</li>
+                                        <li>• <strong>Python Dict Conversion:</strong> Converts Python dictionaries to valid JSON</li>
+                                        <li>• <strong>Error Detection:</strong> Identifies parsing errors with line numbers</li>
+                                        <li>• <strong>Formatting:</strong> Pretty-prints JSON with proper indentation</li>
+                                    </ul>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Convert between different data formats and handle timezone
-                                    conversions with ease.</p>
-                                <ul class="text-sm text-gray-500 space-y-1">
-                                    <li>• Multi-timezone converter (up to 5 zones)</li>
-                                    <li>• JSON to CSV conversion</li>
-                                    <li>• XML to CSV with attribute support</li>
-                                </ul>
                             </div>
 
-                            <div
-                                class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow" style="border-color: #25c9d0;">
-                                <div class="flex items-center mb-4">
-                                    <div class="p-2 bg-purple-100 rounded-lg">
-                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-900 ml-3">Advanced Filters</h3>
+                            <!-- HTML Beautifier -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">HTML Beautifier</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Indent and format HTML code with syntax validation and error checking.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Indentation:</strong> Properly indents nested HTML elements</li>
+                                        <li>• <strong>Validation:</strong> Detects unclosed tags and malformed attributes</li>
+                                        <li>• <strong>Syntax Checking:</strong> Identifies common HTML mistakes</li>
+                                        <li>• <strong>Export:</strong> Download formatted HTML</li>
+                                    </ul>
                                 </div>
-                                <p class="text-gray-600 text-sm mb-4">Filter and query your JSON and XML data with powerful
-                                    condition-based filtering.</p>
-                                <ul class="text-sm text-gray-500 space-y-1">
-                                    <li>• JSON data filtering with multiple conditions</li>
-                                    <li>• XML element and attribute filtering</li>
-                                    <li>• AND/OR logic operators</li>
-                                </ul>
+                            </div>
+
+                            <!-- SQL Beautifier -->
+                            <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">SQL Beautifier</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Format SQL queries with syntax highlighting and comprehensive validation.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Formatting:</strong> Auto-indents SQL keywords and clauses</li>
+                                        <li>• <strong>Syntax Highlighting:</strong> Color-codes keywords, functions, and literals using CodeMirror</li>
+                                        <li>• <strong>Validation:</strong> Detects common SQL syntax errors</li>
+                                        <li>• <strong>Error Line Highlighting:</strong> Marks problematic lines for quick fixes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DATA CONVERTERS Section -->
+                        <div class="mb-12">
+                            <div class="flex items-center mb-6">
+                                <div class="p-3 bg-green-100 rounded-lg mr-4">
+                                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold text-gray-900">DATA CONVERTERS</h2>
+                            </div>
+
+                            <!-- Timezone Converter -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Timezone Converter</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Convert timestamps between multiple timezones with dynamic timezone pair management.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Multi-Timezone Support:</strong> Convert between up to 5 timezone pairs simultaneously</li>
+                                        <li>• <strong>Dynamic Pairs:</strong> Add or remove timezone pairs on the fly</li>
+                                        <li>• <strong>Current Time:</strong> Quick button to set current date and time</li>
+                                        <li>• <strong>Batch Conversion:</strong> Convert all timezone pairs with one click</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- JSON to CSV -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">JSON → CSV</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Extract data from JSON arrays and convert to CSV format for spreadsheet applications.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>JSON Array Support:</strong> Processes arrays of objects</li>
+                                        <li>• <strong>Column Mapping:</strong> Maps JSON properties to CSV columns</li>
+                                        <li>• <strong>Data Export:</strong> Download as timestamped CSV file</li>
+                                        <li>• <strong>Preview:</strong> See table preview before downloading</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- XML to CSV -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">XML → CSV</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Convert XML elements and attributes to CSV format with intelligent column detection.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Element Extraction:</strong> Converts XML elements to CSV rows</li>
+                                        <li>• <strong>Attribute Support:</strong> Includes XML attributes in CSV columns</li>
+                                        <li>• <strong>Drag & Drop:</strong> Upload XML files via drag and drop</li>
+                                        <li>• <strong>CSV Export:</strong> Download formatted CSV data</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Base64 Encoder/Decoder -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Base64 Encoder/Decoder</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Encode text to Base64 or decode Base64 strings with UTF-8 support.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>UTF-8 Encoding:</strong> Full support for international characters</li>
+                                        <li>• <strong>Bidirectional:</strong> Both encode and decode operations</li>
+                                        <li>• <strong>Real-time Processing:</strong> Results update as you type</li>
+                                        <li>• <strong>Copy Output:</strong> Easy clipboard copy functionality</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- UUID Generator -->
+                            <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">UUID Generator</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Generate cryptographically random UUID v4 identifiers for unique identification.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>UUID v4 Generation:</strong> RFC 4122 compliant random UUIDs</li>
+                                        <li>• <strong>Batch Generation:</strong> Generate multiple UUIDs at once</li>
+                                        <li>• <strong>Copy to Clipboard:</strong> Quick copy of generated UUIDs</li>
+                                        <li>• <strong>Instant Generation:</strong> Click to generate new identifiers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ADVANCED FILTERS Section -->
+                        <div class="mb-12">
+                            <div class="flex items-center mb-6">
+                                <div class="p-3 bg-purple-100 rounded-lg mr-4">
+                                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold text-gray-900">ADVANCED FILTERS</h2>
+                            </div>
+
+                            <!-- Filter from JSON -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Filter from JSON</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Extract specific fields from JSON objects with dynamic row-by-row filtering.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Dynamic Field Selection:</strong> Choose which JSON properties to extract</li>
+                                        <li>• <strong>Row-by-Row Filtering:</strong> Filter data based on conditions</li>
+                                        <li>• <strong>Table Preview:</strong> View results in an interactive table</li>
+                                        <li>• <strong>CSV Export:</strong> Download filtered data as CSV</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Filter from XML -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Filter from XML</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Filter XML elements and attributes by name or pattern with powerful querying.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Element Filtering:</strong> Filter by element name or XPath-like patterns</li>
+                                        <li>• <strong>Attribute Filtering:</strong> Extract specific XML attributes</li>
+                                        <li>• <strong>Pattern Matching:</strong> Support for complex filtering rules</li>
+                                        <li>• <strong>CSV Export:</strong> Download filtered XML data</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Diff Checker -->
+                            <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Diff Checker</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Side-by-side comparison of two texts with intelligent line-level and character-level diffing.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Side-by-Side View:</strong> Compare left and right content visually</li>
+                                        <li>• <strong>Intelligent Diffing:</strong> Uses jsdiff library for smart comparisons</li>
+                                        <li>• <strong>Visual Highlighting:</strong> Color-codes added (green), removed (red), and unchanged lines</li>
+                                        <li>• <strong>Navigation:</strong> Find previous/next differences and jump between them</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DATA EXTRACTION Section -->
+                        <div class="mb-12">
+                            <div class="flex items-center mb-6">
+                                <div class="p-3 bg-yellow-100 rounded-lg mr-4">
+                                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold text-gray-900">DATA EXTRACTION</h2>
+                            </div>
+
+                            <!-- Extract from JSON -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Extract from JSON</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Parse JSON arrays and extract specific fields with real-time preview and CSV export.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>JSON Parsing:</strong> Automatically parses and validates JSON structure</li>
+                                        <li>• <strong>Field Selection:</strong> Choose which properties to extract from objects</li>
+                                        <li>• <strong>Real-time Preview:</strong> View formatted JSON before processing</li>
+                                        <li>• <strong>Drag & Drop Upload:</strong> Upload JSON files with file drag and drop</li>
+                                        <li>• <strong>CSV Export:</strong> Download extracted data as CSV</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Extract from XML -->
+                            <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900">Extract from XML</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <p class="text-gray-600 mb-3">Parse XML documents with drag and drop upload and CSV export capabilities.</p>
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>XML Parsing:</strong> Parses and displays XML structure</li>
+                                        <li>• <strong>Real-time Preview:</strong> View formatted XML as you paste or upload</li>
+                                        <li>• <strong>Drag & Drop Upload:</strong> Easy file upload via drag and drop</li>
+                                        <li>• <strong>Element Extraction:</strong> Extract specific elements and attributes</li>
+                                        <li>• <strong>CSV Export:</strong> Download extracted data in CSV format</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
 
@@ -1106,9 +1358,24 @@
                 </main>
             </div>
 
+            <script type="text/javascript">
+                function toggleExpand(button) {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('.expand-icon');
+                    
+                    // Toggle hidden class
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        content.classList.add('hidden');
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            </script>
             <script type="text/javascript" src="static/main.js"></script>
             <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
-                    TSE Tools Version 1.5c © 2026 <br>
+                    TSE Tools Version 1.5d © 2026 <br>
                     Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
             </footer>
         </body>
