@@ -1419,6 +1419,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'extractJsonInput','extractXmlInput',
                 // Base64 converter
                 'base64Input','base64Output', 'diffLeft', 'diffRight', 'diffLeftView', 'diffRightView',
+                // URL Encoder/Decoder
+                'urlInput','urlOutput',
                 // SQL Formatter
                 'sqlOutput',
                 // Data Extract fields input areas
@@ -2764,6 +2766,74 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             navigator.clipboard.writeText(out.value).then(() => {
                 // show a brief success message near the output (use alert fallback if not desired)
+                const prev = out.style.borderColor;
+                out.style.borderColor = '#16a34a'; // green
+                setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
+            }).catch(err => {
+                // Fallback copy method
+                try {
+                    out.select();
+                    document.execCommand('copy');
+                    out.setSelectionRange(0, 0);
+                    alert('Copied to clipboard');
+                } catch (e) {
+                    alert('Copy failed: ' + (e && e.message ? e.message : err));
+                }
+            });
+        }
+
+        // URL Encoder/Decoder Functions
+        function encodeURL() {
+            const input = document.getElementById('urlInput').value || '';
+            const out = document.getElementById('urlOutput');
+            if (!input.trim()) {
+                out.value = 'Error: Please enter text to encode';
+                out.style.color = 'red';
+                return;
+            }
+            try {
+                const encoded = encodeURIComponent(input);
+                out.value = encoded;
+                out.style.color = 'black';
+            } catch (e) {
+                out.value = 'Error: ' + e.message;
+                out.style.color = 'red';
+            }
+        }
+
+        function decodeURL() {
+            const input = document.getElementById('urlInput').value || '';
+            const out = document.getElementById('urlOutput');
+            if (!input.trim()) {
+                out.value = 'Error: Please enter URL-encoded text to decode';
+                out.style.color = 'red';
+                return;
+            }
+            try {
+                const decoded = decodeURIComponent(input);
+                out.value = decoded;
+                out.style.color = 'black';
+            } catch (e) {
+                out.value = 'Error: ' + e.message;
+                out.style.color = 'red';
+            }
+        }
+
+        function clearURL() {
+            const inEl = document.getElementById('urlInput');
+            const out = document.getElementById('urlOutput');
+            if (inEl) inEl.value = '';
+            if (out) { out.value = ''; out.style.color = 'black'; }
+        }
+
+        function copyURLOutput() {
+            const out = document.getElementById('urlOutput');
+            if (!out || !out.value) {
+                alert('Nothing to copy. Please encode or decode first.');
+                return;
+            }
+            navigator.clipboard.writeText(out.value).then(() => {
+                // show a brief success message near the output
                 const prev = out.style.borderColor;
                 out.style.borderColor = '#16a34a'; // green
                 setTimeout(() => { out.style.borderColor = prev || ''; }, 900);
