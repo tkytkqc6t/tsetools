@@ -165,9 +165,30 @@ function showSection(sectionId) {
     if (target) target.style.display = '';
 }
 
-// Data Extract: JSON
+// Data Extract: JSON - Optimized with caching and consolidated CSV generation
 let lastJsonExtractRows = [];
 let lastJsonExtractFields = [];
+let cachedJsonData = null;
+let cachedJsonInputHash = '';
+
+function hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString();
+}
+
+function generateJsonCSV(rows, fields) {
+    let csv = fields.join(',') + '\n';
+    rows.forEach(row => {
+        csv += fields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
+    });
+    return csv;
+}
+
 function extractJsonPreview() {
     let jsonText = document.getElementById('extractJsonInput').value;
     let parentCond = document.getElementById('extractJsonParent').value.trim();
@@ -176,13 +197,21 @@ function extractJsonPreview() {
     let outputTa = document.getElementById('extractJsonOutput');
     resultDiv.innerHTML = '';
     if (outputTa) outputTa.value = '';
-    // If input is empty, show an error instead of a successful preview
     if (!jsonText || !jsonText.trim()) {
         lastJsonExtractRows = [];
         lastJsonExtractFields = [];
         resultDiv.innerHTML = '<span class="text-red-600">Error: Please enter JSON to extract.</span>';
         return;
     }
+    
+    // Check if input has changed using hash (optimization for large datasets)
+    const inputHash = hashString(jsonText + parentCond + fields.join(','));
+    if (cachedJsonData && cachedJsonInputHash === inputHash && lastJsonExtractRows.length > 0) {
+        if (outputTa) outputTa.value = generateJsonCSV(lastJsonExtractRows, lastJsonExtractFields);
+        resultDiv.innerHTML = '<span class="text-green-600">Using cached data!</span>';
+        return;
+    }
+    
     try {
         let data = JSON.parse(jsonText);
         if (!Array.isArray(data)) data = [data];
@@ -197,10 +226,13 @@ function extractJsonPreview() {
                 data = data.filter(item => String(item[pField]) === pValue);
             }
         }
+        
+        cachedJsonData = data;
+        cachedJsonInputHash = inputHash;
+        
         let rows = data.map(item => {
             let row = {};
             fields.forEach(f => {
-                // Flexible custom_fields[cf_key=...].value extraction
                 const cfMatch = f.match(/^custom_fields\[cf_key=([^\]]+)\]\.value$/);
                 if (cfMatch) {
                     const cfKey = cfMatch[1];
@@ -211,14 +243,27 @@ function extractJsonPreview() {
                         row[f] = '';
                     }
                 } else if (f.includes('.')) {
-                    let [parent, child] = f.split('.');
-                    if (Array.isArray(item[parent])) {
-                        row[f] = item[parent].map(sub => sub[child]).join('\n');
-                    } else if (item[parent]) {
-                        row[f] = item[parent][child];
-                    } else {
-                        row[f] = '';
+                    const parts = f.split('.');
+                    let value = item;
+                    for (let i = 0; i < parts.length; i++) {
+                        if (!value) break;
+                        if (Array.isArray(value)) {
+                            value = value.map(el => {
+                                let v = el;
+                                for (let j = i; j < parts.length; j++) {
+                                    v = v?.[parts[j]];
+                                }
+                                return v;
+                            }).filter(v => v !== undefined).join('\n');
+                            break;
+                        } else if (typeof value === 'object') {
+                            value = value[parts[i]];
+                        } else {
+                            value = undefined;
+                            break;
+                        }
                     }
+                    row[f] = value !== undefined ? value : '';
                 } else {
                     row[f] = item[f];
                 }
@@ -227,11 +272,8 @@ function extractJsonPreview() {
         });
         lastJsonExtractRows = rows;
         lastJsonExtractFields = fields;
-        // Output to textarea
-        let csv = fields.join(',') + '\n';
-        rows.forEach(row => {
-            csv += fields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
-        });
+        
+        const csv = generateJsonCSV(rows, fields);
         if (outputTa) outputTa.value = csv;
         resultDiv.innerHTML = '<span class="text-green-600">Preview generated!</span>';
     } catch (e) {
@@ -244,10 +286,7 @@ function downloadJsonCSV() {
         document.getElementById('extractJsonResult').innerHTML = '<span class="text-red-600">No data to download. Please extract first.</span>';
         return;
     }
-    let csv = lastJsonExtractFields.join(',') + '\n';
-    lastJsonExtractRows.forEach(row => {
-        csv += lastJsonExtractFields.map(f => '"' + (row[f] !== undefined ? String(row[f]).replace(/"/g, '""') : '') + '"').join(',') + '\n';
-    });
+    const csv = generateJsonCSV(lastJsonExtractRows, lastJsonExtractFields);
     let blob = new Blob([csv], {type: 'text/csv'});
     let url = URL.createObjectURL(blob);
     let a = document.createElement('a');
@@ -637,13 +676,36 @@ function clearSQL() {
 }
 
 // Diff Checker functions
+// Debounce handler for Diff Checker to prevent excessive processing
+let diffDebounceTimer = null;
+let lastDiffCompare = { left: '', right: '', timestamp: 0 };
+const DIFF_DEBOUNCE_MS = 300;
+
 function compareDiff() {
+    // Clear previous debounce timer
+    if (diffDebounceTimer) clearTimeout(diffDebounceTimer);
+    
+    // Debounce rapid calls
+    diffDebounceTimer = setTimeout(() => {
+        performDiffComparison();
+    }, DIFF_DEBOUNCE_MS);
+}
+
+function performDiffComparison() {
     const leftTa = document.getElementById('diffLeft');
     const rightTa = document.getElementById('diffRight');
     const leftView = document.getElementById('diffLeftView');
     const rightView = document.getElementById('diffRightView');
     const leftText = leftTa ? leftTa.value : '';
     const rightText = rightTa ? rightTa.value : '';
+    
+    // Skip if texts haven't changed since last comparison
+    const currentTime = Date.now();
+    if (lastDiffCompare.left === leftText && lastDiffCompare.right === rightText && 
+        currentTime - lastDiffCompare.timestamp < 1000) {
+        return;
+    }
+    lastDiffCompare = { left: leftText, right: rightText, timestamp: currentTime };
     // We always use word-level inline diffs for modified lines
 
     // Helpers to create row elements with line number and content cell
@@ -3174,11 +3236,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        // Cache for condition evaluation to reduce redundant conversions
+        const conditionCache = new Map();
+        
+        function getCachedConditionKey(fieldValue, operator, targetValue) {
+            return `${fieldValue}|${operator}|${targetValue}`;
+        }
+        
         function applyJsonFilter() {
             const input = document.getElementById('jsonFilterInput').value;
             const arrayPath = document.getElementById('jsonArrayPath').value.trim();
             const logicOperator = document.getElementById('jsonLogicOperator').value;
             const output = document.getElementById('jsonFilterOutput');
+            
+            // Clear cache at start of new filter operation
+            conditionCache.clear();
 
             try {
                 const data = JSON.parse(input);
@@ -3203,19 +3275,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error('Selected path does not contain an array');
                 }
 
-                // Collect filter conditions
+                // Collect and validate filter conditions early
                 const conditions = [];
                 for (let i = 1; i <= jsonFilterFieldCount; i++) {
                     const fieldName = document.getElementById(`jsonFieldName-${i}`);
                     const operator = document.getElementById(`jsonOperator-${i}`);
                     const fieldValue = document.getElementById(`jsonFieldValue-${i}`);
 
-                    if (fieldName && operator && fieldValue && fieldName.value.trim()) {
-                        conditions.push({
-                            field: fieldName.value.trim(),
-                            operator: operator.value,
-                            value: fieldValue.value
-                        });
+                    if (fieldName && operator && fieldValue) {
+                        const trimmedField = fieldName.value.trim();
+                        if (trimmedField) {
+                            conditions.push({
+                                field: trimmedField,
+                                operator: operator.value,
+                                value: fieldValue.value,
+                                numValue: parseFloat(fieldValue.value)
+                            });
+                        }
                     }
                 }
 
@@ -3224,33 +3300,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-
-                // Enhanced: support filtering by nested array/object fields (e.g., batters.batter.id or topping.id)
-                function matchConditionDeep(item, fieldPath, operator, value) {
+                // Optimized: support filtering by nested array/object fields with caching
+                function matchConditionDeep(item, fieldPath, operator, cachedNumValue) {
                     const parts = fieldPath.split('.');
                     let current = item;
                     for (let i = 0; i < parts.length; i++) {
                         if (Array.isArray(current)) {
-                            // If current is array, check if any element matches the rest of the path
-                            return current.some(el => matchConditionDeep(el, parts.slice(i).join('.'), operator, value));
+                            return current.some(el => matchConditionDeep(el, parts.slice(i).join('.'), operator, cachedNumValue));
                         } else if (current && typeof current === 'object') {
                             current = current[parts[i]];
                         } else {
                             return false;
                         }
                     }
-                    // At the leaf, evaluate the condition
                     if (Array.isArray(current)) {
-                        // If leaf is array, match any element
-                        return current.some(el => evaluateCondition(el, operator, value));
+                        return current.some(el => evaluateConditionOptimized(el, operator, cachedNumValue));
                     } else {
-                        return evaluateCondition(current, operator, value);
+                        return evaluateConditionOptimized(current, operator, cachedNumValue);
                     }
                 }
 
                 const filteredData = arrayToFilter.filter(item => {
                     const results = conditions.map(condition => {
-                        return matchConditionDeep(item, condition.field, condition.operator, condition.value);
+                        return matchConditionDeep(item, condition.field, condition.operator, condition.numValue);
                     });
                     return logicOperator === 'AND' ? results.every(r => r) : results.some(r => r);
                 });
@@ -3276,37 +3348,55 @@ document.addEventListener('DOMContentLoaded', function() {
             return value;
         }
 
-        function evaluateCondition(fieldValue, operator, targetValue) {
-            // Convert values for comparison
-            const fieldStr = String(fieldValue || '').toLowerCase();
-            const targetStr = String(targetValue).toLowerCase();
-            const fieldNum = parseFloat(fieldValue);
-            const targetNum = parseFloat(targetValue);
+        function evaluateConditionOptimized(fieldValue, operator, targetNumValue) {
+            const cacheKey = getCachedConditionKey(fieldValue, operator, targetNumValue);
+            if (conditionCache.has(cacheKey)) {
+                return conditionCache.get(cacheKey);
+            }
+            
+            const fieldNum = Number(fieldValue);
+            const isFieldNumeric = !isNaN(fieldNum) && fieldValue !== '';
+            const isTargetNumeric = !isNaN(targetNumValue);
+            let result = false;
 
             switch (operator) {
                 case 'equals':
-                    return fieldValue == targetValue;
+                    result = fieldValue == targetNumValue;
+                    break;
                 case 'not_equals':
-                    return fieldValue != targetValue;
+                    result = fieldValue != targetNumValue;
+                    break;
                 case 'contains':
-                    return fieldStr.includes(targetStr);
+                    result = String(fieldValue || '').toLowerCase().includes(String(targetNumValue).toLowerCase());
+                    break;
                 case 'not_contains':
-                    return !fieldStr.includes(targetStr);
+                    result = !String(fieldValue || '').toLowerCase().includes(String(targetNumValue).toLowerCase());
+                    break;
                 case 'greater_than':
-                    return !isNaN(fieldNum) && !isNaN(targetNum) && fieldNum > targetNum;
+                    result = isFieldNumeric && isTargetNumeric && fieldNum > targetNumValue;
+                    break;
                 case 'less_than':
-                    return !isNaN(fieldNum) && !isNaN(targetNum) && fieldNum < targetNum;
+                    result = isFieldNumeric && isTargetNumeric && fieldNum < targetNumValue;
+                    break;
                 case 'greater_equal':
-                    return !isNaN(fieldNum) && !isNaN(targetNum) && fieldNum >= targetNum;
+                    result = isFieldNumeric && isTargetNumeric && fieldNum >= targetNumValue;
+                    break;
                 case 'less_equal':
-                    return !isNaN(fieldNum) && !isNaN(targetNum) && fieldNum <= targetNum;
+                    result = isFieldNumeric && isTargetNumeric && fieldNum <= targetNumValue;
+                    break;
                 case 'starts_with':
-                    return fieldStr.startsWith(targetStr);
+                    result = String(fieldValue || '').toLowerCase().startsWith(String(targetNumValue).toLowerCase());
+                    break;
                 case 'ends_with':
-                    return fieldStr.endsWith(targetStr);
+                    result = String(fieldValue || '').toLowerCase().endsWith(String(targetNumValue).toLowerCase());
+                    break;
                 default:
-                    return false;
+                    result = false;
             }
+            
+            // Cache the result
+            conditionCache.set(cacheKey, result);
+            return result;
         }
 
         function downloadJsonFilter() {
