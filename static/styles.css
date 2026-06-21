@@ -204,14 +204,20 @@ button.sidebar-menu-btn:active {
     pointer-events: auto;
 }
 
-/* Subfeature grid layout - 2 columns */
+/* Subfeature grid layout - 3 columns */
 .subfeature-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 4px;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
+    .subfeature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
     .subfeature-grid {
         grid-template-columns: 1fr;
     }
