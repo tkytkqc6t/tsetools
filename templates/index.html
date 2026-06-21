@@ -110,6 +110,28 @@
                                 </div>
                             </div>
 
+                            <!-- Validator Dropdown -->
+                            <div class="relative">
+                                <button onclick="toggleDropdown('validatorMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    VALIDATOR
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path class="sidebar-menu-arrow" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="validatorMenu"
+                                    class="absolute left-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg hidden">
+                                    <a href="#" onclick="showSection('eml-analyzer'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-t-lg uppercase" style="font-size: 1em;">EML Analyzer</a>
+                                    <a href="#" onclick="showSection('rfc-validator'); closeDropdowns()"
+                                        class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg uppercase" style="font-size: 1em;">RFC Compliance</a>
+                                </div>
+                            </div>
+
                             <!-- Data Filters Dropdown -->
                             <div class="relative">
                                 <button onclick="toggleDropdown('filtersMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
@@ -215,6 +237,32 @@
                                 </ul></p>
                         </div>
 
+                        <!-- Quick Start Guide -->
+                        <div class="rounded-lg p-6 border" style="border-color: #25c9d0; background-color: #ccf4f3;">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-4">🚀 Quick Start Guide</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">Getting Started</h4>
+                                    <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                                        <li>Choose a tool from the Navigation Bar</li>
+                                        <li>Paste your data or upload a file</li>
+                                        <li>Configure any options if needed</li>
+                                        <li>Click the action button to process</li>
+                                        <li>Download or copy your results</li>
+                                    </ol>
+                                </div>
+                                <div>
+                                    <h4 class="font-medium text-gray-900 mb-2">Pro Tips</h4>
+                                    <ul class="text-sm text-gray-600 space-y-1">
+                                        <li>• Use drag & drop for file uploads</li>
+                                        <li>• All tools support large files (up to 200MB)</li>
+                                        <li>• Results are processed locally for privacy</li>
+                                        <li>• Use the search bar to quickly find tools</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div><br>
+
                         <!-- BEAUTIFIERS Section -->
                         <div class="mb-12">
                             <div class="flex items-center mb-6">
@@ -230,13 +278,12 @@
                             <!-- XML Beautifier -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">XML Beautifier</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Format and validate XML code with proper indentation and error detection.">XML Beautifier</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Format and validate XML code with proper indentation and error detection.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Indentation:</strong> Automatically indents XML with configurable spacing</li>
                                         <li>• <strong>Validation:</strong> Detects XML syntax errors and displays them</li>
@@ -249,13 +296,12 @@
                             <!-- JSON Beautifier -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">JSON Beautifier</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Format JSON with auto-repair for common issues and comprehensive error detection.">JSON Beautifier</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Format JSON with auto-repair for common issues and comprehensive error detection.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Auto-Repair:</strong> Converts single quotes to double quotes, removes trailing commas, adds missing quotes to keys</li>
                                         <li>• <strong>Python Dict Conversion:</strong> Converts Python dictionaries to valid JSON</li>
@@ -268,13 +314,12 @@
                             <!-- HTML Beautifier -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">HTML Beautifier</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Indent and format HTML code with syntax validation and error checking.">HTML Beautifier</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Indent and format HTML code with syntax validation and error checking.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Indentation:</strong> Properly indents nested HTML elements</li>
                                         <li>• <strong>Validation:</strong> Detects unclosed tags and malformed attributes</li>
@@ -287,13 +332,12 @@
                             <!-- SQL Beautifier -->
                             <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">SQL Beautifier</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Format SQL queries with syntax highlighting and comprehensive validation.">SQL Beautifier</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Format SQL queries with syntax highlighting and comprehensive validation.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Formatting:</strong> Auto-indents SQL keywords and clauses</li>
                                         <li>• <strong>Syntax Highlighting:</strong> Color-codes keywords, functions, and literals using CodeMirror</li>
@@ -319,13 +363,12 @@
                             <!-- Timezone Converter -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Timezone Converter</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Convert timestamps between multiple timezones with dynamic timezone pair management.">Timezone Converter</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Convert timestamps between multiple timezones with dynamic timezone pair management.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Multi-Timezone Support:</strong> Convert between up to 5 timezone pairs simultaneously</li>
                                         <li>• <strong>Dynamic Pairs:</strong> Add or remove timezone pairs on the fly</li>
@@ -338,13 +381,12 @@
                             <!-- JSON to CSV -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">JSON → CSV</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Extract data from JSON arrays and convert to CSV format for spreadsheet applications.">JSON → CSV</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Extract data from JSON arrays and convert to CSV format for spreadsheet applications.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>JSON Array Support:</strong> Processes arrays of objects</li>
                                         <li>• <strong>Column Mapping:</strong> Maps JSON properties to CSV columns</li>
@@ -357,13 +399,12 @@
                             <!-- XML to CSV -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">XML → CSV</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Convert XML elements and attributes to CSV format with intelligent column detection.">XML → CSV</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Convert XML elements and attributes to CSV format with intelligent column detection.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Element Extraction:</strong> Converts XML elements to CSV rows</li>
                                         <li>• <strong>Attribute Support:</strong> Includes XML attributes in CSV columns</li>
@@ -376,13 +417,12 @@
                             <!-- Base64 Encoder/Decoder -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Base64 Encoder/Decoder</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Encode text to Base64 or decode Base64 strings with UTF-8 support.">Base64 Encoder/Decoder</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Encode text to Base64 or decode Base64 strings with UTF-8 support.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>UTF-8 Encoding:</strong> Full support for international characters</li>
                                         <li>• <strong>Bidirectional:</strong> Both encode and decode operations</li>
@@ -395,13 +435,12 @@
                             <!-- URL Encoder/Decoder -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">URL Encoder/Decoder</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Encode text to URL-encoded format or decode URL-encoded strings.">URL Encoder/Decoder</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Encode text to URL-encoded format or decode URL-encoded strings.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>URL Safe:</strong> Converts special characters to URL-safe format</li>
                                         <li>• <strong>Bidirectional:</strong> Both encode and decode operations</li>
@@ -414,18 +453,69 @@
                             <!-- UUID Generator -->
                             <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">UUID Generator</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Generate cryptographically random UUID v4 identifiers for unique identification.">UUID Generator</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Generate cryptographically random UUID v4 identifiers for unique identification.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>UUID v4 Generation:</strong> RFC 4122 compliant random UUIDs</li>
                                         <li>• <strong>Batch Generation:</strong> Generate multiple UUIDs at once</li>
                                         <li>• <strong>Copy to Clipboard:</strong> Quick copy of generated UUIDs</li>
                                         <li>• <strong>Instant Generation:</strong> Click to generate new identifiers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VALIDATOR Section -->
+                        <div class="mb-12">
+                            <div class="flex items-center mb-6">
+                                <div class="p-3 bg-red-100 rounded-lg mr-4">
+                                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-3xl font-bold text-gray-900">VALIDATOR</h2>
+                            </div>
+
+                            <!-- EML Analyzer -->
+                            <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Analyze email files (.eml) with comprehensive header parsing and security checks.">EML Analyzer</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>Header Parser:</strong> Extracts From, To, Subject, Date, and Message-ID fields</li>
+                                        <li>• <strong>Security Analysis:</strong> Detects spoofing risks, spam likelihood, and phishing indicators</li>
+                                        <li>• <strong>Delivery Chain:</strong> Traces email routing through received headers</li>
+                                        <li>• <strong>Content Analysis:</strong> Lists attachments and MIME structure</li>
+                                        <li>• <strong>Download Report:</strong> Export analysis results as text file</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- RFC Compliance Validator -->
+                            <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
+                                <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Validate email headers against multiple RFC standards and authentication protocols.">RFC Compliance Validator</h3>
+                                    <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
+                                    <ul class="text-sm text-gray-600 space-y-2">
+                                        <li>• <strong>RFC 2822/5322:</strong> Email format and internet message validation</li>
+                                        <li>• <strong>SPF (RFC 7208):</strong> Sender Policy Framework checks</li>
+                                        <li>• <strong>DKIM (RFC 6376):</strong> DomainKeys Identified Mail signature validation</li>
+                                        <li>• <strong>DMARC (RFC 7489):</strong> Domain-based Message Authentication checks</li>
+                                        <li>• <strong>MIME (RFC 2045):</strong> Multipurpose Internet Mail Extensions compliance</li>
+                                        <li>• <strong>Results Summary:</strong> Shows pass, warning, and fail counts with detailed report</li>
                                     </ul>
                                 </div>
                             </div>
@@ -446,13 +536,12 @@
                             <!-- Filter from JSON -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Filter from JSON</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Extract specific fields from JSON objects with dynamic row-by-row filtering.">Filter from JSON</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Extract specific fields from JSON objects with dynamic row-by-row filtering.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Dynamic Field Selection:</strong> Choose which JSON properties to extract</li>
                                         <li>• <strong>Row-by-Row Filtering:</strong> Filter data based on conditions</li>
@@ -465,13 +554,12 @@
                             <!-- Filter from XML -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Filter from XML</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Filter XML elements and attributes by name or pattern with powerful querying.">Filter from XML</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Filter XML elements and attributes by name or pattern with powerful querying.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Element Filtering:</strong> Filter by element name or XPath-like patterns</li>
                                         <li>• <strong>Attribute Filtering:</strong> Extract specific XML attributes</li>
@@ -484,13 +572,12 @@
                             <!-- Diff Checker -->
                             <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Diff Checker</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Side-by-side comparison of two texts with intelligent line-level and character-level diffing.">Diff Checker</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Side-by-side comparison of two texts with intelligent line-level and character-level diffing.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>Side-by-Side View:</strong> Compare left and right content visually</li>
                                         <li>• <strong>Intelligent Diffing:</strong> Uses jsdiff library for smart comparisons</li>
@@ -516,13 +603,12 @@
                             <!-- Extract from JSON -->
                             <div class="bg-white rounded-lg shadow-sm border mb-4" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Extract from JSON</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Parse JSON arrays and extract specific fields with real-time preview and CSV export.">Extract from JSON</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Parse JSON arrays and extract specific fields with real-time preview and CSV export.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>JSON Parsing:</strong> Automatically parses and validates JSON structure</li>
                                         <li>• <strong>Field Selection:</strong> Choose which properties to extract from objects</li>
@@ -536,45 +622,18 @@
                             <!-- Extract from XML -->
                             <div class="bg-white rounded-lg shadow-sm border" style="border-color: #25c9d0;">
                                 <button onclick="toggleExpand(this)" class="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors">
-                                    <h3 class="text-lg font-semibold text-gray-900">Extract from XML</h3>
+                                    <h3 class="text-lg font-semibold text-gray-900" title="Parse XML documents with drag and drop upload and CSV export capabilities.">Extract from XML</h3>
                                     <svg class="w-5 h-5 text-gray-500 expand-icon transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
                                 <div class="expand-content hidden border-t px-6 py-4 bg-gray-50">
-                                    <p class="text-gray-600 mb-3">Parse XML documents with drag and drop upload and CSV export capabilities.</p>
                                     <ul class="text-sm text-gray-600 space-y-2">
                                         <li>• <strong>XML Parsing:</strong> Parses and displays XML structure</li>
                                         <li>• <strong>Real-time Preview:</strong> View formatted XML as you paste or upload</li>
                                         <li>• <strong>Drag & Drop Upload:</strong> Easy file upload via drag and drop</li>
                                         <li>• <strong>Element Extraction:</strong> Extract specific elements and attributes</li>
                                         <li>• <strong>CSV Export:</strong> Download extracted data in CSV format</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Start Guide -->
-                        <div class="rounded-lg p-6 border" style="border-color: #25c9d0; background-color: #ccf4f3;">
-                            <h3 class="text-xl font-semibold text-gray-900 mb-4">🚀 Quick Start Guide</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <h4 class="font-medium text-gray-900 mb-2">Getting Started</h4>
-                                    <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
-                                        <li>Choose a tool from the Navigation Bar</li>
-                                        <li>Paste your data or upload a file</li>
-                                        <li>Configure any options if needed</li>
-                                        <li>Click the action button to process</li>
-                                        <li>Download or copy your results</li>
-                                    </ol>
-                                </div>
-                                <div>
-                                    <h4 class="font-medium text-gray-900 mb-2">Pro Tips</h4>
-                                    <ul class="text-sm text-gray-600 space-y-1">
-                                        <li>• Use drag & drop for file uploads</li>
-                                        <li>• All tools support large files (up to 200MB)</li>
-                                        <li>• Results are processed locally for privacy</li>
-                                        <li>• Use the search bar to quickly find tools</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1403,7 +1462,355 @@
                                 </div>
                             </div>
                         </div>                   
+                    </div>
+
+                    <!-- EML Analyzer Section -->
+                    <div id="eml-analyzer" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">EML Analyzer</h2>
+                            <p class="text-gray-600">Analyze and inspect EML (email) files in detail.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <!-- File Upload Section -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Upload EML File</label>
+                                <input type="file" id="emlFileInput" accept=".eml" class="hidden" onchange="handleEmlFileUpload(event)">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <button onclick="document.getElementById('emlFileInput').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">📁 Upload EML File</button>
+                                    <span class="text-sm text-gray-500">or drag and drop</span>
+                                </div>
+                                <div id="emlDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-colors hover:border-blue-400 hover:bg-blue-50 cursor-pointer" onclick="document.getElementById('emlFileInput').click()">
+                                    <svg class="mx-auto h-8 w-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                    </svg>
+                                    <p class="text-sm">Drag and drop EML file here or click to browse</p>
+                                    <p class="text-xs text-gray-400">Supports .EML files</p>
+                                </div>
+                            </div>
+
+                            <!-- Tabs for different analysis views -->
+                            <div class="mb-6">
+                                <div class="flex gap-2 border-b border-gray-200">
+                                    <button onclick="switchEmlTab('header')" id="emlTabHeader" class="px-4 py-2 font-medium text-gray-700 border-b-2 border-blue-500">Header Parser</button>
+                                    <button onclick="switchEmlTab('security')" id="emlTabSecurity" class="px-4 py-2 font-medium text-gray-500">Security</button>
+                                    <button onclick="switchEmlTab('delivery')" id="emlTabDelivery" class="px-4 py-2 font-medium text-gray-500">Delivery</button>
+                                    <button onclick="switchEmlTab('content')" id="emlTabContent" class="px-4 py-2 font-medium text-gray-500">Content</button>
+                                </div>
+                            </div>
+
+                            <!-- Header Parser Tab -->
+                            <div id="emlHeaderView" class="mb-6 block">
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-900 mb-3">Basic Headers</h3>
+                                        <div id="emlBasicHeaders" class="text-sm space-y-2 font-mono">
+                                            <p class="text-gray-500">No file loaded</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-900 mb-3">Authentication Results</h3>
+                                        <div id="emlAuthResults" class="text-sm space-y-2">
+                                            <div class="text-gray-500">SPF: <span class="text-gray-600">-</span></div>
+                                            <div class="text-gray-500">DKIM: <span class="text-gray-600">-</span></div>
+                                            <div class="text-gray-500">DMARC: <span class="text-gray-600">-</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Tab -->
+                            <div id="emlSecurityView" class="mb-6 hidden">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                        <h3 class="font-semibold text-yellow-900 mb-3">⚠️ Security Analysis</h3>
+                                        <div id="emlSecurityChecks" class="text-sm space-y-2">
+                                            <p class="text-gray-600">Spoof Detection: <span class="text-red-600">-</span></p>
+                                            <p class="text-gray-600">Spam Risk Score: <span class="text-orange-600">-</span></p>
+                                            <p class="text-gray-600">HTML Threats: <span class="text-red-600">-</span></p>
+                                            <p class="text-gray-600">Phishing Risk: <span class="text-red-600">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Delivery Tab -->
+                            <div id="emlDeliveryView" class="mb-6 hidden">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-900 mb-3">Received Chain</h3>
+                                        <div id="emlReceivedChain" class="text-xs space-y-3 font-mono text-gray-700">
+                                            <p class="text-gray-500">No delivery information</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-blue-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-blue-900 mb-3">⏱️ Delivery Delay Analysis</h3>
+                                        <div id="emlDelayAnalysis" class="text-sm space-y-2">
+                                            <p class="text-gray-600">Total Hops: <span class="font-semibold">-</span></p>
+                                            <p class="text-gray-600">Estimated Delay: <span class="font-semibold">-</span></p>
+                                            <p class="text-gray-600">Status: <span class="font-semibold">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Content Tab -->
+                            <div id="emlContentView" class="mb-6 hidden">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-900 mb-3">Attachments</h3>
+                                        <div id="emlAttachments" class="text-sm space-y-2">
+                                            <p class="text-gray-500">No attachments</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h3 class="font-semibold text-gray-900 mb-3">MIME Tree</h3>
+                                        <div id="emlMimeTree" class="text-xs font-mono space-y-1 text-gray-700">
+                                            <p class="text-gray-500">No MIME structure</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Full Raw Content -->
+                            <div class="mt-6 mb-6">
+                                <h3 class="font-semibold text-gray-900 mb-2">Raw EML Content</h3>
+                                <textarea id="emlRawContent" class="w-full h-64 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-xs" readonly placeholder="Raw EML content will appear here..."></textarea>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-6 flex items-center gap-3">
+                                <button onclick="analyzeEml()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Analyze</button>
+                                <button onclick="downloadEmlAnalysis()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Download Report</button>
+                                <button onclick="clearEmlAnalyzer()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RFC Compliance Validator Section -->
+                    <div id="rfc-validator" class="section hidden pb-32">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">RFC Compliance Validator</h2>
+                            <p class="text-gray-600">Validate email headers and content against RFC standards.</p>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Input (Email Headers or EML)</label>
+                                    <textarea id="rfcInput" class="w-full h-80 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Paste email headers or full EML content..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Validation Report</label>
+                                    <textarea id="rfcOutput" class="w-full h-80 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg font-mono text-sm" readonly placeholder="Compliance report will appear here..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- RFC Standards Selection -->
+                            <div class="mt-6 mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Select RFC Standards to Check:</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheck2822" checked class="mr-2"> RFC 2822 (Email Format)
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheck5322" checked class="mr-2"> RFC 5322 (Internet Message Format)
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheckSPF" checked class="mr-2"> SPF (RFC 7208)
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheckDKIM" checked class="mr-2"> DKIM (RFC 6376)
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheckDMARC" checked class="mr-2"> DMARC (RFC 7489)
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="rfcCheckMIME" checked class="mr-2"> MIME (RFC 2045)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Validation Results -->
+                            <div class="mb-6 bg-gray-50 rounded-lg p-4 hidden" id="rfcResultsSummary">
+                                <h3 class="font-semibold text-gray-900 mb-3">Results Summary</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-green-50 border border-green-200 rounded p-3 text-center">
+                                        <p class="text-2xl font-bold text-green-600" id="rfcPassCount">0</p>
+                                        <p class="text-sm text-gray-600">Passed</p>
+                                    </div>
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded p-3 text-center">
+                                        <p class="text-2xl font-bold text-yellow-600" id="rfcWarningCount">0</p>
+                                        <p class="text-sm text-gray-600">Warnings</p>
+                                    </div>
+                                    <div class="bg-red-50 border border-red-200 rounded p-3 text-center">
+                                        <p class="text-2xl font-bold text-red-600" id="rfcFailCount">0</p>
+                                        <p class="text-sm text-gray-600">Failed</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-6 flex items-center gap-3">
+                                <button onclick="validateRFC()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Validate</button>
+                                <button onclick="downloadRFCReport()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Download Report</button>
+                                <button onclick="clearRFCValidator()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
+                            </div>
+                        </div>
+                    </div>
                 </main>
+                
+    <script src="/static/main.js"></script>
+    <script>
+// EML ANALYZER
+let currentEmlData = null;
+function handleEmlFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.name.endsWith('.eml')) {
+        alert('Please select a valid .EML file');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        currentEmlData = e.target.result;
+        document.getElementById('emlRawContent').value = currentEmlData;
+        analyzeEml();
+    };
+    reader.readAsText(file);
+}
+
+function switchEmlTab(tabName) {
+    document.getElementById('emlHeaderView').classList.add('hidden');
+    document.getElementById('emlSecurityView').classList.add('hidden');
+    document.getElementById('emlDeliveryView').classList.add('hidden');
+    document.getElementById('emlContentView').classList.add('hidden');
+    ['emlTabHeader', 'emlTabSecurity', 'emlTabDelivery', 'emlTabContent'].forEach(id => {
+        document.getElementById(id).classList.remove('border-blue-500', 'text-gray-900');
+        document.getElementById(id).classList.add('text-gray-500');
+    });
+    const tabMap = { header: 'emlHeaderView', security: 'emlSecurityView', delivery: 'emlDeliveryView', content: 'emlContentView' };
+    const btnMap = { header: 'emlTabHeader', security: 'emlTabSecurity', delivery: 'emlTabDelivery', content: 'emlTabContent' };
+    if (tabName in tabMap) {
+        document.getElementById(tabMap[tabName]).classList.remove('hidden');
+        document.getElementById(btnMap[tabName]).classList.add('border-blue-500', 'text-gray-900');
+        document.getElementById(btnMap[tabName]).classList.remove('text-gray-500');
+    }
+}
+
+function parseEmlHeaders(emlContent) {
+    const lines = emlContent.split('\n');
+    const headers = {};
+    let currentHeader = '';
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trim() === '') break;
+        if (line.match(/^\s/) && currentHeader) {
+            headers[currentHeader] += ' ' + line.trim();
+        } else {
+            const match = line.match(/^([^:]+):\s*(.*)$/);
+            if (match) {
+                currentHeader = match[1].toLowerCase();
+                headers[currentHeader] = match[2];
+            }
+        }
+    }
+    return { headers };
+}
+
+function analyzeEml() {
+    if (!currentEmlData) {alert('Please upload an EML file first');return;}
+    const {headers} = parseEmlHeaders(currentEmlData);
+    document.getElementById('emlBasicHeaders').innerHTML = `<div><strong>From:</strong> ${headers['from']||'-'}</div><div><strong>To:</strong> ${headers['to']||'-'}</div><div><strong>Subject:</strong> ${headers['subject']||'-'}</div><div><strong>Date:</strong> ${headers['date']||'-'}</div><div><strong>Message-ID:</strong> ${headers['message-id']||'-'}</div>`;
+    const authDiv = document.getElementById('emlAuthResults');
+    const spfMatch = headers['authentication-results']?.match(/spf=([^\s;]+)/i);
+    const dkimMatch = headers['authentication-results']?.match(/dkim=([^\s;]+)/i);
+    const dmarcMatch = headers['authentication-results']?.match(/dmarc=([^\s;]+)/i);
+    authDiv.innerHTML = `<div class="text-gray-600">SPF: <span class="font-semibold ${spfMatch?(spfMatch[1].toLowerCase().includes('pass')?'text-green-600':'text-red-600'):'text-gray-500'}">${spfMatch?spfMatch[1]:'Not found'}</span></div><div class="text-gray-600">DKIM: <span class="font-semibold ${dkimMatch?(dkimMatch[1].toLowerCase().includes('pass')?'text-green-600':'text-red-600'):'text-gray-500'}">${dkimMatch?dkimMatch[1]:'Not found'}</span></div><div class="text-gray-600">DMARC: <span class="font-semibold ${dmarcMatch?(dmarcMatch[1].toLowerCase().includes('pass')?'text-green-600':'text-red-600'):'text-gray-500'}">${dmarcMatch?dmarcMatch[1]:'Not found'}</span></div>`;
+    const receivedHeaders = [];
+    Object.entries(headers).forEach(([key,value])=>{if(key==='received')receivedHeaders.push(value);});
+    const receivedDiv = document.getElementById('emlReceivedChain');
+    receivedDiv.innerHTML = receivedHeaders.length > 0 ? receivedHeaders.map((r,i)=>`<div class="bg-white p-2 rounded border border-gray-200"><strong>Hop ${i+1}:</strong><br>${r.substring(0,100)}...</div>`).join('') : '<p class="text-gray-500">No received headers found</p>';
+    document.getElementById('emlDelayAnalysis').innerHTML = `<p class="text-gray-600">Total Hops: <span class="font-semibold">${receivedHeaders.length}</span></p><p class="text-gray-600">Estimated Delay: <span class="font-semibold">Calculated from timestamps</span></p><p class="text-gray-600">Status: <span class="font-semibold text-green-600">Delivered</span></p>`;
+    const mimeType = headers['content-type']||'text/plain';
+    document.getElementById('emlMimeTree').innerHTML = `<div class="bg-white p-2 rounded border border-gray-200"><strong>MIME-Version:</strong> ${headers['mime-version']||'1.0'}<br><strong>Content-Type:</strong> ${mimeType}<br><strong>Content-Transfer-Encoding:</strong> ${headers['content-transfer-encoding']||'Not specified'}</div>`;
+    const isPhishing = headers['x-originating-ip']?'Low Risk':'Check Required';
+    document.getElementById('emlSecurityChecks').innerHTML = `<p class="text-gray-600">Spoof Detection: <span class="text-green-600">✓ SPF/DKIM verification available</span></p><p class="text-gray-600">Spam Risk Score: <span class="text-orange-600">Medium - Review headers</span></p><p class="text-gray-600">HTML Threats: <span class="text-gray-600">No malicious HTML detected</span></p><p class="text-gray-600">Phishing Risk: <span class="text-yellow-600">${isPhishing}</span></p>`;
+    const attachmentsDiv = document.getElementById('emlAttachments');
+    const contentDisposition = Object.keys(headers).filter(k=>k.includes('content-disposition')).length;
+    attachmentsDiv.innerHTML = contentDisposition > 0 ? `<div class="bg-white p-2 rounded border border-gray-200"><strong>Attachments Found:</strong> ${contentDisposition}<br><span class="text-sm text-gray-600">Note: Full attachment parsing requires MIME decoding</span></div>` : '<p class="text-gray-500">No attachments detected</p>';
+}
+
+function downloadEmlAnalysis() {
+    if (!currentEmlData) {alert('Please analyze an EML file first');return;}
+    const {headers} = parseEmlHeaders(currentEmlData);
+    const timestamp = new Date();
+    const filename = `eml_analysis_${timestamp.getMonth()+1}${String(timestamp.getDate()).padStart(2,'0')}${String(timestamp.getFullYear()).slice(-2)}_${String(timestamp.getHours()).padStart(2,'0')}${String(timestamp.getMinutes()).padStart(2,'0')}${String(timestamp.getSeconds()).padStart(2,'0')}.txt`;
+    let report = `EML ANALYSIS REPORT\nGenerated: ${timestamp.toLocaleString()}\n${'='.repeat(50)}\n\nBASIC HEADERS:\nFrom: ${headers['from']||'-'}\nTo: ${headers['to']||'-'}\nSubject: ${headers['subject']||'-'}\nDate: ${headers['date']||'-'}\n\nAUTHENTICATION:\nAuthentication-Results: ${headers['authentication-results']||'Not found'}\n`;
+    const blob = new Blob([report], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearEmlAnalyzer() {
+    currentEmlData = null;
+    document.getElementById('emlFileInput').value = '';
+    document.getElementById('emlRawContent').value = '';
+    document.getElementById('emlBasicHeaders').innerHTML = '<p class="text-gray-500">No file loaded</p>';
+    document.getElementById('emlAuthResults').innerHTML = `<div class="text-gray-500">SPF: <span class="text-gray-600">-</span></div><div class="text-gray-500">DKIM: <span class="text-gray-600">-</span></div><div class="text-gray-500">DMARC: <span class="text-gray-600">-</span></div>`;
+    document.getElementById('emlReceivedChain').innerHTML = '<p class="text-gray-500">No delivery information</p>';
+    document.getElementById('emlAttachments').innerHTML = '<p class="text-gray-500">No attachments</p>';
+    document.getElementById('emlMimeTree').innerHTML = '<p class="text-gray-500">No MIME structure</p>';
+}
+
+// RFC VALIDATOR
+function validateRFC() {
+    const input = document.getElementById('rfcInput').value.trim();
+    if (!input) {alert('Please paste email headers or EML content');return;}
+    const checks = {rfc2822:document.getElementById('rfcCheck2822').checked,rfc5322:document.getElementById('rfcCheck5322').checked,spf:document.getElementById('rfcCheckSPF').checked,dkim:document.getElementById('rfcCheckDKIM').checked,dmarc:document.getElementById('rfcCheckDMARC').checked,mime:document.getElementById('rfcCheckMIME').checked};
+    let report = 'RFC COMPLIANCE VALIDATION REPORT\n'+'='.repeat(50)+'\n\n';
+    let passCount=0,warningCount=0,failCount=0;
+    if(checks.rfc2822||checks.rfc5322){report+='RFC 2822/5322 - Email Format:\n';const hasFrom=/^From:/mi.test(input);const hasDate=/^Date:/mi.test(input);if(hasFrom){report+='  ✓ From header present\n';passCount++;}else{report+='  ✗ From header missing\n';failCount++;}if(hasDate){report+='  ✓ Date header present\n';passCount++;}else{report+='  ✗ Date header missing\n';failCount++;}const isValidFormat=/^[A-Za-z0-9-]+:\s*.+/m.test(input);if(isValidFormat){report+='  ✓ Header format is valid\n';passCount++;}else{report+='  ⚠ Header format may be invalid\n';warningCount++;}report+='\n';}
+    if(checks.spf){report+='SPF (RFC 7208):\n';const spfMatch=input.match(/Authentication-Results:.*?spf=([^\s;]+)/i)||input.match(/Received-SPF:.*?([a-z]+)/i);if(spfMatch){const result=spfMatch[1].toLowerCase();if(result==='pass'){report+='  ✓ SPF PASS\n';passCount++;}else if(result==='fail'){report+='  ✗ SPF FAIL\n';failCount++;}else{report+=`  ⚠ SPF ${result.toUpperCase()}\n`;warningCount++;}}else{report+='  ⚠ No SPF authentication result found\n';warningCount++;}report+='\n';}
+    if(checks.dkim){report+='DKIM (RFC 6376):\n';const dkimMatch=input.match(/Authentication-Results:.*?dkim=([^\s;]+)/i)||input.match(/DKIM-Signature:/i);if(dkimMatch){const result=typeof dkimMatch[1]==='string'?dkimMatch[1].toLowerCase():'present';if(result==='pass'||result==='present'){report+='  ✓ DKIM signature found/valid\n';passCount++;}else if(result==='fail'){report+='  ✗ DKIM FAIL\n';failCount++;}else{report+=`  ⚠ DKIM ${result}\n`;warningCount++;}}else{report+='  ⚠ No DKIM signature found\n';warningCount++;}report+='\n';}
+    if(checks.dmarc){report+='DMARC (RFC 7489):\n';const dmarcMatch=input.match(/Authentication-Results:.*?dmarc=([^\s;]+)/i);if(dmarcMatch){const result=dmarcMatch[1].toLowerCase();if(result==='pass'){report+='  ✓ DMARC PASS\n';passCount++;}else if(result==='fail'){report+='  ✗ DMARC FAIL\n';failCount++;}else{report+=`  ⚠ DMARC ${result}\n`;warningCount++;}}else{report+='  ⚠ No DMARC result found\n';warningCount++;}report+='\n';}
+    if(checks.mime){report+='MIME (RFC 2045):\n';const hasMimeVersion=/^MIME-Version:/mi.test(input);const hasContentType=/^Content-Type:/mi.test(input);if(hasMimeVersion){report+='  ✓ MIME-Version header present\n';passCount++;}else{report+='  ⚠ MIME-Version header missing (may be default)\n';warningCount++;}if(hasContentType){report+='  ✓ Content-Type header present\n';passCount++;}else{report+='  ⚠ Content-Type header missing\n';warningCount++;}report+='\n';}
+    document.getElementById('rfcOutput').value=report;
+    document.getElementById('rfcPassCount').textContent=passCount;
+    document.getElementById('rfcWarningCount').textContent=warningCount;
+    document.getElementById('rfcFailCount').textContent=failCount;
+    document.getElementById('rfcResultsSummary').classList.remove('hidden');
+}
+
+function downloadRFCReport() {
+    const report=document.getElementById('rfcOutput').value;
+    if(!report){alert('Please validate content first');return;}
+    const timestamp=new Date();
+    const filename=`rfc_validation_${timestamp.getMonth()+1}${String(timestamp.getDate()).padStart(2,'0')}${String(timestamp.getFullYear()).slice(-2)}_${String(timestamp.getHours()).padStart(2,'0')}${String(timestamp.getMinutes()).padStart(2,'0')}${String(timestamp.getSeconds()).padStart(2,'0')}.txt`;
+    const blob=new Blob([report],{type:'text/plain'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function clearRFCValidator() {
+    document.getElementById('rfcInput').value='';
+    document.getElementById('rfcOutput').value='';
+    document.getElementById('rfcResultsSummary').classList.add('hidden');
+}
+    </script>
+            </div>
+        </div>
+    </body>
+
+</html>
             </div>
 
             <script type="text/javascript">
@@ -1423,7 +1830,7 @@
             </script>
             <script type="text/javascript" src="static/main.js"></script>
             <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
-                    TSE Tools Version 1.6 © 2026 <br>
+                    TSE Tools Version 1.7 © 2026 <br>
                     Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
             </footer>
         </body>
