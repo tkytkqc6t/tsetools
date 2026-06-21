@@ -3298,7 +3298,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (conditions.length === 0) {
                     output.value = JSON.stringify(arrayToFilter, null, 2);
                     return;
-
+                }
 
                 // Optimized: support filtering by nested array/object fields with caching
                 function matchConditionDeep(item, fieldPath, operator, cachedNumValue) {
