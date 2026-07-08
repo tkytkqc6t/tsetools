@@ -233,12 +233,13 @@ function extractJsonPreview() {
         let rows = data.map(item => {
             let row = {};
             fields.forEach(f => {
-                const cfMatch = f.match(/^custom_fields\[cf_key=([^\]]+)\]\.value$/);
+                const cfMatch = f.match(/^custom_fields\[cf_key=([^\]]+)\]\.(value|key)$/);
                 if (cfMatch) {
                     const cfKey = cfMatch[1];
+                    const cfProp = cfMatch[2];
                     if (Array.isArray(item.custom_fields)) {
                         const cf = item.custom_fields.find(sub => sub.cf_key === cfKey);
-                        row[f] = cf && cf.value !== undefined ? cf.value : '';
+                        row[f] = cf && cf[cfProp] !== undefined ? cf[cfProp] : '';
                     } else {
                         row[f] = '';
                     }
