@@ -222,3 +222,125 @@ button.sidebar-menu-btn:active {
         grid-template-columns: 1fr;
     }
 }
+/* Enhanced Diff Checker Styles */
+.diff-row {
+    display: flex;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+.diff-line {
+    display: flex;
+    width: 100%;
+    min-height: 1.5rem;
+    align-items: stretch;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.diff-linenumber-wrap {
+    display: flex;
+    flex-shrink: 0;
+    width: 50px;
+    background-color: #f5f5f5;
+    border-right: 1px solid #e0e0e0;
+    user-select: none;
+    justify-content: flex-end;
+}
+
+.diff-linenumber {
+    padding: 0.25rem 0.5rem;
+    text-align: right;
+    color: #999;
+    font-size: 0.75rem;
+    flex-grow: 1;
+}
+
+.diff-cell-content {
+    flex-grow: 1;
+    padding: 0.25rem 0.5rem;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.diff-line.same {
+    background-color: #ffffff;
+}
+
+.diff-line.added {
+    background-color: #e8f5e9;
+}
+
+.diff-line.removed {
+    background-color: #ffebee;
+}
+
+.diff-line.modified {
+    background-color: #fff3e0;
+}
+
+.diff-empty-placeholder {
+    background-color: #f0f0f0;
+    color: #ccc;
+}
+
+.diff-inline-span.removed {
+    background-color: #ff9999;
+    text-decoration: line-through;
+}
+
+.diff-inline-span.added {
+    background-color: #99ff99;
+    font-weight: bold;
+}
+
+.diff-inline-span {
+    margin: 0 1px;
+}
+
+/* Unified diff view styling */
+#diffUnifiedView {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+}
+
+#diffUnifiedView {
+    counter-reset: line-number;
+}
+
+/* Statistics panel */
+#diffStats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+#diffStats > div {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+}
+
+#diffStats .text-2xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+}
+
+#diffStats .font-bold {
+    font-weight: 700;
+}
+
+#diffStats .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+/* Navigation buttons */
+#diffNavPrev:disabled,
+#diffNavNext:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+

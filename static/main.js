@@ -984,6 +984,20 @@ function performDiffComparison() {
     if (summaryEl) summaryEl.textContent = `${diffRows.length} change${diffRows.length === 1 ? '' : 's'}`;
     // highlight initial diff
     if (window.__diffNav.index >= 0) highlightDiffAtIndex(window.__diffNav.index);
+    
+    // Generate unified diff view
+    const unifiedView = document.getElementById('diffUnifiedView');
+    const currentMode = document.querySelector('input[name="diffMode"]:checked')?.value || 'side-by-side';
+    if (unifiedView) {
+        const unifiedContent = generateUnifiedDiff(leftText, rightText);
+        unifiedView.textContent = unifiedContent;
+        if (currentMode === 'unified') {
+            unifiedView.parentElement?.parentElement?.classList.remove('hidden');
+        }
+    }
+    
+    // Update statistics
+    updateDiffStats();
 }
 
 function highlightDiffAtIndex(idx) {
@@ -1061,10 +1075,19 @@ function clearDiff() {
     const rightTa = document.getElementById('diffRight');
     const leftView = document.getElementById('diffLeftView');
     const rightView = document.getElementById('diffRightView');
+    const unifiedView = document.getElementById('diffUnifiedView');
+    const statsPanel = document.getElementById('diffStats');
+    
     if (leftTa) { leftTa.value = ''; }
     if (rightTa) { rightTa.value = ''; }
     if (leftView) { leftView.innerHTML = ''; leftView.classList.add('hidden'); }
     if (rightView) { rightView.innerHTML = ''; rightView.classList.add('hidden'); }
+    if (unifiedView) { unifiedView.innerHTML = ''; }
+    if (statsPanel) { statsPanel.classList.add('hidden'); }
+    
+    // Reset navigation buttons
+    document.getElementById('diffNavPrev').disabled = true;
+    document.getElementById('diffNavNext').disabled = true;
 }
 
 
@@ -4184,3 +4207,115 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
     })();
+
+    // =====================
+    // Enhanced Diff Checker Functions
+    // =====================
+    let diffIgnoreWhitespace = false;
+
+    function switchDiffMode(mode) {
+        const sideByShide = document.getElementById('diffSideByShide');
+        const unified = document.getElementById('diffUnified');
+        if (mode === 'side-by-side') {
+            sideByShide.classList.remove('hidden');
+            unified.classList.add('hidden');
+        } else {
+            sideByShide.classList.add('hidden');
+            unified.classList.remove('hidden');
+        }
+        // Re-run comparison if already done
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        if (leftTa && rightTa && (leftTa.value || rightTa.value)) {
+            compareDiff();
+        }
+    }
+
+    function toggleIgnoreWhitespace() {
+        diffIgnoreWhitespace = document.getElementById('diffIgnoreWhitespace').checked;
+        // Re-run comparison if already done
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        if (leftTa && rightTa && (leftTa.value || rightTa.value)) {
+            compareDiff();
+        }
+    }
+
+    function updateDiffStats() {
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        if (!leftTa || !rightTa) return;
+
+        const leftLines = (leftTa.value || '').split('\n');
+        const rightLines = (rightTa.value || '').split('\n');
+
+        let addedCount = 0, removedCount = 0, modifiedCount = 0;
+        const maxLen = Math.max(leftLines.length, rightLines.length);
+
+        for (let i = 0; i < maxLen; i++) {
+            const l = leftLines[i] || '';
+            const r = rightLines[i] || '';
+            if (l === r) continue;
+            if (l === '') addedCount++;
+            else if (r === '') removedCount++;
+            else modifiedCount++;
+        }
+
+        const similarity = maxLen === 0 ? 100 : Math.round(((maxLen - (addedCount + removedCount + modifiedCount)) / maxLen) * 100);
+
+        document.getElementById('statAdded').textContent = addedCount;
+        document.getElementById('statRemoved').textContent = removedCount;
+        document.getElementById('statModified').textContent = modifiedCount;
+        document.getElementById('statSimilarity').textContent = similarity + '%';
+        document.getElementById('diffStats').classList.remove('hidden');
+
+        // Enable/disable nav buttons based on whether there are diffs
+        const hasDiffs = addedCount > 0 || removedCount > 0 || modifiedCount > 0;
+        document.getElementById('diffNavPrev').disabled = !hasDiffs;
+        document.getElementById('diffNavNext').disabled = !hasDiffs;
+    }
+
+    function generateUnifiedDiff(leftText, rightText) {
+        const leftLines = leftText.split('\n');
+        const rightLines = rightText.split('\n');
+        let diff = '--- left\n+++ right\n';
+        let leftIdx = 0, rightIdx = 0;
+        const maxLen = Math.max(leftLines.length, rightLines.length);
+
+        for (let i = 0; i < maxLen; i++) {
+            const l = leftLines[i];
+            const r = rightLines[i];
+            if (l === r) {
+                diff += ' ' + (l || '') + '\n';
+            } else {
+                if (l !== undefined) diff += '-' + l + '\n';
+                if (r !== undefined) diff += '+' + r + '\n';
+            }
+        }
+        return diff;
+    }
+
+    function downloadDiffPatch() {
+        const leftTa = document.getElementById('diffLeft');
+        const rightTa = document.getElementById('diffRight');
+        if (!leftTa || !rightTa || (!leftTa.value && !rightTa.value)) {
+            alert('Please compare texts first');
+            return;
+        }
+
+        try {
+            const patchContent = generateUnifiedDiff(leftTa.value || '', rightTa.value || '');
+            const blob = new Blob([patchContent], { type: 'text/plain;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'diff_' + new Date().toISOString().slice(0, 10) + '.patch';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            alert('Error downloading patch: ' + error.message);
+        }
+    }
+

@@ -745,27 +745,77 @@
                     <div id="diff-checker" class="section hidden pb-32">
                         <div class="mb-8">
                             <h2 class="text-2xl font-bold text-gray-900 mb-2">Diff Checker</h2>
-                            <p class="text-gray-600">Compare two texts line-by-line. Useful for quick diffs.</p>
+                            <p class="text-gray-600">Compare two texts with advanced diff visualization and export options.</p>
                         </div>
 
                         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Options Bar -->
+                            <div class="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex flex-wrap items-center gap-4 mb-3">
+                                    <label class="flex items-center gap-2">
+                                        <input type="radio" name="diffMode" value="side-by-side" checked onchange="switchDiffMode('side-by-side')"> 
+                                        <span class="text-sm font-medium">Side-by-Side</span>
+                                    </label>
+                                    <label class="flex items-center gap-2">
+                                        <input type="radio" name="diffMode" value="unified" onchange="switchDiffMode('unified')"> 
+                                        <span class="text-sm font-medium">Unified</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 ml-6">
+                                        <input type="checkbox" id="diffIgnoreWhitespace" onchange="toggleIgnoreWhitespace()"> 
+                                        <span class="text-sm font-medium">Ignore Whitespace</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Statistics Panel -->
+                            <div id="diffStats" class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 hidden">
+                                <div class="grid grid-cols-4 gap-4">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-green-600" id="statAdded">0</div>
+                                        <div class="text-xs text-gray-600">Added Lines</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-red-600" id="statRemoved">0</div>
+                                        <div class="text-xs text-gray-600">Removed Lines</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-orange-600" id="statModified">0</div>
+                                        <div class="text-xs text-gray-600">Modified Lines</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-blue-600" id="statSimilarity">100%</div>
+                                        <div class="text-xs text-gray-600">Similarity</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Side-by-Side View -->
+                            <div id="diffSideByShide" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Left</label>
                                     <textarea id="diffLeft" class="w-full h-[428px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Left text..."></textarea>
-                                    <!-- Rendered colored diff view (hidden until Compare) -->
-                                    <div id="diffLeftView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                                    <div id="diffLeftView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 0.875rem"></div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Right</label>
                                     <textarea id="diffRight" class="w-full h-[428px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="Right text..."></textarea>
-                                    <!-- Rendered colored diff view (hidden until Compare) -->
-                                    <div id="diffRightView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 1.5rem"></div>
+                                    <div id="diffRightView" class="hidden mt-2 p-2 bg-white border border-gray-200 rounded overflow-auto" style="max-height:30rem; font-size: 0.875rem"></div>
                                 </div>
                             </div>
-                            <div class="mt-6 flex items-center gap-3">
-                                <button onclick="compareDiff()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors mr-3" style="background-color: #25c9d0;">Compare</button>
+
+                            <!-- Unified View -->
+                            <div id="diffUnified" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Unified Diff Output</label>
+                                <div id="diffUnifiedView" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg overflow-auto font-mono text-sm" style="max-height:30rem; min-height:200px; white-space:pre-wrap; word-break:break-word;"></div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mt-6 flex flex-wrap items-center gap-3">
+                                <button onclick="compareDiff()" class="text-white px-4 py-2 rounded-lg font-medium transition-colors" style="background-color: #25c9d0;">Compare</button>
+                                <button id="diffNavPrev" onclick="findPrevDiff()" class="bg-gray-400 text-white px-3 py-2 rounded-lg font-medium transition-colors hover:bg-gray-500" disabled>← Prev</button>
+                                <button id="diffNavNext" onclick="findNextDiff()" class="bg-gray-400 text-white px-3 py-2 rounded-lg font-medium transition-colors hover:bg-gray-500" disabled>Next →</button>
                                 <button onclick="copyDiffResult()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Copy</button>
+                                <button onclick="downloadDiffPatch()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">Export Patch</button>
                                 <button onclick="clearDiff()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Clear</button>
                             </div>
                         </div>
