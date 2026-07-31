@@ -24,37 +24,28 @@
             <!-- Header -->
             <header class="shadow-lg border-b border-blue-500/20 sticky top-0 z-30"
                 style="background-color: #25c9d0; color: #111; font-family: figtree;">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="color: #111;">
+                <div class="w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8" style="color: #111;">
                     <div class="flex justify-between items-center h-20">
 
-                        <!-- Logo + Title -->
+                        <!-- Logo -->
                         <div class="flex items-center cursor-pointer" onclick="showSection('welcome')">
-                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
-                                <svg class="w-7 h-7 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg border border-white/40"
+                                style="background: linear-gradient(135deg, #ffffff 0%, #e6fbfc 100%);">
+                                <svg class="w-8 h-8" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="6" y="6" width="52" height="52" rx="16" fill="#25c9d0" />
+                                    <path d="M21 20H43" stroke="white" stroke-width="4" stroke-linecap="round" />
+                                    <path d="M21 32H35" stroke="white" stroke-width="4" stroke-linecap="round" />
+                                    <path d="M21 44H39" stroke="white" stroke-width="4" stroke-linecap="round" />
+                                    <path d="M43 23L51 31L43 39" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </div>
-                            <div class="ml-4" >
-                                <h1 class="text-2xl font-bold">TSE Tools Suite</h1>
-                                <p class="text-sm font-medium">Daily Used Tools</p>
+                            <div class="ml-3 flex items-center gap-2">
+                                <span class="text-lg font-black tracking-[0.25em] uppercase" style="color:#0f172a;">TSE<br>TOOLS</span>
                             </div>
                         </div>
 
                         <!-- Navigation with dropdowns -->
-                        <nav class="flex items-center space-x-8 ml-10">
-                            <!-- Home -->
-                            <a href="#" onclick="showSection('welcome')"
-                                class="text-2xl font-bold text-black hover:bg-transparent flex items-center uppercase sidebar-menu-link" style="font-size: 1.2em; color:#111"
-                                style="background-color: #25c9d0; color: #111">
-                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    style="color: #111">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h6m8-11v10a1 1 0 01-1 1h-6" />
-                                </svg>
-                                Home
-                            </a>
-
+                        <nav class="flex items-center space-x-8 ml-10 mr-8">
                             <!-- Beautifier Dropdown -->
                             <div class="relative">
                                 <button onclick="toggleDropdown('beautifierMenu')" class="text-2xl font-bold text-black flex items-center uppercase sidebar-menu-btn" style="font-size: 1.2em;">
@@ -171,15 +162,12 @@
                                         <a href="#" onclick="showSection('data-extract-xml'); closeDropdowns()" class="block px-4 py-2 text-base text-black hover:bg-gray-100 rounded-b-lg " style="font-size: 1em;">Extract from XML</a>
                                     </div>
                                 </div>
-                        </nav>
-                            
-                        <!-- Find & Replace Toggle Button -->
-                            <div class="ml-3">
-                                <button id="srToggleBtn" class="text-black bg-white/30 px-3 py-1 mr-2 rounded-lg hover:bg-white/60" title="Open Find & Replace">Find & Replace</button>
-                            </div>
 
-                        <!-- Search Bar + Search & Replace Toggle -->
-                        <div class="flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto">
+                            <!-- Find & Replace Toggle Button -->
+                            <button id="srToggleBtn" class="text-black bg-white/30 px-3 py-1 mr-2 rounded-lg hover:bg-white/60" title="Open Find & Replace">Find & Replace</button>
+
+                            <!-- Search Bar + Search & Replace Toggle -->
+                            <div class="flex items-center bg-white/20 rounded-lg px-4 py-1 ml-auto mr-4">
                             <div style="position: relative; width: 140px;">
                                 <svg class="w-5 h-5 text-black mr-2 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -191,6 +179,7 @@
                                 <div id="searchDropdown" class="absolute left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden"></div>
                             </div>
                         </div>
+                        </nav>
 
                         <!-- Search & Replace Panel (hidden by default) -->
                         <div id="srPanel" class="sr-panel hidden" aria-hidden="true">
@@ -1992,7 +1981,7 @@ function clearRFCValidator() {
             </script>
             <script type="text/javascript" src="static/main.js"></script>
             <footer class="fixed bottom-0 left-0 w-full text-center py-4 text-gray-600 border-t border-gray-200 bg-white text-sm">
-                    TSE Tools Version 1.7b © 2026 <br>
+                    TSE Tools Version 1.7c © 2026 <br>
                     Inspiration from <a href="https://www.canva.com/">Canva</a> & <a href="https://github.com/features/copilot">Github Copilot</a>
             </footer>
         </body>
