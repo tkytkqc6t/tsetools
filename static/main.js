@@ -3299,24 +3299,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     throw new Error('Selected path does not contain an array');
                 }
 
-                // Collect and validate filter conditions early
+                // Collect and validate filter conditions from DOM fields
                 const conditions = [];
-                for (let i = 1; i <= jsonFilterFieldCount; i++) {
-                    const fieldName = document.getElementById(`jsonFieldName-${i}`);
-                    const operator = document.getElementById(`jsonOperator-${i}`);
-                    const fieldValue = document.getElementById(`jsonFieldValue-${i}`);
-
-                    if (fieldName && operator && fieldValue) {
-                        const trimmedField = fieldName.value.trim();
-                        if (trimmedField) {
-                            conditions.push({
-                                field: trimmedField,
-                                operator: operator.value,
-                                value: fieldValue.value,
-                                numValue: parseFloat(fieldValue.value)
-                            });
+                const container = document.getElementById('jsonFilterFields');
+                if (container) {
+                    const fieldDivs = Array.from(container.querySelectorAll('[id^="jsonFilterField-"]'));
+                    fieldDivs.forEach(fd => {
+                        const fieldNameEl = fd.querySelector('[id^="jsonFieldName-"]');
+                        const operatorEl = fd.querySelector('[id^="jsonOperator-"]');
+                        const fieldValueEl = fd.querySelector('[id^="jsonFieldValue-"]');
+                        if (fieldNameEl && operatorEl && fieldValueEl) {
+                            const trimmedField = fieldNameEl.value.trim();
+                            if (trimmedField) {
+                                conditions.push({
+                                    field: trimmedField,
+                                    operator: operatorEl.value,
+                                    value: fieldValueEl.value,
+                                    numValue: parseFloat(fieldValueEl.value)
+                                });
+                            }
                         }
-                    }
+                    });
                 }
 
                 if (conditions.length === 0) {
@@ -3324,29 +3327,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // Optimized: support filtering by nested array/object fields with caching
-                function matchConditionDeep(item, fieldPath, operator, cachedNumValue) {
-                    const parts = fieldPath.split('.');
-                    let current = item;
-                    for (let i = 0; i < parts.length; i++) {
-                        if (Array.isArray(current)) {
-                            return current.some(el => matchConditionDeep(el, parts.slice(i).join('.'), operator, cachedNumValue));
-                        } else if (current && typeof current === 'object') {
-                            current = current[parts[i]];
-                        } else {
-                            return false;
+                // Collect values at a nested path (handles arrays/objects) and evaluate
+                function collectValuesAtPath(obj, parts) {
+                    if (parts.length === 0) return [obj];
+                    const [head, ...rest] = parts;
+                    const values = [];
+                    if (obj == null) return values;
+                    const next = obj[head];
+                    if (Array.isArray(next)) {
+                        for (const el of next) {
+                            values.push(...collectValuesAtPath(el, rest));
                         }
+                    } else if (next && typeof next === 'object') {
+                        values.push(...collectValuesAtPath(next, rest));
+                    } else if (next !== undefined) {
+                        values.push(next);
                     }
-                    if (Array.isArray(current)) {
-                        return current.some(el => evaluateConditionOptimized(el, operator, cachedNumValue));
-                    } else {
-                        return evaluateConditionOptimized(current, operator, cachedNumValue);
-                    }
+                    return values;
+                }
+
+                function matchConditionDeep(item, fieldPath, operator, targetValue, targetNumValue) {
+                    const parts = fieldPath.split('.');
+                    const values = collectValuesAtPath(item, parts);
+                    if (!values || values.length === 0) return false;
+                    return values.some(v => evaluateConditionOptimized(v, operator, targetValue, targetNumValue));
                 }
 
                 const filteredData = arrayToFilter.filter(item => {
                     const results = conditions.map(condition => {
-                        return matchConditionDeep(item, condition.field, condition.operator, condition.numValue);
+                        return matchConditionDeep(item, condition.field, condition.operator, condition.value, condition.numValue);
                     });
                     return logicOperator === 'AND' ? results.every(r => r) : results.some(r => r);
                 });
@@ -3372,29 +3381,38 @@ document.addEventListener('DOMContentLoaded', function() {
             return value;
         }
 
-        function evaluateConditionOptimized(fieldValue, operator, targetNumValue) {
-            const cacheKey = getCachedConditionKey(fieldValue, operator, targetNumValue);
+        function evaluateConditionOptimized(fieldValue, operator, targetValue, targetNumValue) {
+            const cacheKey = getCachedConditionKey(fieldValue, operator, targetValue);
             if (conditionCache.has(cacheKey)) {
                 return conditionCache.get(cacheKey);
             }
-            
+
             const fieldNum = Number(fieldValue);
             const isFieldNumeric = !isNaN(fieldNum) && fieldValue !== '';
             const isTargetNumeric = !isNaN(targetNumValue);
+            const targetStr = String(targetValue || '');
             let result = false;
 
             switch (operator) {
                 case 'equals':
-                    result = fieldValue == targetNumValue;
+                    if (isFieldNumeric && isTargetNumeric) {
+                        result = fieldNum == targetNumValue;
+                    } else {
+                        result = String(fieldValue) == targetStr;
+                    }
                     break;
                 case 'not_equals':
-                    result = fieldValue != targetNumValue;
+                    if (isFieldNumeric && isTargetNumeric) {
+                        result = fieldNum != targetNumValue;
+                    } else {
+                        result = String(fieldValue) != targetStr;
+                    }
                     break;
                 case 'contains':
-                    result = String(fieldValue || '').toLowerCase().includes(String(targetNumValue).toLowerCase());
+                    result = String(fieldValue || '').toLowerCase().includes(targetStr.toLowerCase());
                     break;
                 case 'not_contains':
-                    result = !String(fieldValue || '').toLowerCase().includes(String(targetNumValue).toLowerCase());
+                    result = !String(fieldValue || '').toLowerCase().includes(targetStr.toLowerCase());
                     break;
                 case 'greater_than':
                     result = isFieldNumeric && isTargetNumeric && fieldNum > targetNumValue;
@@ -3409,15 +3427,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     result = isFieldNumeric && isTargetNumeric && fieldNum <= targetNumValue;
                     break;
                 case 'starts_with':
-                    result = String(fieldValue || '').toLowerCase().startsWith(String(targetNumValue).toLowerCase());
+                    result = String(fieldValue || '').toLowerCase().startsWith(targetStr.toLowerCase());
                     break;
                 case 'ends_with':
-                    result = String(fieldValue || '').toLowerCase().endsWith(String(targetNumValue).toLowerCase());
+                    result = String(fieldValue || '').toLowerCase().endsWith(targetStr.toLowerCase());
                     break;
                 default:
                     result = false;
             }
-            
+
             // Cache the result
             conditionCache.set(cacheKey, result);
             return result;
