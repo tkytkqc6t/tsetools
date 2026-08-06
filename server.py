@@ -47,7 +47,10 @@ def upload_file():
     return jsonify({'success': True, 'chunk': chunk_index}), 200
 
 def main():
-    app.run(debug=True)
+    host = os.environ.get('TS_TOOLS_HOST', '127.0.0.1')
+    port = int(os.environ.get('TS_TOOLS_PORT', '5000'))
+    debug = os.environ.get('TS_TOOLS_DEBUG', '0') == '1'
+    app.run(host=host, port=port, debug=debug)
 
 if __name__ == '__main__':
     main()

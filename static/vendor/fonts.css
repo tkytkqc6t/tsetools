@@ -1,0 +1,75 @@
+﻿/* Generated local fonts.css - includes Figtree and Inter (woff2) *//* Figtree:wght@300;400;500;600;700 */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(/static/vendor/fonts/_Xmz-HUzqDCFdgfMsYiV_F7wfS-Bs_chQF5e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/static/vendor/fonts/_Xmz-HUzqDCFdgfMsYiV_F7wfS-Bs_d_QF5e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/static/vendor/fonts/_Xmz-HUzqDCFdgfMsYiV_F7wfS-Bs_dNQF5e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/static/vendor/fonts/_Xmz-HUzqDCFdgfMsYiV_F7wfS-Bs_ehR15e.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/static/vendor/fonts/_Xmz-HUzqDCFdgfMsYiV_F7wfS-Bs_eYR15e.ttf) format('truetype');
+}
+
+/* Inter:wght@300;400;500;600;700 */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(/static/vendor/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuOKfMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/static/vendor/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/static/vendor/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/static/vendor/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYMZg.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/static/vendor/fonts/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf) format('truetype');
+}
+
+
