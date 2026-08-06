@@ -1,2 +1,5 @@
 uploads/
 .github/
+download_vendor.ps1
+download_fonts.ps1
+download_packages.ps1
