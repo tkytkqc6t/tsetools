@@ -3564,6 +3564,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const logicOperator = document.getElementById('xmlLogicOperator').value;
             const output = document.getElementById('xmlFilterOutput');
 
+            conditionCache.clear();
+
             try {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(input, 'text/xml');
@@ -3618,7 +3620,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             fieldValue = childElement ? childElement.textContent : '';
                         }
 
-                        return evaluateCondition(fieldValue, condition.operator, condition.value);
+                        return evaluateConditionOptimized(
+                            fieldValue,
+                            condition.operator,
+                            condition.value,
+                            parseFloat(condition.value)
+                        );
                     });
 
                     return logicOperator === 'AND' ? results.every(r => r) : results.some(r => r);
