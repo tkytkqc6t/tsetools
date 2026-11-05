@@ -1149,8 +1149,7 @@
                                     <!-- File Upload Area -->
                                     <div class="mb-4">
                                         <div class="flex items-center gap-3">
-                                            <input type="file" id="xmlFileInput" accept=".xml" class="hidden"
-                                                onchange="handleXmlFileUpload(event)">
+                                            <input type="file" id="xmlFileInput" accept=".xml" class="hidden">
                                             <button onclick="document.getElementById('xmlFileInput').click()"
                                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                                 📁 Upload XML File
@@ -1239,8 +1238,7 @@
                                     <!-- File Upload & Drag-and-Drop Area -->
                                     <div class="mb-4">
                                         <div class="flex items-center gap-3 mb-2">
-                                            <input type="file" id="jsonFilterFileInput" accept=".json" class="hidden"
-                                                onchange="handleJsonFilterFileUpload(event)">
+                                            <input type="file" id="jsonFilterFileInput" accept=".json" class="hidden">
                                             <button onclick="document.getElementById('jsonFilterFileInput').click()"
                                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                                 📁 Upload JSON File
@@ -1339,8 +1337,7 @@
                                     <!-- File Upload & Drag-and-Drop Area -->
                                     <div class="mb-4">
                                         <div class="flex items-center gap-3 mb-2">
-                                            <input type="file" id="xmlFilterFileInput" accept=".xml" class="hidden"
-                                                onchange="handleXmlFilterFileUpload(event)">
+                                            <input type="file" id="xmlFilterFileInput" accept=".xml" class="hidden">
                                             <button onclick="document.getElementById('xmlFilterFileInput').click()"
                                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
                                                 📁 Upload XML File
@@ -1448,6 +1445,7 @@
                                                 <p class="text-sm">Drag and drop JSON file here</p>
                                                 <p class="text-xs text-gray-400">Supports .JSON file up to 200MB</p>
                                             </div>
+                                            <p id="extractJsonUploadStatus" class="hidden mb-2 text-sm" aria-live="polite"></p>
                                             <textarea id="extractJsonInput" class="w-full h-32 p-2 border rounded" placeholder="Paste JSON here..."></textarea>
                                             <textarea id="extractJsonPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>                                
                                         </div>
@@ -1497,6 +1495,7 @@
                                             <p class="text-sm">Drag and drop XML file here</p>
                                             <p class="text-xs text-gray-400">Supports .XML file up to 200MB</p>
                                         </div>
+                                        <p id="extractXmlUploadStatus" class="hidden mb-2 text-sm" aria-live="polite"></p>
                                         <textarea id="extractXmlInput" class="w-full h-32 p-2 border rounded" placeholder="Paste XML here..."></textarea>
                                         <textarea id="extractXmlPreview" class="bg-gray-50 border rounded p-2 mt-2 text-xs font-mono text-gray-700 w-full" style="max-height: 200px; overflow:auto;" readonly placeholder="Input data will appear here..."></textarea>
                                     </div>
