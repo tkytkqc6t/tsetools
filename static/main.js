@@ -1,6 +1,73 @@
 // SQL Beautifier Functions
 // sqlEditor will hold a CodeMirror instance when available
 let sqlEditor; // global
+
+function createUploadId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+        return window.crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(character) {
+        const random = Math.random() * 16 | 0;
+        return (character === 'x' ? random : (random & 0x3 | 0x8)).toString(16);
+    });
+}
+
+async function uploadLargeFileInChunks(file, onProgress) {
+    const chunkSize = 2 * 1024 * 1024;
+    const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
+    const uploadId = createUploadId();
+    let uploadedFilename = file.name;
+
+    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const formData = new FormData();
+        formData.append('file', file.slice(start, end), file.name);
+        formData.append('filename', file.name);
+        formData.append('chunkIndex', chunkIndex);
+        formData.append('totalChunks', totalChunks);
+        formData.append('totalSize', file.size);
+        formData.append('uploadId', uploadId);
+
+        const response = await fetch('/uploads', { method: 'POST', body: formData });
+        if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            throw new Error(result.error || `Upload failed on chunk ${chunkIndex + 1}`);
+        }
+        const result = await response.json();
+        if (chunkIndex === totalChunks - 1 && result.filename) {
+            uploadedFilename = result.filename;
+        }
+        if (onProgress) onProgress(end, file.size);
+    }
+
+    const response = await fetch(`/uploads/${encodeURIComponent(uploadedFilename)}`);
+    if (!response.ok) throw new Error('Upload completed, but the file could not be loaded.');
+    return response.text();
+}
+
+async function loadExtractFile(file, format) {
+    const status = document.getElementById(`extract${format}UploadStatus`);
+    const input = document.getElementById(`extract${format}Input`);
+    const updatePreview = format === 'Json' ? updateExtractJsonPreview : updateExtractXmlPreview;
+    status.classList.remove('hidden');
+    status.textContent = 'Uploading in 2 MB chunks...';
+    status.style.color = '';
+
+    try {
+        const content = await uploadLargeFileInChunks(file, (sent, total) => {
+            const percent = total ? (sent / total * 100).toFixed(1) : '100.0';
+            status.textContent = `Uploading: ${percent}%`;
+        });
+        input.value = content;
+        updatePreview();
+        status.textContent = `Loaded ${file.name}`;
+    } catch (error) {
+        status.textContent = error.message || 'File upload failed.';
+        status.style.color = 'red';
+    }
+}
+
 // File upload and preview for Data Extract JSON
 // Drag & drop for JSON
 const jsonDropZone = document.getElementById('extractJsonDropZone');
@@ -18,24 +85,14 @@ if (jsonDropZone) {
         jsonDropZone.classList.remove('border-blue-400', 'bg-blue-50');
         const file = e.dataTransfer.files[0];
         if (file && file.name.endsWith('.json')) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById('extractJsonInput').value = ev.target.result;
-                updateExtractJsonPreview();
-            };
-            reader.readAsText(file);
+            loadExtractFile(file, 'Json');
         }
     });
 }
 function handleExtractJsonFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('extractJsonInput').value = e.target.result;
-        updateExtractJsonPreview();
-    };
-    reader.readAsText(file);
+    loadExtractFile(file, 'Json');
 }
 
 function updateExtractJsonPreview() {
@@ -68,24 +125,14 @@ if (xmlDropZone) {
         xmlDropZone.classList.remove('border-blue-400', 'bg-blue-50');
         const file = e.dataTransfer.files[0];
         if (file && file.name.endsWith('.xml')) {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                document.getElementById('extractXmlInput').value = ev.target.result;
-                updateExtractXmlPreview();
-            };
-            reader.readAsText(file);
+            loadExtractFile(file, 'Xml');
         }
     });
 }
 function handleExtractXmlFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('extractXmlInput').value = e.target.result;
-        updateExtractXmlPreview();
-    };
-    reader.readAsText(file);
+    loadExtractFile(file, 'Xml');
 }
 
 function updateExtractXmlPreview() {
@@ -1115,7 +1162,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            const CHUNK_SIZE = 5 * 1024 * 1024;
+            const CHUNK_SIZE = 2 * 1024 * 1024;
+            const uploadId = createUploadId();
             function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
                 const chunk = file.slice(start, end);
                 const formData = new FormData();
@@ -1123,6 +1171,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('filename', file.name);
                 formData.append('chunkIndex', chunkIndex);
                 formData.append('totalChunks', totalChunks);
+                formData.append('totalSize', file.size);
+                formData.append('uploadId', uploadId);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/uploads', true);
                 xhr.onload = function() {
@@ -1142,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.send(formData);
             }
             function uploadFileInChunks(file, onFileComplete) {
-                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
                 let chunkIndex = 0;
                 let uploadedSize = 0;
                 function uploadNextChunk() {
@@ -1210,7 +1260,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            const CHUNK_SIZE = 5 * 1024 * 1024;
+            const CHUNK_SIZE = 2 * 1024 * 1024;
+            const uploadId = createUploadId();
             function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
                 const chunk = file.slice(start, end);
                 const formData = new FormData();
@@ -1218,6 +1269,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('filename', file.name);
                 formData.append('chunkIndex', chunkIndex);
                 formData.append('totalChunks', totalChunks);
+                formData.append('totalSize', file.size);
+                formData.append('uploadId', uploadId);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/uploads', true);
                 xhr.onload = function() {
@@ -1237,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.send(formData);
             }
             function uploadFileInChunks(file, onFileComplete) {
-                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
                 let chunkIndex = 0;
                 let uploadedSize = 0;
                 function uploadNextChunk() {
@@ -1302,7 +1355,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            const CHUNK_SIZE = 5 * 1024 * 1024;
+            const CHUNK_SIZE = 2 * 1024 * 1024;
+            const uploadId = createUploadId();
             function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
                 const chunk = file.slice(start, end);
                 const formData = new FormData();
@@ -1310,6 +1364,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('filename', file.name);
                 formData.append('chunkIndex', chunkIndex);
                 formData.append('totalChunks', totalChunks);
+                formData.append('totalSize', file.size);
+                formData.append('uploadId', uploadId);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/uploads', true);
                 xhr.onload = function() {
@@ -1330,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.send(formData);
             }
             function uploadFileInChunks(file, onFileComplete) {
-                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
                 let chunkIndex = 0;
                 let uploadedSize = 0;
                 function uploadNextChunk() {
@@ -1398,7 +1454,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let uploaded = 0;
             let successCount = 0;
             let errorCount = 0;
-            const CHUNK_SIZE = 5 * 1024 * 1024;
+            const CHUNK_SIZE = 2 * 1024 * 1024;
+            const uploadId = createUploadId();
             function uploadChunk(file, chunkIndex, totalChunks, start, end, onProgress, onComplete, onError) {
                 const chunk = file.slice(start, end);
                 const formData = new FormData();
@@ -1406,6 +1463,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('filename', file.name);
                 formData.append('chunkIndex', chunkIndex);
                 formData.append('totalChunks', totalChunks);
+                formData.append('totalSize', file.size);
+                formData.append('uploadId', uploadId);
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/uploads', true);
                 xhr.onload = function() {
@@ -1425,7 +1484,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 xhr.send(formData);
             }
             function uploadFileInChunks(file, onFileComplete) {
-                const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+                const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
                 let chunkIndex = 0;
                 let uploadedSize = 0;
                 function uploadNextChunk() {
@@ -2751,16 +2810,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const files = dt.files;
 
                 if (files.length > 0) {
-                    const file = files[0];
-
-                    // Create a fake event object for handleXmlFileUpload
-                    const fakeEvent = {
-                        target: {
-                            files: [file]
-                        }
-                    };
-
-                    handleXmlFileUpload(fakeEvent);
+                    const fileInput = document.getElementById('xmlFileInput');
+                    fileInput.files = files;
+                    fileInput.dispatchEvent(new Event('change'));
                 }
             }
         }
@@ -3176,16 +3228,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const files = dt.files;
 
                 if (files.length > 0) {
-                    const file = files[0];
-
-                    // Create a fake event object for handleJsonFileUpload
-                    const fakeEvent = {
-                        target: {
-                            files: [file]
-                        }
-                    };
-
-                    handleJsonFileUpload(fakeEvent);
+                    const fileInput = document.getElementById('jsonFileInput');
+                    fileInput.files = files;
+                    fileInput.dispatchEvent(new Event('change'));
                 }
             }
         }
@@ -3767,7 +3812,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dropZone.addEventListener('drop', e => {
                 if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     fileInput.files = e.dataTransfer.files;
-                    handleJsonFilterFileUpload({ target: fileInput });
+                    fileInput.dispatchEvent(new Event('change'));
                 }
             });
         }
@@ -3794,7 +3839,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dropZone.addEventListener('drop', e => {
                 if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     fileInput.files = e.dataTransfer.files;
-                    handleXmlFilterFileUpload({ target: fileInput });
+                    fileInput.dispatchEvent(new Event('change'));
                 }
             });
         }
