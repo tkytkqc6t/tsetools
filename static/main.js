@@ -831,45 +831,42 @@ function performDiffComparison() {
     const leftKeys = leftLines.map(normalize);
     const rightKeys = rightLines.map(normalize);
 
-    // Global walker over both lists with lookahead for small shifts/transpositions
-    let i = 0, j = 0;
-    const n = leftLines.length, m = rightLines.length;
-    while (i < n || j < m) {
-        if (i < n && j < m && leftKeys[i] === rightKeys[j]) {
-            renderPair(leftLines[i], rightLines[j], 'same', i + 1, j + 1);
-            i++; j++;
-            continue;
+    // Build an LCS table to align unchanged lines around insertions and deletions.
+    const n = leftLines.length;
+    const m = rightLines.length;
+    function buildLcsTable() {
+        const table = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+        for (let leftIndex = n - 1; leftIndex >= 0; leftIndex--) {
+            for (let rightIndex = m - 1; rightIndex >= 0; rightIndex--) {
+                if (leftKeys[leftIndex] === rightKeys[rightIndex]) {
+                    table[leftIndex][rightIndex] = table[leftIndex + 1][rightIndex + 1] + 1;
+                } else {
+                    table[leftIndex][rightIndex] = Math.max(
+                        table[leftIndex + 1][rightIndex],
+                        table[leftIndex][rightIndex + 1]
+                    );
+                }
+            }
         }
-        // transposition detection
-        if (i + 1 < n && j + 1 < m && leftKeys[i] === rightKeys[j + 1] && leftKeys[i + 1] === rightKeys[j]) {
-            renderPair(leftLines[i], rightLines[j + 1], 'same', i + 1, j + 2);
-            renderPair(leftLines[i + 1], rightLines[j], 'same', i + 2, j + 1);
-            i += 2; j += 2;
-            continue;
+        return table;
+    }
+
+    function backtrackMatches(table) {
+        const matches = [];
+        let leftIndex = 0;
+        let rightIndex = 0;
+        while (leftIndex < n && rightIndex < m) {
+            if (leftKeys[leftIndex] === rightKeys[rightIndex]) {
+                matches.push({ i: leftIndex, j: rightIndex });
+                leftIndex++;
+                rightIndex++;
+            } else if (table[leftIndex + 1][rightIndex] >= table[leftIndex][rightIndex + 1]) {
+                leftIndex++;
+            } else {
+                rightIndex++;
+            }
         }
-        // right has an extra line (insert)
-        if (i < n && j + 1 < m && leftKeys[i] === rightKeys[j + 1]) {
-            renderPair('', rightLines[j], 'added', '', j + 1);
-            j++;
-            continue;
-        }
-        // left has an extra line (delete)
-        if (i + 1 < n && j < m && leftKeys[i + 1] === rightKeys[j]) {
-            renderPair(leftLines[i], '', 'removed', i + 1, '');
-            i++;
-            continue;
-        }
-        // fallback: pair as modified or single-sided
-        if (i < n && j < m) {
-            renderPair(leftLines[i], rightLines[j], 'modified', i + 1, j + 1);
-            i++; j++;
-        } else if (i < n) {
-            renderPair(leftLines[i], '', 'removed', i + 1, '');
-            i++;
-        } else if (j < m) {
-            renderPair('', rightLines[j], 'added', '', j + 1);
-            j++;
-        }
+        return matches;
     }
 
     const dp = buildLcsTable();
@@ -4333,16 +4330,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const similarity = maxLen === 0 ? 100 : Math.round(((maxLen - (addedCount + removedCount + modifiedCount)) / maxLen) * 100);
 
-        document.getElementById('statAdded').textContent = addedCount;
-        document.getElementById('statRemoved').textContent = removedCount;
-        document.getElementById('statModified').textContent = modifiedCount;
-        document.getElementById('statSimilarity').textContent = similarity + '%';
-        document.getElementById('diffStats').classList.remove('hidden');
+        const addedStat = document.getElementById('statAdded');
+        const removedStat = document.getElementById('statRemoved');
+        const modifiedStat = document.getElementById('statModified');
+        const similarityStat = document.getElementById('statSimilarity');
+        const statsPanel = document.getElementById('diffStats');
+        if (addedStat) addedStat.textContent = addedCount;
+        if (removedStat) removedStat.textContent = removedCount;
+        if (modifiedStat) modifiedStat.textContent = modifiedCount;
+        if (similarityStat) similarityStat.textContent = similarity + '%';
+        if (statsPanel) statsPanel.classList.remove('hidden');
 
         // Enable/disable nav buttons based on whether there are diffs
         const hasDiffs = addedCount > 0 || removedCount > 0 || modifiedCount > 0;
-        document.getElementById('diffNavPrev').disabled = !hasDiffs;
-        document.getElementById('diffNavNext').disabled = !hasDiffs;
+        const prevButton = document.getElementById('diffNavPrev');
+        const nextButton = document.getElementById('diffNavNext');
+        if (prevButton) prevButton.disabled = !hasDiffs;
+        if (nextButton) nextButton.disabled = !hasDiffs;
     }
 
     function generateUnifiedDiff(leftText, rightText) {

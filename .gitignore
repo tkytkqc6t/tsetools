@@ -1,4 +1,8 @@
 uploads/
+__pycache__/
+*.py[cod]
+test_run/*
+!test_run/.gitkeep
 .github/
 download_vendor.ps1
 download_fonts.ps1
