@@ -23,6 +23,10 @@ Go to your project folder
 
 ## Installation: download and run below files
 
+The application is launched through `server.py`. The existing TSETools tools
+remain available at `/`; large JSON/XML processing is an optional enhancement at
+`/large/`, with its disk-backed API under `/api/v1`.
+
 ### macOS
 - Download 2 files:
   + install_macos.sh: run it using below commands:<br>
