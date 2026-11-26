@@ -1,42 +1,23 @@
 #!/bin/bash
-set -e  # exit on error
+set -e
 
 REPO_URL="https://github.com/tkytkqc6t/tsetools.git"
 REPO_NAME="tsetools"
-
-# 1. Clone repo if not exists
-if [ ! -d "$REPO_NAME" ]; then
-    echo "Cloning repository..."
-    git clone "$REPO_URL"
-fi
-
+if [ ! -d "$REPO_NAME" ]; then git clone "$REPO_URL"; fi
 cd "$REPO_NAME"
+if [ ! -d "venv" ]; then python3 -m venv venv; fi
+source venv/bin/activate
+python -m pip install --no-cache-dir -r requirements.txt
 
-# 2. Create virtual environment if not exists
-if [ ! -d "venv" ]; then
-    echo "Creating virtual environment..."
-    python3 -m venv venv
+if command -v npm >/dev/null 2>&1; then
+    (cd frontend && npm install && npm run build)
+else
+    echo "npm was not found; the legacy UI will be available at /."
 fi
 
-# Activate venv
-echo "Activating virtual environment..."
-source venv/bin/activate
-
-# 3. Install dependencies
-echo "Installing dependencies..."
-pip3 install --no-cache-dir -r requirements.txt
-
-# 4. Run server in background
-echo "Starting server..."
-python3 server.py &
-
-# Give server a few seconds to start
+venv/bin/python -m uvicorn fastapi_server:app --host 127.0.0.1 --port 8000 &
+SERVER_PID=$!
 sleep 3
-
-# 5. Open browser (macOS only)
-URL="http://127.0.0.1:5000"
-echo "Opening browser at $URL..."
+if [ -d "frontend/dist" ]; then URL="http://127.0.0.1:8000/large/"; else URL="http://127.0.0.1:8000/"; fi
 open "$URL"
-
-# Keep script alive so server doesn’t exit
-wait
+wait "$SERVER_PID"

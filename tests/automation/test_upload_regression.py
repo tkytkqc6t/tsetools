@@ -95,6 +95,18 @@ class UploadRegressionTests(unittest.TestCase):
         self.assertEqual(content, self.client.get("/uploads/sample.txt").data)
         self.assertFalse(os.path.exists(os.path.join(self.upload_dir.name, upload_id + ".part")))
 
+    def test_existing_filename_gets_unique_destination(self):
+        existing = os.path.join(self.upload_dir.name, "sample.txt")
+        with open(existing, "wb") as output:
+            output.write(b"previous upload")
+        response = self.post_chunk(b"new upload")
+
+        self.assertEqual(200, response.status_code)
+        uploaded_name = response.get_json()["filename"]
+        self.assertNotEqual("sample.txt", uploaded_name)
+        with open(os.path.join(self.upload_dir.name, uploaded_name), "rb") as uploaded:
+            self.assertEqual(b"new upload", uploaded.read())
+
     def test_rejects_unsupported_extension(self):
         response = self.post_chunk(b"bad", filename="payload.exe")
 

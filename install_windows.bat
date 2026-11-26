@@ -1,36 +1,22 @@
 @echo off
 setlocal
-
 set REPO_URL=https://github.com/tkytkqc6t/tsetools.git
 set REPO_NAME=tsetools
-
-REM 1. Clone repo if not exists
-if not exist %REPO_NAME% (
-    echo Cloning repository...
-    git clone %REPO_URL%
-)
-
+if not exist %REPO_NAME% git clone %REPO_URL%
 cd %REPO_NAME%
-
-REM 2. Create virtual environment if not exists
-if not exist venv (
-    echo Creating virtual environment...
-    python -m venv venv
-)
-
-REM 3. Activate venv
+if not exist venv python -m venv venv
 call venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
 
-REM 4. Install dependencies
-echo Installing dependencies...
-pip install -r requirements.txt
+where npm >nul 2>nul
+if %ERRORLEVEL% EQU 0 (
+    pushd frontend
+    call npm install
+    call npm run build
+    popd
+) else echo npm was not found; the legacy UI will be available at /.
 
-REM 5. Run server
-echo Starting server...
-start "" python server.py
-
-REM 6. Open browser
+start "TSETools FastAPI" cmd /k "venv\Scripts\python.exe -m uvicorn fastapi_server:app --host 127.0.0.1 --port 8000"
 timeout /t 3 >nul
-start http://127.0.0.1:5000
-
+if exist frontend\dist (start http://127.0.0.1:8000/large/) else (start http://127.0.0.1:8000/)
 endlocal
