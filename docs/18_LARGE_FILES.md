@@ -22,7 +22,7 @@ npm run dev
 ```
 
 For a local production-style workspace, run `npm run build` in `frontend`,
-start FastAPI with `run_large_file_windows.bat`, and open `/large/`. If the
+start FastAPI with `run_large_file_windows.bat`, and open `/`. If the
 React build is absent, the same server still serves the legacy Flask UI at `/`.
 
 For a 16 GB machine, keep one worker, reserve at least 4 GB for the OS/browser,

@@ -9,6 +9,11 @@ if [ -f "$SCRIPT_DIR/fastapi_server.py" ] && [ -f "$SCRIPT_DIR/requirements.txt"
     [ -d "$REPO_DIR/.git" ] || git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$REPO_DIR"
 fi
 cd "$REPO_DIR"
+if [ -d .git ]; then
+    git fetch origin "$REPO_BRANCH"
+    git checkout "$REPO_BRANCH" 2>/dev/null || git checkout -b "$REPO_BRANCH" "origin/$REPO_BRANCH"
+    git pull --ff-only origin "$REPO_BRANCH" || echo "Warning: could not fast-forward the local checkout; continuing with its current files."
+fi
 [ -x venv/bin/python ] || python3 -m venv venv
 venv/bin/python -m pip install -r requirements.txt
 if command -v npm >/dev/null 2>&1 && [ -f frontend/package.json ]; then (cd frontend && npm install && npm run build); fi
