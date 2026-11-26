@@ -18,6 +18,6 @@ SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
 for _ in {1..30}; do curl --silent --fail http://127.0.0.1:8000/api/v1/health >/dev/null && break; sleep 1; done
 curl --silent --fail http://127.0.0.1:8000/api/v1/health >/dev/null || { echo "The server did not become ready." >&2; exit 1; }
-[ -d frontend/dist ] && URL="http://127.0.0.1:8000/large/" || URL="http://127.0.0.1:8000/"
+URL="http://127.0.0.1:8000"
 open "$URL"
 wait "$SERVER_PID"

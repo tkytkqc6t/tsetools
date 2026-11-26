@@ -29,6 +29,6 @@ echo The server did not become ready.
 popd
 exit /b 1
 :ready
-if exist frontend\dist (start "" http://127.0.0.1:8000/large/) else (start "" http://127.0.0.1:8000/)
+start "" http://127.0.0.1:8000
 popd
 endlocal
