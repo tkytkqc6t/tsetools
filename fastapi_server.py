@@ -269,8 +269,10 @@ from fastapi.middleware.wsgi import WSGIMiddleware
 from server import app as legacy_flask_app
 _react_dist = Path(__file__).parent / "frontend" / "dist"
 if _react_dist.is_dir():
-    app.mount("/large", StaticFiles(directory=_react_dist, html=True), name="large-react")
-app.mount("/", WSGIMiddleware(legacy_flask_app))
+    app.mount("/legacy", WSGIMiddleware(legacy_flask_app), name="legacy-flask")
+    app.mount("/", StaticFiles(directory=_react_dist, html=True), name="react")
+else:
+    app.mount("/", WSGIMiddleware(legacy_flask_app), name="legacy-flask")
 
 
 if __name__ == "__main__":
