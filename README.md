@@ -35,15 +35,15 @@ Go to your project folder
 ### Windows
 - Download 2 files:
   + install_windows.bat  --> just double click to run it
-  + run_macos.bat        --> just double click to run it
+  + run_windows.bat      --> just double click to run it
 
 #### The install_* files will automatically:
 - Clone the repository
 - Create a Python virtual environment
 - Install dependencies
-- Start the server and open it in your browser at http://127.0.0.1:5000
+- Start the server and open it in your browser at http://127.0.0.1:8000
 
 #### The run_* files will automatically:
-- Pull the latest code from the main branch
+- Clone the repository from the main branch when no checkout exists
 - Activate the virtual environment
-- Start the server and open it in your browser at http://127.0.0.1:5000
+- Start the server and open it in your browser at http://127.0.0.1:8000
