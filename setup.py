@@ -7,11 +7,16 @@ setup(
     author="Your Name",
     packages=find_packages(),
     install_requires=[
-        "Flask"
+        "Flask",
+        "fastapi>=0.115,<1",
+        "uvicorn[standard]>=0.30,<1",
+        "python-multipart>=0.0.9,<1",
+        "ijson>=3.3,<4",
     ],
     entry_points={
         "console_scripts": [
-            "tsetools=server:main"
+            "tsetools=server:main",
+            "tsetools-large=fastapi_server:app"
         ]
     },
     include_package_data=True,

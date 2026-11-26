@@ -1,31 +1,11 @@
 #!/bin/bash
-set -e  # exit on error
-
-REPO_NAME="tsetools"
-URL="http://127.0.0.1:5000"
-
-# Go into repo folder
-cd "$REPO_NAME" || { echo "Repository $REPO_NAME not found! Run install_macos.sh first."; exit 1; }
-
-# Pull latest code from main
-echo "Pulling latest changes from main..."
-git checkout main
-git pull origin main
-
-# Activate venv
-echo "Activating virtual environment..."
-source venv/bin/activate
-
-# Run server in background
-echo "Starting server..."
-python3 server.py &
-
-# Give server a few seconds to start
+set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+if [ -x "venv/bin/python" ]; then PYTHON="venv/bin/python"; else PYTHON="python3"; fi
+"$PYTHON" -m uvicorn fastapi_server:app --host 127.0.0.1 --port 8000 &
+SERVER_PID=$!
 sleep 3
-
-# Open browser (macOS only)
-echo "Opening browser at $URL..."
+if [ -d "frontend/dist" ]; then URL="http://127.0.0.1:8000/large/"; else URL="http://127.0.0.1:8000/"; fi
 open "$URL"
-
-# Keep script alive so server doesn’t exit
-wait
+wait "$SERVER_PID"

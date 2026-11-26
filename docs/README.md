@@ -181,9 +181,9 @@ TSE Tools Suite is regularly updated with:
 
 ## Version Information
 
-- **Current Version:** 1.7c
+- **Current Version:** 1.8a
 - **Last Updated:** 2024
-- **All Tools:** v1.7c
+- **All Tools:** v1.8a
 
 ---
 

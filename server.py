@@ -66,9 +66,19 @@ def upload_file():
         if os.path.getsize(temp_filepath) != total_size:
             os.remove(temp_filepath)
             return jsonify({'error': 'Uploaded file size mismatch'}), 400
-        final_filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+        safe_filename = secure_filename(filename)
+        final_filepath = os.path.join(app.config['UPLOAD_FOLDER'], safe_filename)
+        # On Windows, replacing an existing file can fail when a browser or
+        # another tool still has it open. Preserve both uploads by selecting a
+        # unique destination instead of overwriting the existing file.
+        if os.path.exists(final_filepath):
+            stem, extension = os.path.splitext(safe_filename)
+            final_filepath = os.path.join(
+                app.config['UPLOAD_FOLDER'],
+                f'{stem}_{upload_id[:8]}{extension}',
+            )
         os.replace(temp_filepath, final_filepath)
-        return jsonify({'success': True, 'filename': secure_filename(filename)}), 200
+        return jsonify({'success': True, 'filename': os.path.basename(final_filepath)}), 200
     return jsonify({'success': True, 'chunk': chunk_index}), 200
 
 def main():
