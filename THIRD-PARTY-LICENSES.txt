@@ -1,0 +1,21 @@
+Third-party licenses included in this release
+===========================================
+
+This project includes third-party frontend and JS/CSS/font dependencies bundled for offline use. The following files include the full license texts; preserve these when redistributing.
+
+- Tailwind CSS (local file: static/vendor/tailwind.min.js) — MIT License
+  License text: licenses/tailwind.MIT.txt
+
+- CodeMirror (local files: static/vendor/codemirror.min.js, codemirror.min.css, theme) — MIT License
+  License text: licenses/codemirror.MIT.txt
+
+- jsdiff / diff (local file: static/vendor/diff.min.js) — BSD-style License
+  License text: licenses/diff.BSD-3-clause.txt
+
+- Inter font (local files: static/vendor/fonts/*) — SIL Open Font License 1.1
+  License text: licenses/inter.OFL.txt
+
+- Figtree font (local files: static/vendor/fonts/*) — SIL Open Font License 1.1
+  License text: licenses/figtree.OFL.txt
+
+If you need a different license format (single SPDX file, or separate per-package notices), tell me and I will generate it.
