@@ -85,14 +85,7 @@ def main():
     host = os.environ.get('TS_TOOLS_HOST', '127.0.0.1')
     port = int(os.environ.get('TS_TOOLS_PORT', '5000'))
     debug = os.environ.get('TS_TOOLS_DEBUG', '0') == '1'
-    # server.py is the product entrypoint.  The FastAPI service extends this
-    # Flask app with the optional large-file API, while preserving all existing
-    # routes and the normal homepage at '/'.
-    if os.environ.get('TS_TOOLS_DISABLE_LARGE_API', '0') != '1':
-        import uvicorn
-        uvicorn.run('fastapi_server:app', host=host, port=port, log_level='debug' if debug else 'info')
-    else:
-        app.run(host=host, port=port, debug=debug)
+    app.run(host=host, port=port, debug=debug)
 
 if __name__ == '__main__':
     main()

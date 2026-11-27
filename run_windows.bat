@@ -3,7 +3,7 @@ setlocal EnableExtensions EnableDelayedExpansion
 set "REPO_URL=https://github.com/tkytkqc6t/tsetools.git"
 set "REPO_BRANCH=main"
 set "SCRIPT_DIR=%~dp0"
-if exist "%SCRIPT_DIR%server.py" (set "REPO_DIR=%SCRIPT_DIR%") else (
+if exist "%SCRIPT_DIR%fastapi_server.py" (set "REPO_DIR=%SCRIPT_DIR%") else (
     set "REPO_DIR=%SCRIPT_DIR%tsetools"
     if not exist "!REPO_DIR!\.git" git clone --branch %REPO_BRANCH% --single-branch "%REPO_URL%" "!REPO_DIR!"
 )
@@ -24,7 +24,7 @@ if %ERRORLEVEL% EQU 0 if exist frontend\package.json (
     call npm run build
     popd
 )
-start "TSETools" cmd /c "set TS_TOOLS_PORT=8000&& venv\Scripts\python.exe server.py"
+start "TSETools FastAPI" cmd /c "venv\Scripts\python.exe -m uvicorn fastapi_server:app --host 127.0.0.1 --port 8000"
 for /l %%i in (1,1,30) do (
     curl --silent --fail http://127.0.0.1:8000/api/v1/health >nul 2>nul
     if not errorlevel 1 goto ready

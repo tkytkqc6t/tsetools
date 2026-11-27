@@ -1,8 +1,8 @@
-"""Large-file enhancement API for TSETools.
+"""Disk-backed FastAPI service for large JSON/XML documents.
 
-The normal TSETools application remains the legacy Flask application served at
-``/``.  This module adds the disk-backed large-file API under ``/api/v1`` and
-the optional large-file workspace under ``/large``.
+The legacy Flask application is intentionally left intact for the existing small
+document tools.  This service is the large-file path: request bodies are written
+to disk, parsers stream records, and results are also written to disk.
 """
 
 from __future__ import annotations
@@ -263,15 +263,16 @@ def download_job(job_id: str) -> FileResponse:
     return FileResponse(job["output"], media_type="text/csv", filename="tsetools-result.csv")
 
 
-# Keep all existing TSETools routes available at the normal application root.
-# The large-file UI is explicitly opt-in at /large; it must not replace the
-# existing TSETools workspace.
+# Keep all existing TSETools routes available when this is the local launcher.
+# API routes are registered above, so the catch-all mount does not shadow them.
 from fastapi.middleware.wsgi import WSGIMiddleware
 from server import app as legacy_flask_app
 _react_dist = Path(__file__).parent / "frontend" / "dist"
 if _react_dist.is_dir():
-    app.mount("/large", StaticFiles(directory=_react_dist, html=True), name="large-react")
-app.mount("/", WSGIMiddleware(legacy_flask_app), name="legacy-flask")
+    app.mount("/legacy", WSGIMiddleware(legacy_flask_app), name="legacy-flask")
+    app.mount("/", StaticFiles(directory=_react_dist, html=True), name="react")
+else:
+    app.mount("/", WSGIMiddleware(legacy_flask_app), name="legacy-flask")
 
 
 if __name__ == "__main__":
